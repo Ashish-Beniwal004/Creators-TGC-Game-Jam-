@@ -30,7 +30,7 @@ func _ready():
 	_setup_inputs()
 	attack_ray.add_exception(self)
 	current_hp = max_hp
-	ui.update_ui(current_hp, level, xp)
+	ui.update_ui(current_hp, level, xp, xp_to_next_level)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _setup_inputs():
@@ -133,7 +133,7 @@ func add_xp(amount: int):
 	xp += amount
 	if xp >= xp_to_next_level:
 		_level_up()
-	ui.update_ui(current_hp, level, xp)
+	ui.update_ui(current_hp, level, xp, xp_to_next_level)
 
 func _level_up():
 	xp -= xp_to_next_level
@@ -142,13 +142,15 @@ func _level_up():
 	base_damage += 5
 	max_hp += 20
 	current_hp = max_hp
+	if ui.has_method("show_level_up"):
+		ui.show_level_up()
 	print("Leveled up to ", level, "! Base damage is now ", base_damage)
 
 func take_damage(amount: int):
 	if is_dead:
 		return
 	current_hp -= amount
-	ui.update_ui(current_hp, level, xp)
+	ui.update_ui(current_hp, level, xp, xp_to_next_level)
 	print("Player took ", amount, " damage. HP: ", current_hp)
 	if current_hp <= 0:
 		die()

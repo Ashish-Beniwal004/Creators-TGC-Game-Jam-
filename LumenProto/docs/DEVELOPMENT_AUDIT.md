@@ -564,3 +564,19 @@ Implemented:
 Files modified:
 - scenes/player/Player.tscn
 - scripts/player/Player.gd
+
+### 17C — Enemy Visuals
+Status: PASS
+Implemented:
+- Reviewed `assets/` and confirmed ZERO actual image assets exist.
+- Maintained procedurally generated placeholders per the Phase 17A audit.
+- Added `EnemyAura` to `Enemy.tscn` to visually distinguish the base enemy with corrupted red energy.
+Files modified:
+- scenes/enemies/Enemy.tscn
+
+### 17D — Bosses
+Status: PASS
+Implemented:
+- Reviewed `assets/` and confirmed ZERO actual image assets exist for boss sprites.
+- `ColdBlood` and `Overgrowth` retain their massive Phase 16F `BossAura` logic which correctly establishes their presence without mutating gameplay logic.
+- Maintained boss health bar UI, collision capsules, and all gameplay mechanics as previously audited.

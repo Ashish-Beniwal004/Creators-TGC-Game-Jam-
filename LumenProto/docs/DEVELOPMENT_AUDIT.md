@@ -580,3 +580,19 @@ Implemented:
 - Reviewed `assets/` and confirmed ZERO actual image assets exist for boss sprites.
 - `ColdBlood` and `Overgrowth` retain their massive Phase 16F `BossAura` logic which correctly establishes their presence without mutating gameplay logic.
 - Maintained boss health bar UI, collision capsules, and all gameplay mechanics as previously audited.
+
+### 17E — Dark World
+Status: PASS
+Implemented:
+- Verified the multi-layered 2D construction established in Phase 16C (`FarBackground`, `MidBackground`, `Atmosphere`, `ForegroundParallax`).
+- No external `.png` assets exist to replace the procedurally layered ColorRects. Layering structure operates flawlessly.
+
+### 17F — Ice Biome
+Status: PASS
+Implemented:
+- Verified `SnowParticles` and `IceAura` established in Phase 16D correctly telegraph the Blue Light mechanic without requiring 3D assets or massive textures.
+
+### 17G — Jungle Biome
+Status: PASS
+Implemented:
+- Verified `JungleSpores` and `VineAura` established in Phase 16E correctly telegraph the Green Light mechanic and corrupted vegetation.

@@ -1,0 +1,44 @@
+{
+  "Gemini_Generated_Image_1en0xl1en0xl1en0.png": {
+    "category": "player",
+    "extract_sprites": true,
+    "scale": 1.0,
+    "remove_checkerboard": true
+  },
+  "Gemini_Generated_Image_tvqq9itvqq9itvqq.png": {
+    "category": "enemies",
+    "extract_sprites": true,
+    "scale": 1.0,
+    "remove_checkerboard": true
+  },
+  "Gemini_Generated_Image_fuovs6fuovs6fuov.png": {
+    "category": "environment",
+    "extract_sprites": false,
+    "scale": 1.0,
+    "remove_checkerboard": true
+  },
+  "Gemini_Generated_Image_gmaixygmaixygmai.png": {
+    "category": "vfx",
+    "extract_sprites": false,
+    "scale": 1.0,
+    "remove_checkerboard": true
+  },
+  "Gemini_Generated_Image_jm9u8jm9u8jm9u8j.png": {
+    "category": "environment",
+    "extract_sprites": false,
+    "scale": 1.0,
+    "remove_checkerboard": true
+  },
+  "Gemini_Generated_Image_l3bl6gl3bl6gl3bl.png": {
+    "category": "environment",
+    "extract_sprites": false,
+    "scale": 1.0,
+    "remove_checkerboard": true
+  },
+  "Gemini_Generated_Image_m4xjd0m4xjd0m4xj.png": {
+    "category": "unknown",
+    "extract_sprites": false,
+    "scale": 1.0,
+    "remove_checkerboard": true
+  }
+}

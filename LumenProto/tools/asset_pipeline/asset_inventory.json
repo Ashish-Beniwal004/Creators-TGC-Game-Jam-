@@ -1,0 +1,74 @@
+{
+  "Gemini_Generated_Image_1en0xl1en0xl1en0 (3).png": {
+    "file": "Gemini_Generated_Image_1en0xl1en0xl1en0 (3).png",
+    "width": 1376,
+    "height": 768,
+    "format": "PNG",
+    "has_alpha": false,
+    "category": "unknown"
+  },
+  "Gemini_Generated_Image_1en0xl1en0xl1en0.png": {
+    "file": "Gemini_Generated_Image_1en0xl1en0xl1en0.png",
+    "width": 2752,
+    "height": 1536,
+    "format": "PNG",
+    "has_alpha": true,
+    "category": "player"
+  },
+  "Gemini_Generated_Image_fuovs6fuovs6fuov.png": {
+    "file": "Gemini_Generated_Image_fuovs6fuovs6fuov.png",
+    "width": 2752,
+    "height": 1536,
+    "format": "PNG",
+    "has_alpha": true,
+    "category": "environment"
+  },
+  "Gemini_Generated_Image_gmaixygmaixygmai.png": {
+    "file": "Gemini_Generated_Image_gmaixygmaixygmai.png",
+    "width": 2752,
+    "height": 1536,
+    "format": "PNG",
+    "has_alpha": true,
+    "category": "vfx"
+  },
+  "Gemini_Generated_Image_jm9u8jm9u8jm9u8j (2).png": {
+    "file": "Gemini_Generated_Image_jm9u8jm9u8jm9u8j (2).png",
+    "width": 1376,
+    "height": 768,
+    "format": "PNG",
+    "has_alpha": false,
+    "category": "unknown"
+  },
+  "Gemini_Generated_Image_jm9u8jm9u8jm9u8j.png": {
+    "file": "Gemini_Generated_Image_jm9u8jm9u8jm9u8j.png",
+    "width": 2752,
+    "height": 1536,
+    "format": "PNG",
+    "has_alpha": true,
+    "category": "environment"
+  },
+  "Gemini_Generated_Image_l3bl6gl3bl6gl3bl.png": {
+    "file": "Gemini_Generated_Image_l3bl6gl3bl6gl3bl.png",
+    "width": 2752,
+    "height": 1536,
+    "format": "PNG",
+    "has_alpha": true,
+    "category": "environment"
+  },
+  "Gemini_Generated_Image_m4xjd0m4xjd0m4xj.png": {
+    "file": "Gemini_Generated_Image_m4xjd0m4xjd0m4xj.png",
+    "width": 2752,
+    "height": 1536,
+    "format": "PNG",
+    "has_alpha": true,
+    "category": "unknown"
+  },
+  "Gemini_Generated_Image_tvqq9itvqq9itvqq.png": {
+    "file": "Gemini_Generated_Image_tvqq9itvqq9itvqq.png",
+    "width": 2752,
+    "height": 1536,
+    "format": "PNG",
+    "has_alpha": true,
+    "category": "enemies"
+  }
+}

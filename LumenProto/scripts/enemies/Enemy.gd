@@ -1,24 +1,26 @@
-extends CharacterBody3D
+extends CharacterBody2D
 
 enum State { IDLE, CHASE, ATTACK, HIT, DEATH }
 var current_state: State = State.IDLE
 
 @export var max_hp: int = 30
-@export var movement_speed: float = 3.0
-@export var attack_damage: int = 15
-@export var attack_range: float = 2.0
+@export var movement_speed: float = 150.0
+@export var attack_damage: int = 10
+@export var attack_range: float = 40.0
 @export var attack_cooldown: float = 1.5
-@export var detection_range: float = 20.0
+@export var detection_range: float = 400.0
 @export var xp_reward: int = 10
 
 var current_hp: int = 30
-var gravity: float = 12.0
+var gravity: float = 1200.0
 var can_attack: bool = true
 
-var player: Node3D = null
+var player: Node2D = null
+@onready var sprite = $Sprite2D
 
 func _ready():
 	current_hp = max_hp
+	add_to_group("enemy")
 
 func _physics_process(delta):
 	if current_state == State.DEATH:
@@ -30,26 +32,24 @@ func _physics_process(delta):
 			player = players[0]
 			
 	if not is_on_floor():
-		velocity.y -= gravity * delta
+		velocity.y += gravity * delta
 		
 	_handle_states(delta)
 	move_and_slide()
 
-func _handle_states(_delta):
+func _handle_states(delta):
 	if not player:
 		current_state = State.IDLE
 		velocity.x = move_toward(velocity.x, 0, movement_speed)
-		velocity.z = move_toward(velocity.z, 0, movement_speed)
 		return
 		
 	var dist = global_position.distance_to(player.global_position)
 	
 	if current_state == State.HIT:
 		velocity.x = move_toward(velocity.x, 0, movement_speed)
-		velocity.z = move_toward(velocity.z, 0, movement_speed)
 		return
 		
-	if dist <= attack_range:
+	if dist <= attack_range and can_attack:
 		current_state = State.ATTACK
 	elif dist <= detection_range:
 		current_state = State.CHASE
@@ -59,23 +59,17 @@ func _handle_states(_delta):
 	match current_state:
 		State.IDLE:
 			velocity.x = move_toward(velocity.x, 0, movement_speed)
-			velocity.z = move_toward(velocity.z, 0, movement_speed)
 		State.CHASE:
 			_chase_player()
 		State.ATTACK:
 			velocity.x = move_toward(velocity.x, 0, movement_speed)
-			velocity.z = move_toward(velocity.z, 0, movement_speed)
 			_attack_player()
 
 func _chase_player():
-	var direction = global_position.direction_to(player.global_position)
-	direction.y = 0
-	if direction.length_squared() > 0.001:
-		direction = direction.normalized()
-		velocity.x = direction.x * movement_speed
-		velocity.z = direction.z * movement_speed
-		var look_target = global_position + direction
-		look_at(look_target, Vector3.UP)
+	var direction = sign(player.global_position.x - global_position.x)
+	if direction != 0:
+		velocity.x = direction * movement_speed
+		sprite.flip_h = direction > 0
 
 func _attack_player():
 	if not can_attack:
@@ -105,4 +99,3 @@ func die():
 	if player and player.has_method("add_xp"):
 		player.add_xp(xp_reward)
 	queue_free()
-

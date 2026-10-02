@@ -1,26 +1,41 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scripts/combat/Projectile.gd" id="1_proj"]
+[ext_resource type="Script" path="res://scripts/projectiles/Projectile.gd" id="1_script"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_proj"]
-radius = 0.2
+[sub_resource type="CircleShape2D" id="CircleShape2D_proj"]
+radius = 8.0
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_proj"]
-albedo_color = Color(1, 1, 0, 1)
-emission_enabled = true
-emission = Color(1, 1, 0, 1)
-emission_energy_multiplier = 2.0
+[sub_resource type="Gradient" id="Gradient_proj"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 
-[sub_resource type="SphereMesh" id="SphereMesh_proj"]
-material = SubResource("StandardMaterial3D_proj")
-radius = 0.2
-height = 0.4
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_proj"]
+gradient = SubResource("Gradient_proj")
+width = 16
+height = 16
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8, 0.8)
 
-[node name="Projectile" type="Area3D"]
-script = ExtResource("1_proj")
+[sub_resource type="Gradient" id="Gradient_light"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("SphereShape3D_proj")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_light"]
+gradient = SubResource("Gradient_light")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8, 0.8)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereMesh_proj")
+[node name="Projectile" type="Area2D"]
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_proj")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_proj")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+texture = SubResource("GradientTexture2D_light")

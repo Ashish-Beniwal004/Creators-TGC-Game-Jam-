@@ -1,19 +1,41 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/IceProjectile.gd" id="1_script"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_iceproj"]
-radius = 0.3
+[sub_resource type="CircleShape2D" id="CircleShape2D_iceproj"]
+radius = 8.0
 
-[sub_resource type="SphereMesh" id="SphereMesh_iceproj"]
-radius = 0.3
-height = 0.6
+[sub_resource type="Gradient" id="Gradient_iceproj"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.8, 0.9, 1, 1, 0.2, 0.5, 1, 0)
 
-[node name="IceProjectile" type="Area3D"]
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_iceproj"]
+gradient = SubResource("Gradient_iceproj")
+width = 16
+height = 16
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8, 0.8)
+
+[sub_resource type="Gradient" id="Gradient_light"]
+colors = PackedColorArray(0.2, 0.5, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_light"]
+gradient = SubResource("Gradient_light")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8, 0.8)
+
+[node name="IceProjectile" type="Area2D"]
 script = ExtResource("1_script")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("SphereShape3D_iceproj")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_iceproj")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereMesh_iceproj")
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_iceproj")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+texture = SubResource("GradientTexture2D_light")

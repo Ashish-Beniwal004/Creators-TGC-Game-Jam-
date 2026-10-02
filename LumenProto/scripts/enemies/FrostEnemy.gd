@@ -1,27 +1,29 @@
-extends CharacterBody3D
+extends CharacterBody2D
 
 enum State { IDLE, CHASE, ATTACK, RETREAT, HIT, DEATH }
 var current_state: State = State.IDLE
 
 @export var max_hp: int = 50
-@export var movement_speed: float = 2.5
-@export var retreat_speed: float = 1.5
+@export var movement_speed: float = 120.0
+@export var retreat_speed: float = 80.0
 @export var attack_damage: int = 20
-@export var attack_range: float = 2.5
+@export var attack_range: float = 45.0
 @export var attack_cooldown: float = 2.0
-@export var detection_range: float = 25.0
+@export var detection_range: float = 400.0
 @export var retreat_duration: float = 1.5
 @export var xp_reward: int = 25
 
 var current_hp: int = 50
-var gravity: float = 12.0
+var gravity: float = 1200.0
 var can_attack: bool = true
 var retreat_timer: float = 0.0
 
-var player: Node3D = null
+var player: Node2D = null
+@onready var sprite = $Sprite2D
 
 func _ready():
 	current_hp = max_hp
+	add_to_group("enemy")
 
 func _physics_process(delta):
 	if current_state == State.DEATH:
@@ -33,7 +35,7 @@ func _physics_process(delta):
 			player = players[0]
 			
 	if not is_on_floor():
-		velocity.y -= gravity * delta
+		velocity.y += gravity * delta
 		
 	_handle_states(delta)
 	move_and_slide()
@@ -42,14 +44,12 @@ func _handle_states(delta):
 	if not player:
 		current_state = State.IDLE
 		velocity.x = move_toward(velocity.x, 0, movement_speed)
-		velocity.z = move_toward(velocity.z, 0, movement_speed)
 		return
 		
 	var dist = global_position.distance_to(player.global_position)
 	
 	if current_state == State.HIT:
 		velocity.x = move_toward(velocity.x, 0, movement_speed)
-		velocity.z = move_toward(velocity.z, 0, movement_speed)
 		return
 		
 	if current_state == State.RETREAT:
@@ -70,33 +70,23 @@ func _handle_states(delta):
 	match current_state:
 		State.IDLE:
 			velocity.x = move_toward(velocity.x, 0, movement_speed)
-			velocity.z = move_toward(velocity.z, 0, movement_speed)
 		State.CHASE:
 			_chase_player()
 		State.ATTACK:
 			velocity.x = move_toward(velocity.x, 0, movement_speed)
-			velocity.z = move_toward(velocity.z, 0, movement_speed)
 			_attack_player()
 
 func _chase_player():
-	var direction = global_position.direction_to(player.global_position)
-	direction.y = 0
-	if direction.length_squared() > 0.001:
-		direction = direction.normalized()
-		velocity.x = direction.x * movement_speed
-		velocity.z = direction.z * movement_speed
-		var look_target = global_position + direction
-		look_at(look_target, Vector3.UP)
+	var direction = sign(player.global_position.x - global_position.x)
+	if direction != 0:
+		velocity.x = direction * movement_speed
+		sprite.flip_h = direction > 0
 
 func _retreat_from_player():
-	var direction = player.global_position.direction_to(global_position)
-	direction.y = 0
-	if direction.length_squared() > 0.001:
-		direction = direction.normalized()
-		velocity.x = direction.x * retreat_speed
-		velocity.z = direction.z * retreat_speed
-		var look_target = global_position + direction * -1
-		look_at(look_target, Vector3.UP)
+	var direction = sign(global_position.x - player.global_position.x)
+	if direction != 0:
+		velocity.x = direction * retreat_speed
+		sprite.flip_h = direction < 0
 
 func _attack_player():
 	if not can_attack:
@@ -118,7 +108,6 @@ func take_damage(amount: int):
 		return
 		
 	current_hp -= amount
-	print("Frost Enemy took ", amount, " damage. HP: ", current_hp)
 	
 	if current_hp <= 0:
 		die()

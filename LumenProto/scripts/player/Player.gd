@@ -1,192 +1,177 @@
-extends CharacterBody3D
+extends CharacterBody2D
 
-@export var max_hp: int = 100
+var max_hp: int = 100
 var current_hp: int = 100
+
+var speed: float = 300.0
+var jump_velocity: float = -450.0
+var gravity: float = 1200.0
+
 var level: int = 1
 var xp: int = 0
 var xp_to_next_level: int = 10
-var base_damage: int = 10
-var attack_cooldown: float = 0.5
-var can_attack: bool = true
-var projectile_cooldown: float = 1.0
-var can_fire_projectile: bool = true
-var speed: float = 6.0
-var acceleration: float = 10.0
-var deceleration: float = 12.0
-var jump_velocity: float = 5.0
-var gravity: float = 12.0
-var max_fall_speed: float = -40.0
-var mouse_sensitivity: float = 0.005
+
 var is_dead: bool = false
 var is_slowed: bool = false
-var original_speed: float = 6.0
-var original_acceleration: float = 10.0
+var original_speed: float = 300.0
 
-@onready var camera = $Camera3D
-@onready var attack_ray = $Camera3D/AttackRay
+var can_attack: bool = true
+var attack_cooldown: float = 0.5
+var can_fire_projectile: bool = true
+var projectile_cooldown: float = 1.0
+
+var facing_right: bool = true
+
 @onready var ui = $UI
 @onready var light_power = $LightPower
-@onready var lumen_light = $LumenLight
-
-const PROJECTILE_SCENE = preload("res://scenes/projectiles/Projectile.tscn")
+@onready var sprite = $Sprite2D
+@onready var melee_area = $MeleeArea
 
 func _ready():
 	add_to_group("player")
 	_setup_inputs()
-	attack_ray.add_exception(self)
 	current_hp = max_hp
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	original_speed = speed
-	original_acceleration = acceleration
 
 func _setup_inputs():
 	var inputs = {
-		"move_forward": KEY_W,
-		"move_backward": KEY_S,
-		"move_left": KEY_A,
-		"move_right": KEY_D,
-		"jump": KEY_SPACE,
-		"fire_projectile": KEY_Q,
-		"interact": KEY_E
+		"move_left": [KEY_A, KEY_LEFT],
+		"move_right": [KEY_D, KEY_RIGHT],
+		"jump": [KEY_SPACE, KEY_W, KEY_UP],
+		"attack_light": [MOUSE_BUTTON_LEFT],
+		"fire_projectile": [KEY_Q, MOUSE_BUTTON_RIGHT],
+		"interact": [KEY_E],
+		"restart": [KEY_R]
 	}
+	
 	for action in inputs:
 		if not InputMap.has_action(action):
 			InputMap.add_action(action)
-			var ev = InputEventKey.new()
-			ev.physical_keycode = inputs[action]
-			InputMap.action_add_event(action, ev)
-	
-	if not InputMap.has_action("attack"):
-		InputMap.add_action("attack")
-		var ev = InputEventMouseButton.new()
-		ev.button_index = MOUSE_BUTTON_LEFT
-		InputMap.action_add_event("attack", ev)
-
-func _unhandled_input(event):
-	if is_dead:
-		if event is InputEventKey and event.pressed and event.keycode == KEY_R:
-			get_tree().reload_current_scene()
-		return
-
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		rotate_y(-event.relative.x * mouse_sensitivity)
-		camera.rotate_x(-event.relative.y * mouse_sensitivity)
-		camera.rotation.x = clamp(camera.rotation.x, -PI/2, PI/2)
-	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		for key in inputs[action]:
+			var event = null
+			if key in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
+				event = InputEventMouseButton.new()
+				event.button_index = key
+			else:
+				event = InputEventKey.new()
+				event.keycode = key
+			InputMap.action_add_event(action, event)
 
 func _physics_process(delta):
-	_sync_light_visuals()
-
 	if is_dead:
-		velocity.x = move_toward(velocity.x, 0, deceleration * delta)
-		velocity.z = move_toward(velocity.z, 0, deceleration * delta)
-		if not is_on_floor():
-			velocity.y -= gravity * delta
-		move_and_slide()
 		return
-
+		
 	if not is_on_floor():
-		velocity.y -= gravity * delta
-		if velocity.y < max_fall_speed:
-			velocity.y = max_fall_speed
+		velocity.y += gravity * delta
 
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
 
-	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
-	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	var direction = Input.get_axis("move_left", "move_right")
 	if direction:
-		velocity.x = lerp(velocity.x, direction.x * speed, acceleration * delta)
-		velocity.z = lerp(velocity.z, direction.z * speed, acceleration * delta)
+		velocity.x = direction * speed
+		if direction > 0:
+			facing_right = true
+			sprite.flip_h = false
+			melee_area.position.x = abs(melee_area.position.x)
+		elif direction < 0:
+			facing_right = false
+			sprite.flip_h = true
+			melee_area.position.x = -abs(melee_area.position.x)
 	else:
-		velocity.x = lerp(velocity.x, 0.0, deceleration * delta)
-		velocity.z = lerp(velocity.z, 0.0, deceleration * delta)
+		velocity.x = move_toward(velocity.x, 0, speed)
 
 	move_and_slide()
 
-	if Input.is_action_just_pressed("attack"):
-		_perform_melee_attack()
+func _process(delta):
+	_sync_light_visuals()
+
+func _sync_light_visuals():
+	if has_node("PointLight2D") and light_power:
+		var point_light = $PointLight2D
+		point_light.color = light_power.get_light_color_value()
+		point_light.energy = 1.0 + (light_power.current_level * 0.5)
+		point_light.texture_scale = 3.0 + (light_power.current_level * 0.5)
+
+func _input(event):
+	if is_dead:
+		if event.is_action_pressed("restart"):
+			get_tree().reload_current_scene()
+		return
 		
-	if Input.is_action_just_pressed("fire_projectile"):
+	if event.is_action_pressed("attack_light"):
+		_perform_light_attack()
+	elif event.is_action_pressed("fire_projectile"):
 		_fire_projectile()
-		
-	if Input.is_action_just_pressed("interact"):
+	elif event.is_action_pressed("interact"):
 		_interact()
 
-func _interact():
-	var interactables = get_tree().get_nodes_in_group("interactable")
-	for obj in interactables:
-		if "interaction_range" in obj and obj.global_position.distance_to(global_position) <= obj.interaction_range:
-			if obj.has_method("on_interact"):
-				obj.on_interact(self)
-
-func _perform_melee_attack():
+func _perform_light_attack():
 	if not can_attack:
 		return
 	can_attack = false
-	if attack_ray.is_colliding():
-		var target = attack_ray.get_collider()
-		if target and target.has_method("take_damage"):
-			target.take_damage(base_damage)
 	
+	var base_damage = 10
+	var damage = int(base_damage * light_power.get_damage_multiplier())
+	
+	for body in melee_area.get_overlapping_bodies():
+		if body.is_in_group("enemy") or body.is_in_group("boss"):
+			if body.has_method("take_damage"):
+				body.take_damage(damage)
+				
 	get_tree().create_timer(attack_cooldown).timeout.connect(func(): can_attack = true)
 
 func _fire_projectile():
 	if not can_fire_projectile:
 		return
 	can_fire_projectile = false
-	var proj = PROJECTILE_SCENE.instantiate()
-	get_tree().current_scene.add_child(proj)
-	proj.global_transform = camera.global_transform
-	# Offset it a bit forward so it doesn't spawn exactly inside the camera
-	proj.global_position += -proj.global_transform.basis.z * 0.5
-	proj.damage = int(base_damage * 1.5 * light_power.get_damage_multiplier())
-	if "speed" in proj:
-		proj.speed = proj.speed * light_power.get_speed_multiplier()
-	proj.scale = Vector3.ONE * light_power.get_size_multiplier()
 	
-	if proj.has_node("MeshInstance3D"):
-		var mat = StandardMaterial3D.new()
-		mat.albedo_color = light_power.get_light_color_value()
-		mat.emission_enabled = true
-		mat.emission = light_power.get_light_color_value()
-		proj.get_node("MeshInstance3D").material_override = mat
-	
+	var proj_scene = load("res://scenes/projectiles/Projectile.tscn")
+	if proj_scene:
+		var proj = proj_scene.instantiate()
+		get_tree().current_scene.add_child(proj)
+		proj.global_position = global_position
+		proj.direction = Vector2(1, 0) if facing_right else Vector2(-1, 0)
+		
+		var base_damage = 5
+		proj.damage = int(base_damage * 1.5 * light_power.get_damage_multiplier())
+		if "speed" in proj:
+			proj.speed = proj.speed * light_power.get_speed_multiplier()
+		proj.scale = Vector2.ONE * light_power.get_size_multiplier()
+		
+		if proj.has_node("Sprite2D"):
+			proj.get_node("Sprite2D").modulate = light_power.get_light_color_value()
+			
+		if proj.has_node("PointLight2D"):
+			proj.get_node("PointLight2D").color = light_power.get_light_color_value()
+		
 	get_tree().create_timer(projectile_cooldown).timeout.connect(func(): can_fire_projectile = true)
 
-func _sync_light_visuals():
-	if lumen_light and light_power:
-		lumen_light.light_energy = light_power.get_light_energy()
-		lumen_light.light_color = light_power.get_light_color_value()
+func _interact():
+	var interactables = get_tree().get_nodes_in_group("interactable")
+	for obj in interactables:
+		if global_position.distance_to(obj.global_position) < 100.0:
+			if obj.has_method("on_interact"):
+				obj.on_interact(self)
 
 func add_xp(amount: int):
 	xp += amount
+	
 	while xp >= xp_to_next_level:
-		_level_up()
+		xp -= xp_to_next_level
+		level += 1
+		xp_to_next_level = int(xp_to_next_level * 1.5)
+		if ui.has_method("show_level_up"):
+			ui.show_level_up()
+			
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
-
-func _level_up():
-	xp -= xp_to_next_level
-	level += 1
-	xp_to_next_level = int(xp_to_next_level * 1.5)
-	base_damage += 5
-	max_hp += 20
-	current_hp = max_hp
-	if ui.has_method("show_level_up"):
-		ui.show_level_up()
-	print("Leveled up to ", level, "! Base damage is now ", base_damage)
 
 func take_damage(amount: int):
 	if is_dead:
 		return
 	current_hp -= amount
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
-	print("Player took ", amount, " damage. HP: ", current_hp)
 	if current_hp <= 0:
 		die()
 
@@ -195,17 +180,11 @@ func apply_slow(duration: float, speed_multiplier: float = 0.5):
 		return
 	is_slowed = true
 	speed = original_speed * speed_multiplier
-	acceleration = original_acceleration * 0.5
 	get_tree().create_timer(duration).timeout.connect(func():
 		speed = original_speed
-		acceleration = original_acceleration
 		is_slowed = false
 	)
 
 func die():
 	is_dead = true
-	print("Player died!")
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	if ui.has_method("show_death_screen"):
-		ui.show_death_screen()
-
+	ui.show_death_screen()

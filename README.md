@@ -3,10 +3,10 @@
 **Lumen** is a dark-fantasy action platformer centered around the mechanics of light. The player controls a mysterious light-bearing character exploring a corrupted, monochrome world. Light is utilized as both a core gameplay mechanic and a visual storytelling device as the player fights corrupted creatures, navigates ruined environments, and gradually restores color and light to the world.
 
 ## Team: Creators
-* **Ashish Beniwal** - ashish.beniwal@students.iiit.ac.in
-* **Ishit Agarwal** - ishit.agarwal@students.iiit.ac.in
-* **Princy Patel** - princy.patel@students.iiit.ac.in
-* **Moiesha Gupta** - moiesha.gupta@students.iiit.ac.in
+* **Ashish Beniwal** - ashish.beniwal@students.iiit.ac.in (IndieConnect ID: ashishbeniwal)
+* **Ishit Agarwal** - ishit.agarwal@students.iiit.ac.in (IndieConnect ID: hyperterror)
+* **Princy Patel** - princy.patel@students.iiit.ac.in (IndieConnect ID: tinchu)
+* **Moiesha Gupta** - moiesha.gupta@students.iiit.ac.in (IndieConnect ID: ascian)
 
 ## GameJam Themes
 

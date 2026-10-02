@@ -7,6 +7,15 @@ var speed: float = 300.0
 var jump_velocity: float = -450.0
 var gravity: float = 1200.0
 
+var acceleration: float = 2000.0
+var friction: float = 2500.0
+var fall_gravity_multiplier: float = 1.5
+
+var coyote_time: float = 0.1
+var jump_buffer_time: float = 0.1
+var coyote_timer: float = 0.0
+var jump_buffer_timer: float = 0.0
+
 var level: int = 1
 var xp: int = 0
 var xp_to_next_level: int = 10
@@ -65,15 +74,33 @@ func _physics_process(delta):
 	if is_dead:
 		return
 		
-	if not is_on_floor():
-		velocity.y += gravity * delta
+	if is_on_floor():
+		coyote_timer = coyote_time
+	else:
+		coyote_timer -= delta
+		
+	if Input.is_action_just_pressed("jump"):
+		jump_buffer_timer = jump_buffer_time
+	else:
+		jump_buffer_timer -= delta
 
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if not is_on_floor():
+		if velocity.y > 0:
+			velocity.y += gravity * fall_gravity_multiplier * delta
+		else:
+			velocity.y += gravity * delta
+			
+		if Input.is_action_just_released("jump") and velocity.y < 0:
+			velocity.y *= 0.5
+
+	if jump_buffer_timer > 0.0 and coyote_timer > 0.0:
 		velocity.y = jump_velocity
+		jump_buffer_timer = 0.0
+		coyote_timer = 0.0
 
 	var direction = Input.get_axis("move_left", "move_right")
 	if direction:
-		velocity.x = direction * speed
+		velocity.x = move_toward(velocity.x, direction * speed, acceleration * delta)
 		if direction > 0:
 			facing_right = true
 			visual.scale.x = 1
@@ -83,7 +110,7 @@ func _physics_process(delta):
 			visual.scale.x = -1
 			melee_area.position.x = -abs(melee_area.position.x)
 	else:
-		velocity.x = move_toward(velocity.x, 0, speed)
+		velocity.x = move_toward(velocity.x, 0, friction * delta)
 
 	if is_on_floor():
 		if direction == 0:
@@ -98,8 +125,32 @@ func _physics_process(delta):
 
 	move_and_slide()
 
+var shake_intensity = 0.0
+var shake_decay = 5.0
+
 func _process(delta):
 	_sync_light_visuals()
+	if shake_intensity > 0:
+		shake_intensity = lerp(shake_intensity, 0.0, shake_decay * delta)
+		if has_node("Camera2D"):
+			$Camera2D.offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * shake_intensity
+	else:
+		if has_node("Camera2D"):
+			$Camera2D.offset = Vector2.ZERO
+
+func _apply_shake(intensity: float):
+	shake_intensity = intensity
+
+func _hit_stop(duration: float = 0.05):
+	Engine.time_scale = 0.1
+	await get_tree().create_timer(duration * 0.1, true, false, true).timeout
+	Engine.time_scale = 1.0
+
+func _flash_sprite(spr):
+	var orig_color = spr.modulate
+	spr.modulate = Color(10, 10, 10, 1)
+	var tween = get_tree().create_tween()
+	tween.tween_property(spr, "modulate", orig_color, 0.1)
 
 func _sync_light_visuals():
 	if has_node("PointLight2D") and light_power:
@@ -134,11 +185,19 @@ func _perform_light_attack():
 	
 	var base_damage = 10
 	var damage = int(base_damage * light_power.get_damage_multiplier())
+	var hit_something = false
 	
 	for body in melee_area.get_overlapping_bodies():
 		if body.is_in_group("enemy") or body.is_in_group("boss"):
 			if body.has_method("take_damage"):
 				body.take_damage(damage)
+				hit_something = true
+				if body.has_node("Sprite2D"):
+					_flash_sprite(body.get_node("Sprite2D"))
+					
+	if hit_something:
+		_apply_shake(8.0)
+		_hit_stop(0.04)
 				
 	get_tree().create_timer(attack_cooldown).timeout.connect(func(): can_attack = true)
 
@@ -195,6 +254,15 @@ func take_damage(amount: int):
 		return
 	current_hp -= amount
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
+	
+	_apply_shake(15.0)
+	_hit_stop(0.08)
+	
+	var orig = visual.modulate
+	visual.modulate = Color(10, 0, 0, 1)
+	var tween = get_tree().create_tween()
+	tween.tween_property(visual, "modulate", orig, 0.2)
+	
 	if current_hp <= 0:
 		die()
 	else:

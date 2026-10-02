@@ -58,7 +58,7 @@ func _handle_states(_delta):
 	var dist = global_position.distance_to(player.global_position)
 	
 	if dist <= leap_range and can_leap and is_on_floor():
-		current_state = State.LEAP
+		current_state = State.IDLE
 		_leap_at_player()
 	elif dist <= detection_range:
 		current_state = State.CHASE
@@ -79,11 +79,19 @@ func _chase_player():
 
 func _leap_at_player():
 	can_leap = false
-	var direction = sign(player.global_position.x - global_position.x)
-	if direction != 0:
-		sprite.flip_h = direction > 0
-	velocity.y = leap_jump_velocity
-	velocity.x = direction * leap_speed
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "scale", Vector2(1.2, 0.6), 0.3)
+	get_tree().create_timer(0.3).timeout.connect(func():
+		if current_state != State.DEATH:
+			current_state = State.LEAP
+			var direction = sign(player.global_position.x - global_position.x)
+			if direction != 0:
+				sprite.flip_h = direction > 0
+			velocity.y = leap_jump_velocity
+			velocity.x = direction * leap_speed
+			var reset = get_tree().create_tween()
+			reset.tween_property(sprite, "scale", Vector2.ONE, 0.1)
+	)
 	
 	get_tree().create_timer(attack_cooldown).timeout.connect(func(): can_leap = true)
 
@@ -114,4 +122,12 @@ func die():
 	current_state = State.DEATH
 	if player and player.has_method("add_xp"):
 		player.add_xp(xp_reward)
-	queue_free()
+		
+	set_collision_layer_value(1, false)
+	set_collision_mask_value(1, false)
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "modulate:a", 0.0, 0.3)
+	if has_node("JungleAura"):
+		$JungleAura.emitting = false
+	tween.tween_callback(queue_free)

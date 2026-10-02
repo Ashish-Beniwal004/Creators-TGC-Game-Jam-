@@ -76,8 +76,16 @@ func _attack_player():
 		return
 	
 	can_attack = false
-	if player.has_method("take_damage"):
-		player.take_damage(attack_damage)
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "scale", Vector2(1.2, 0.8), 0.3)
+	tween.tween_callback(func():
+		if player and global_position.distance_to(player.global_position) <= attack_range + 20:
+			if player.has_method("take_damage"):
+				player.take_damage(attack_damage)
+		var reset_tween = get_tree().create_tween()
+		reset_tween.tween_property(sprite, "scale", Vector2.ONE, 0.1)
+	)
 		
 	get_tree().create_timer(attack_cooldown).timeout.connect(func(): can_attack = true)
 
@@ -98,4 +106,12 @@ func die():
 	current_state = State.DEATH
 	if player and player.has_method("add_xp"):
 		player.add_xp(xp_reward)
-	queue_free()
+		
+	set_collision_layer_value(1, false)
+	set_collision_mask_value(1, false)
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "modulate:a", 0.0, 0.3)
+	if has_node("EnemyAura"):
+		$EnemyAura.emitting = false
+	tween.tween_callback(queue_free)

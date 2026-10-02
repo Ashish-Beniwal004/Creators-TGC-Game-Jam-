@@ -98,7 +98,7 @@ func _choose_attack(dist: float):
 		current_state = State.SUMMON
 		_perform_summon()
 	else:
-		current_state = State.LEAP
+		current_state = State.IDLE
 		_perform_leap()
 		
 	var cooldown = attack_cooldown
@@ -115,27 +115,47 @@ func _chase_player():
 		sprite.flip_h = direction > 0
 
 func _perform_melee():
-	action_timer = 0.6
-	if player.has_method("take_damage"):
-		player.take_damage(attack_damage)
+	action_timer = 0.8
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "scale", Vector2(1.3, 0.9), 0.3)
+	get_tree().create_timer(0.3).timeout.connect(func():
+		if current_state != State.DEATH and player and global_position.distance_to(player.global_position) < melee_range + 20:
+			if player.has_method("take_damage"):
+				player.take_damage(attack_damage)
+		var reset = get_tree().create_tween()
+		reset.tween_property(sprite, "scale", Vector2.ONE, 0.2)
+	)
 
 func _perform_leap():
-	var direction = sign(player.global_position.x - global_position.x)
-	if direction != 0:
-		sprite.flip_h = direction > 0
-	velocity.y = leap_jump_velocity
-	velocity.x = direction * leap_speed
-	if is_phase_2:
-		velocity.x *= 1.2
+	action_timer = 0.6
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "scale", Vector2(1.2, 0.6), 0.4)
+	get_tree().create_timer(0.4).timeout.connect(func():
+		if current_state != State.DEATH:
+			current_state = State.LEAP
+			var direction = sign(player.global_position.x - global_position.x)
+			if direction != 0:
+				sprite.flip_h = direction > 0
+			velocity.y = leap_jump_velocity
+			velocity.x = direction * leap_speed
+			if is_phase_2:
+				velocity.x *= 1.2
+			var reset = get_tree().create_tween()
+			reset.tween_property(sprite, "scale", Vector2.ONE, 0.1)
+	)
 
 func _earthquake_landing():
 	# AOE damage slightly larger than melee on landing
 	if player and global_position.distance_to(player.global_position) < 120.0:
 		if player.has_method("take_damage"):
 			player.take_damage(int(attack_damage * 0.8))
+			if player.has_method("apply_shake"):
+				player.apply_shake(10.0)
 
 func _perform_summon():
 	action_timer = 1.0
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "modulate", Color(1.5, 2.5, 1.5), 0.4)
 	get_tree().create_timer(0.4).timeout.connect(func():
 		if current_state != State.DEATH and player:
 			# Temporary root spike at player's current ground position
@@ -147,6 +167,8 @@ func _perform_summon():
 					player.take_damage(attack_damage)
 				if player.has_method("apply_slow"):
 					player.apply_slow(1.5, 0.4)
+		var reset = get_tree().create_tween()
+		reset.tween_property(sprite, "modulate", Color.WHITE, 0.2)
 	)
 
 func _check_player_collision():
@@ -183,11 +205,20 @@ func die():
 	var ui = get_tree().get_first_node_in_group("ui")
 	if ui and ui.has_method("hide_boss_health"):
 		ui.hide_boss_health()
-	
-	var core_scene = load("res://scenes/items/GreenCore.tscn")
-	if core_scene:
-		var core = core_scene.instantiate()
-		get_parent().add_child(core)
-		core.global_position = global_position
 		
-	queue_free()
+	set_collision_layer_value(1, false)
+	set_collision_mask_value(1, false)
+	
+	if has_node("BossAura"):
+		$BossAura.emitting = false
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(func():
+		var core_scene = load("res://scenes/items/GreenCore.tscn")
+		if core_scene:
+			var core = core_scene.instantiate()
+			get_parent().add_child(core)
+			core.global_position = global_position
+		queue_free()
+	)

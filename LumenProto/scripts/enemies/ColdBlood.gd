@@ -105,12 +105,24 @@ func _chase_player():
 		sprite.flip_h = direction > 0
 
 func _perform_melee():
-	action_timer = 0.5
-	if player.has_method("take_damage"):
-		player.take_damage(attack_damage)
+	action_timer = 0.8
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "modulate", Color(2.0, 2.0, 3.0), 0.3)
+	get_tree().create_timer(0.3).timeout.connect(func():
+		if current_state != State.DEATH and player and global_position.distance_to(player.global_position) < melee_range + 20:
+			if player.has_method("take_damage"):
+				player.take_damage(attack_damage)
+		var reset = get_tree().create_tween()
+		reset.tween_property(sprite, "modulate", Color.WHITE, 0.2)
+	)
 
 func _perform_breath():
 	action_timer = 1.2
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "scale", Vector2(1.2, 0.8), 0.4)
+	if has_node("BossAura"):
+		$BossAura.scale_amount_min = 5.0
+		$BossAura.scale_amount_max = 10.0
 	get_tree().create_timer(0.6).timeout.connect(func():
 		if current_state != State.DEATH and player and global_position.distance_to(player.global_position) < melee_range * 2.5:
 			var dir_to_player = sign(player.global_position.x - global_position.x)
@@ -120,10 +132,17 @@ func _perform_breath():
 					player.take_damage(attack_damage)
 				if player.has_method("apply_slow"):
 					player.apply_slow(2.0, 0.3)
+		var reset = get_tree().create_tween()
+		reset.tween_property(sprite, "scale", Vector2.ONE, 0.2)
+		if has_node("BossAura"):
+			$BossAura.scale_amount_min = 2.0
+			$BossAura.scale_amount_max = 5.0
 	)
 
 func _perform_projectile():
 	action_timer = 0.8
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "modulate", Color(0.5, 0.8, 1.5), 0.3)
 	get_tree().create_timer(0.3).timeout.connect(func():
 		if current_state != State.DEATH and player:
 			var proj_scene = load("res://scenes/enemies/IceProjectile.tscn")
@@ -133,6 +152,8 @@ func _perform_projectile():
 				proj.global_position = global_position + Vector2(0, -20)
 				proj.direction = global_position.direction_to(player.global_position).normalized()
 				proj.damage = int(attack_damage * 0.8)
+		var reset = get_tree().create_tween()
+		reset.tween_property(sprite, "modulate", Color.WHITE, 0.2)
 	)
 
 func take_damage(amount: int):
@@ -160,11 +181,20 @@ func die():
 	var ui = get_tree().get_first_node_in_group("ui")
 	if ui and ui.has_method("hide_boss_health"):
 		ui.hide_boss_health()
-	
-	var core_scene = load("res://scenes/items/BlueCore.tscn")
-	if core_scene:
-		var core = core_scene.instantiate()
-		get_parent().add_child(core)
-		core.global_position = global_position
 		
-	queue_free()
+	set_collision_layer_value(1, false)
+	set_collision_mask_value(1, false)
+	
+	if has_node("BossAura"):
+		$BossAura.emitting = false
+	
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(func():
+		var core_scene = load("res://scenes/items/BlueCore.tscn")
+		if core_scene:
+			var core = core_scene.instantiate()
+			get_parent().add_child(core)
+			core.global_position = global_position
+		queue_free()
+	)

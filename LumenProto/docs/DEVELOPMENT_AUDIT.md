@@ -634,3 +634,15 @@ Status: PASS
 Implemented:
 - Ran global regex grep for `Area3D|CharacterBody3D|StaticBody3D|CollisionShape3D|Camera3D|RayCast3D|MeshInstance3D|OmniLight3D|GPUParticles3D|Vector3`.
 - Result: 0 matches in `.tscn` and `.gd` files. 3D eradication is complete and maintained.
+
+PHASE 17 - POLISH, FEEL & PRESENTATION
+### 17A-17M — Comprehensive Gameplay Polish
+Status: PASS
+Implemented:
+- See `docs/PHASE_17_POLISH_AUDIT.md` for full breakdown.
+- Polished movement (coyote time, jump buffer, acceleration, variable height).
+- Polished combat (hit-stop, camera shake, visual flashing).
+- Enhanced enemy and boss readability with telegraphing tweens on all attack states.
+- Reverified 2D architecture constraint with 0 matches for 3D nodes.
+Files created:
+- docs/PHASE_17_POLISH_AUDIT.md

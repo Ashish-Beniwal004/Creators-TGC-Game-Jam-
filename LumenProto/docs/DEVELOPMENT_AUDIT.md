@@ -530,3 +530,17 @@ Implemented:
 - Light scales dynamically (+0.5 per level), making the acquisition of Blue and Green cores tangibly push back the darkness.
 Files modified:
 - scripts/player/Player.gd
+
+### 16H — UI & Dialogue Polish
+Status: PASS
+Implemented:
+- Adjusted `HPLabel` and `LevelLabel` in `UI.tscn` to utilize muted dark-fantasy tones (crimson and silver-gray) rather than stark unstyled white.
+- Maintained the transparent `ColorRect` backing for dialogue to ensure environmental context is not lost during narrative moments.
+Files modified:
+- scenes/ui/UI.tscn
+
+### 16I — Final Integration Audit
+Status: PASS
+Implemented:
+- Conducted full pass over player dependencies, boss dependencies, particle dependencies, and physics structures. All 2D paradigms are intact.
+- Ready for Final Phase 16 Visual Audit Report.

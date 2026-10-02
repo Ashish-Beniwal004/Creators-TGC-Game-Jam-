@@ -43,6 +43,7 @@ texture = SubResource("GradientTexture2D_sprite")
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.5, 1.5)
 position_smoothing_enabled = true
+limit_bottom = 500
 
 [node name="UI" parent="." instance=ExtResource("2_ui")]
 

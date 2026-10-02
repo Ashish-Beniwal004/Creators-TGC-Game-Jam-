@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/JungleEnemy.tscn" id="10_jungle"]
 [ext_resource type="PackedScene" path="res://scenes/items/GreenCore.tscn" id="11_green"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/Overgrowth.tscn" id="12_overgrowth"]
+[ext_resource type="PackedScene" path="res://scenes/environment/Platform.tscn" id="13_plat"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueTrigger.tscn" id="14_diag"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(8000, 100)
@@ -22,6 +24,28 @@ size = Vector2(200, 600)
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 color = Color(0.05, 0.05, 0.1, 1)
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.3, 0.3)
+motion_mirroring = Vector2(2000, 0)
+
+[node name="ColorRect" type="ColorRect" parent="ParallaxBackground/ParallaxLayer"]
+offset_top = -200.0
+offset_right = 2000.0
+offset_bottom = 600.0
+color = Color(0.05, 0.05, 0.08, 1)
+
+[node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.6, 0.6)
+motion_mirroring = Vector2(2000, 0)
+
+[node name="ColorRect" type="ColorRect" parent="ParallaxBackground/ParallaxLayer2"]
+offset_top = 100.0
+offset_right = 2000.0
+offset_bottom = 700.0
+color = Color(0.1, 0.1, 0.15, 1)
 
 [node name="Environment" type="Node2D" parent="."]
 
@@ -37,6 +61,18 @@ offset_top = -50.0
 offset_right = 4000.0
 offset_bottom = 50.0
 color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Platform1" parent="Environment" instance=ExtResource("13_plat")]
+position = Vector2(2800, 320)
+
+[node name="Platform2" parent="Environment" instance=ExtResource("13_plat")]
+position = Vector2(3200, 320)
+
+[node name="Platform3" parent="Environment" instance=ExtResource("13_plat")]
+position = Vector2(5300, 280)
+
+[node name="Platform4" parent="Environment" instance=ExtResource("13_plat")]
+position = Vector2(5700, 280)
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(200, 400)
@@ -87,3 +123,21 @@ boss_path = NodePath("../Enemies/OvergrowthBoss")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="BossTrigger2"]
 shape = SubResource("RectangleShape2D_trigger")
+
+[node name="Dialogues" type="Node2D" parent="."]
+
+[node name="DiagIntro" parent="Dialogues" instance=ExtResource("14_diag")]
+position = Vector2(300, 400)
+dialogue_text = "The light faded long ago..."
+
+[node name="DiagBlue" parent="Dialogues" instance=ExtResource("14_diag")]
+position = Vector2(2500, 400)
+dialogue_text = "Hope rekindled. The frost yields."
+
+[node name="DiagJungle" parent="Dialogues" instance=ExtResource("14_diag")]
+position = Vector2(3600, 400)
+dialogue_text = "The Overgrowth consumes all..."
+
+[node name="DiagGreen" parent="Dialogues" instance=ExtResource("14_diag")]
+position = Vector2(5800, 400)
+dialogue_text = "Life returns to the earth."

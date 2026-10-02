@@ -39,3 +39,10 @@ func update_boss_health(current_hp: int):
 
 func hide_boss_health():
 	boss_health_container.visible = false
+
+func show_dialogue(text: String, duration: float):
+	if has_node("DialogueContainer/DialogueLabel"):
+		$DialogueContainer.visible = true
+		$DialogueContainer/DialogueLabel.text = text
+		var timer = get_tree().create_timer(duration)
+		timer.timeout.connect(func(): $DialogueContainer.visible = false)

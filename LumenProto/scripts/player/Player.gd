@@ -42,10 +42,54 @@ var facing_right: bool = true
 
 func _ready():
 	add_to_group("player")
+	_setup_sprite_frames()
 	_setup_inputs()
 	current_hp = max_hp
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
 	original_speed = speed
+
+func _setup_sprite_frames():
+	var tex = load("res://assets/genrated assests/Gemini_Generated_Image_1en0xl1en0xl1en0_transparent.png")
+	if not tex:
+		return
+		
+	var frames = SpriteFrames.new()
+	var grid_w = 8
+	var grid_h = 6
+	var w = 344
+	var h = 256
+	
+	# Mapping animations to frame indices
+	var anims = {
+		"idle": [0, 5, 5.0, true],
+		"jump": [6, 8, 5.0, false],
+		"run": [9, 15, 10.0, true],
+		"fall": [16, 17, 5.0, false],
+		"attack": [18, 23, 15.0, false],
+		"hurt": [24, 26, 5.0, false],
+		"death": [27, 35, 5.0, false]
+	}
+	
+	for anim_name in anims.keys():
+		frames.add_animation(anim_name)
+		frames.set_animation_speed(anim_name, anims[anim_name][2])
+		frames.set_animation_loop(anim_name, anims[anim_name][3])
+		var start_idx = anims[anim_name][0]
+		var end_idx = anims[anim_name][1]
+		for i in range(start_idx, end_idx + 1):
+			var x = (i % grid_w) * w
+			var y = int(i / grid_w) * h
+			var atlas = AtlasTexture.new()
+			atlas.atlas = tex
+			atlas.region = Rect2(x, y, w, h)
+			frames.add_frame(anim_name, atlas)
+			
+	anim.sprite_frames = frames
+	anim.play("idle")
+	# Scale down the sprite because the original image is very large
+	anim.scale = Vector2(0.3, 0.3)
+	anim.position.y = -20 # Adjust center
+
 
 func _setup_inputs():
 	var inputs = {

@@ -21,6 +21,14 @@ var player: Node2D = null
 func _ready():
 	current_hp = max_hp
 	add_to_group("enemy")
+	var tex = load("res://assets/genrated assests/Gemini_Generated_Image_tvqq9itvqq9itvqq_transparent.png")
+	if tex and has_node("Sprite2D"):
+		var atlas = AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2(894, 480, 453, 377)
+		$Sprite2D.texture = atlas
+		$Sprite2D.scale = Vector2(0.2, 0.2)
+		$Sprite2D.position.y = -20
 
 func _physics_process(delta):
 	if current_state == State.DEATH:

@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/Overgrowth.tscn" id="12_overgrowth"]
 [ext_resource type="PackedScene" path="res://scenes/environment/Platform.tscn" id="13_plat"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DialogueTrigger.tscn" id="14_diag"]
+[ext_resource type="Script" path="res://scripts/environment/Floor.gd" id="15_floor"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(8000, 100)
@@ -104,6 +105,7 @@ color = Color(0.01, 0.01, 0.01, 0.8)
 
 [node name="Floor" type="StaticBody2D" parent="Environment"]
 position = Vector2(3000, 500)
+script = ExtResource("15_floor")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Floor"]
 shape = SubResource("RectangleShape2D_floor")

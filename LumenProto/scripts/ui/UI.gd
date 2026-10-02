@@ -9,8 +9,63 @@ extends Control
 @onready var boss_name_label = $BossHealthContainer/BossNameLabel
 @onready var boss_health_bar = $BossHealthContainer/BossHealthBar
 
+var pause_menu: Control
+
 func _ready():
 	add_to_group("ui")
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	_setup_pause_menu()
+
+func _setup_pause_menu():
+	pause_menu = ColorRect.new()
+	pause_menu.color = Color(0, 0, 0, 0.8)
+	pause_menu.set_anchors_preset(Control.PRESET_FULL_RECT)
+	pause_menu.visible = false
+	add_child(pause_menu)
+	
+	var center = CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	pause_menu.add_child(center)
+	
+	var vbox = VBoxContainer.new()
+	center.add_child(vbox)
+	
+	var title = Label.new()
+	title.text = "LUMEN\nPaused"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 48)
+	vbox.add_child(title)
+	
+	var instructions = Label.new()
+	instructions.text = "\nPress ESC to Resume\nPress R to Restart\nPress Q to Quit"
+	instructions.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(instructions)
+
+func _input(event):
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		if get_tree().paused:
+			_resume_game()
+		else:
+			if not has_node("DeathScreen") or not $DeathScreen.visible:
+				_pause_game()
+			
+	if get_tree().paused:
+		if event is InputEventKey and event.pressed:
+			if event.keycode == KEY_R:
+				_resume_game()
+				get_tree().reload_current_scene()
+			elif event.keycode == KEY_Q:
+				get_tree().quit()
+
+func _pause_game():
+	get_tree().paused = true
+	pause_menu.visible = true
+	AudioManager.play_sfx("ui_pause")
+
+func _resume_game():
+	get_tree().paused = false
+	pause_menu.visible = false
+	AudioManager.play_sfx("ui_resume")
 
 func update_ui(hp: int, level: int, xp: int, max_xp: int = 10):
 	hp_label.text = "HP: " + str(hp)
@@ -27,6 +82,9 @@ func show_level_up():
 func show_death_screen():
 	if has_node("DeathScreen"):
 		$DeathScreen.visible = true
+		$DeathScreen.modulate.a = 0.0
+		var tween = get_tree().create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		tween.tween_property($DeathScreen, "modulate:a", 1.0, 1.0)
 
 func show_boss_health(boss_name: String, current_hp: int, max_hp: int):
 	boss_health_container.visible = true

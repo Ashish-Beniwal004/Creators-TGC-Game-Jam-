@@ -33,6 +33,8 @@ func activate():
 	var ui = get_tree().get_first_node_in_group("ui")
 	if ui and ui.has_method("show_boss_health"):
 		ui.show_boss_health("COLD BLOOD", current_hp, max_hp)
+	AudioManager.play_sfx("boss_activation")
+	AudioManager.set_music_state(AudioManager.MusicState.COLD_BLOOD)
 
 func _physics_process(delta):
 	if current_state == State.DEATH or not is_active:
@@ -107,9 +109,11 @@ func _chase_player():
 func _perform_melee():
 	action_timer = 0.8
 	var tween = get_tree().create_tween()
+	AudioManager.play_sfx("cold_blood_melee_telegraph")
 	tween.tween_property(sprite, "modulate", Color(2.0, 2.0, 3.0), 0.3)
 	get_tree().create_timer(0.3).timeout.connect(func():
 		if current_state != State.DEATH and player and global_position.distance_to(player.global_position) < melee_range + 20:
+			AudioManager.play_sfx("cold_blood_melee_attack")
 			if player.has_method("take_damage"):
 				player.take_damage(attack_damage)
 		var reset = get_tree().create_tween()
@@ -123,8 +127,10 @@ func _perform_breath():
 	if has_node("BossAura"):
 		$BossAura.scale_amount_min = 5.0
 		$BossAura.scale_amount_max = 10.0
+	AudioManager.play_sfx("cold_blood_breath_telegraph")
 	get_tree().create_timer(0.6).timeout.connect(func():
 		if current_state != State.DEATH and player and global_position.distance_to(player.global_position) < melee_range * 2.5:
+			AudioManager.play_sfx("cold_blood_breath_attack")
 			var dir_to_player = sign(player.global_position.x - global_position.x)
 			var facing_dir = 1 if sprite.flip_h else -1
 			if dir_to_player == facing_dir or dir_to_player == 0:
@@ -141,6 +147,7 @@ func _perform_breath():
 
 func _perform_projectile():
 	action_timer = 0.8
+	AudioManager.play_sfx("cold_blood_projectile_telegraph")
 	var tween = get_tree().create_tween()
 	tween.tween_property(sprite, "modulate", Color(0.5, 0.8, 1.5), 0.3)
 	get_tree().create_timer(0.3).timeout.connect(func():
@@ -163,6 +170,8 @@ func take_damage(amount: int):
 	if not is_active:
 		activate()
 		
+	AudioManager.play_sfx("cold_blood_hurt")
+		
 	current_hp -= amount
 	var ui = get_tree().get_first_node_in_group("ui")
 	if ui and ui.has_method("update_boss_health"):
@@ -176,6 +185,8 @@ func take_damage(amount: int):
 
 func die():
 	current_state = State.DEATH
+	AudioManager.play_sfx("boss_death")
+	AudioManager.set_music_state(AudioManager.MusicState.ICE_BIOME)
 	if player and player.has_method("add_xp"):
 		player.add_xp(xp_reward)
 	var ui = get_tree().get_first_node_in_group("ui")

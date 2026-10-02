@@ -8,5 +8,6 @@ func _on_body_entered(body: Node2D):
 		var light_power = body.get_node_or_null("LightPower")
 		if light_power:
 			light_power.upgrade_light(1)
-			print("Blue Core Acquired! Hope is restored.")
+			if body.has_method("acquire_core_presentation"):
+				body.acquire_core_presentation("Blue")
 			queue_free()

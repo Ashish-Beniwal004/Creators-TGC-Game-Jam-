@@ -81,6 +81,7 @@ func _attack_player():
 	tween.tween_property(sprite, "scale", Vector2(1.2, 0.8), 0.3)
 	tween.tween_callback(func():
 		if player and global_position.distance_to(player.global_position) <= attack_range + 20:
+			AudioManager.play_sfx("enemy_attack")
 			if player.has_method("take_damage"):
 				player.take_damage(attack_damage)
 		var reset_tween = get_tree().create_tween()
@@ -93,6 +94,8 @@ func take_damage(amount: int):
 	if current_state == State.DEATH:
 		return
 		
+	AudioManager.play_sfx("enemy_hurt")
+		
 	current_hp -= amount
 	print("Enemy took ", amount, " damage. HP: ", current_hp)
 	
@@ -104,6 +107,7 @@ func take_damage(amount: int):
 
 func die():
 	current_state = State.DEATH
+	AudioManager.play_sfx("enemy_death")
 	if player and player.has_method("add_xp"):
 		player.add_xp(xp_reward)
 		

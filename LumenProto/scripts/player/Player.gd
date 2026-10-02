@@ -21,6 +21,7 @@ var xp: int = 0
 var xp_to_next_level: int = 10
 
 var is_dead: bool = false
+var is_frozen: bool = false
 var is_slowed: bool = false
 var original_speed: float = 300.0
 
@@ -71,7 +72,7 @@ func _setup_inputs():
 			InputMap.action_add_event(action, event)
 
 func _physics_process(delta):
-	if is_dead:
+	if is_dead or is_frozen:
 		return
 		
 	if is_on_floor():
@@ -95,6 +96,7 @@ func _physics_process(delta):
 
 	if jump_buffer_timer > 0.0 and coyote_timer > 0.0:
 		velocity.y = jump_velocity
+		AudioManager.play_sfx("jump")
 		jump_buffer_timer = 0.0
 		coyote_timer = 0.0
 
@@ -187,6 +189,8 @@ func _perform_light_attack():
 	var damage = int(base_damage * light_power.get_damage_multiplier())
 	var hit_something = false
 	
+	AudioManager.play_sfx("player_attack")
+	
 	for body in melee_area.get_overlapping_bodies():
 		if body.is_in_group("enemy") or body.is_in_group("boss"):
 			if body.has_method("take_damage"):
@@ -255,6 +259,7 @@ func take_damage(amount: int):
 	current_hp -= amount
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
 	
+	AudioManager.play_sfx("player_hurt")
 	_apply_shake(15.0)
 	_hit_stop(0.08)
 	
@@ -282,5 +287,31 @@ func apply_slow(duration: float, speed_multiplier: float = 0.5):
 
 func die():
 	is_dead = true
+	AudioManager.play_sfx("player_death")
 	anim.play("death")
 	ui.show_death_screen()
+
+func acquire_core_presentation(core_color: String):
+	is_frozen = true
+	velocity = Vector2.ZERO
+	AudioManager.play_sfx("core_acquired")
+	
+	if core_color == "Blue":
+		ui.show_dialogue("LUMEN\nBlue...\nThe first color returns.", 4.0)
+		if has_node("Visual/CoreGlow"):
+			$Visual/CoreGlow.color = Color(0.2, 0.5, 1.0, 1.0)
+	elif core_color == "Green":
+		ui.show_dialogue("LUMEN\nLife remembers.", 4.0)
+		if has_node("Visual/CoreGlow"):
+			$Visual/CoreGlow.color = Color(0.2, 1.0, 0.4, 1.0)
+			
+	var tween = get_tree().create_tween()
+	if has_node("Visual/CoreGlow"):
+		tween.tween_property($Visual/CoreGlow, "scale", Vector2(3.0, 3.0), 0.5)
+		tween.tween_property($Visual/CoreGlow, "scale", Vector2(1.0, 1.0), 0.5)
+	
+	_apply_shake(20.0)
+	
+	get_tree().create_timer(1.5).timeout.connect(func():
+		is_frozen = false
+	)

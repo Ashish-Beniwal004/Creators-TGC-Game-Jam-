@@ -80,6 +80,7 @@ func _chase_player():
 func _leap_at_player():
 	can_leap = false
 	var tween = get_tree().create_tween()
+	AudioManager.play_sfx("jungle_enemy_leap")
 	tween.tween_property(sprite, "scale", Vector2(1.2, 0.6), 0.3)
 	get_tree().create_timer(0.3).timeout.connect(func():
 		if current_state != State.DEATH:
@@ -101,6 +102,7 @@ func _check_player_collision():
 			var collision = get_slide_collision(i)
 			var collider = collision.get_collider()
 			if collider and collider.is_in_group("player") and collider.has_method("take_damage"):
+				AudioManager.play_sfx("jungle_enemy_attack")
 				collider.take_damage(attack_damage)
 				current_state = State.IDLE
 				velocity.x = -sign(velocity.x) * 100
@@ -108,6 +110,8 @@ func _check_player_collision():
 func take_damage(amount: int):
 	if current_state == State.DEATH:
 		return
+		
+	AudioManager.play_sfx("jungle_enemy_hurt")
 		
 	current_hp -= amount
 	
@@ -120,6 +124,7 @@ func take_damage(amount: int):
 
 func die():
 	current_state = State.DEATH
+	AudioManager.play_sfx("jungle_enemy_death")
 	if player and player.has_method("add_xp"):
 		player.add_xp(xp_reward)
 		

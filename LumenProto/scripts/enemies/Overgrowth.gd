@@ -35,6 +35,8 @@ func activate():
 	var ui = get_tree().get_first_node_in_group("ui")
 	if ui and ui.has_method("show_boss_health"):
 		ui.show_boss_health("OVERGROWTH", current_hp, max_hp)
+	AudioManager.play_sfx("boss_activation")
+	AudioManager.set_music_state(AudioManager.MusicState.OVERGROWTH)
 
 func _physics_process(delta):
 	if current_state == State.DEATH or not is_active:
@@ -117,9 +119,11 @@ func _chase_player():
 func _perform_melee():
 	action_timer = 0.8
 	var tween = get_tree().create_tween()
+	AudioManager.play_sfx("overgrowth_melee_telegraph")
 	tween.tween_property(sprite, "scale", Vector2(1.3, 0.9), 0.3)
 	get_tree().create_timer(0.3).timeout.connect(func():
 		if current_state != State.DEATH and player and global_position.distance_to(player.global_position) < melee_range + 20:
+			AudioManager.play_sfx("overgrowth_melee_attack")
 			if player.has_method("take_damage"):
 				player.take_damage(attack_damage)
 		var reset = get_tree().create_tween()
@@ -128,6 +132,7 @@ func _perform_melee():
 
 func _perform_leap():
 	action_timer = 0.6
+	AudioManager.play_sfx("overgrowth_leap_telegraph")
 	var tween = get_tree().create_tween()
 	tween.tween_property(sprite, "scale", Vector2(1.2, 0.6), 0.4)
 	get_tree().create_timer(0.4).timeout.connect(func():
@@ -145,6 +150,7 @@ func _perform_leap():
 	)
 
 func _earthquake_landing():
+	AudioManager.play_sfx("overgrowth_landing")
 	# AOE damage slightly larger than melee on landing
 	if player and global_position.distance_to(player.global_position) < 120.0:
 		if player.has_method("take_damage"):
@@ -154,6 +160,7 @@ func _earthquake_landing():
 
 func _perform_summon():
 	action_timer = 1.0
+	AudioManager.play_sfx("overgrowth_summon_telegraph")
 	var tween = get_tree().create_tween()
 	tween.tween_property(sprite, "modulate", Color(1.5, 2.5, 1.5), 0.4)
 	get_tree().create_timer(0.4).timeout.connect(func():
@@ -187,6 +194,8 @@ func take_damage(amount: int):
 	if not is_active:
 		activate()
 		
+	AudioManager.play_sfx("overgrowth_hurt")
+		
 	current_hp -= amount
 	var ui = get_tree().get_first_node_in_group("ui")
 	if ui and ui.has_method("update_boss_health"):
@@ -200,6 +209,8 @@ func take_damage(amount: int):
 
 func die():
 	current_state = State.DEATH
+	AudioManager.play_sfx("boss_death")
+	AudioManager.set_music_state(AudioManager.MusicState.VICTORY)
 	if player and player.has_method("add_xp"):
 		player.add_xp(xp_reward)
 	var ui = get_tree().get_first_node_in_group("ui")

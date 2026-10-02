@@ -181,16 +181,26 @@ shape = SubResource("RectangleShape2D_trigger")
 
 [node name="DiagIntro" parent="Dialogues" instance=ExtResource("14_diag")]
 position = Vector2(300, 400)
-dialogue_text = "The light faded long ago..."
+dialogue_text = "The light is fading."
+dialogue_line_2 = "But something still burns."
+ambient_state = "DARK_WORLD"
 
-[node name="DiagBlue" parent="Dialogues" instance=ExtResource("14_diag")]
-position = Vector2(2500, 400)
-dialogue_text = "Hope rekindled. The frost yields."
+[node name="DiagIce" parent="Dialogues" instance=ExtResource("14_diag")]
+position = Vector2(1200, 400)
+dialogue_text = "The cold has swallowed everything."
+ambient_state = "ICE_BIOME"
+
+[node name="DiagColdBlood" parent="Dialogues" instance=ExtResource("14_diag")]
+position = Vector2(2400, 400)
+dialogue_text = "Something is guarding this place."
 
 [node name="DiagJungle" parent="Dialogues" instance=ExtResource("14_diag")]
 position = Vector2(3600, 400)
-dialogue_text = "The Overgrowth consumes all..."
+dialogue_text = "Beyond the frost..."
+dialogue_line_2 = "...something still grows."
+ambient_state = "JUNGLE"
 
-[node name="DiagGreen" parent="Dialogues" instance=ExtResource("14_diag")]
-position = Vector2(5800, 400)
-dialogue_text = "Life returns to the earth."
+[node name="DiagOvergrowth" parent="Dialogues" instance=ExtResource("14_diag")]
+position = Vector2(4800, 400)
+dialogue_text = "Not everything that grows..."
+dialogue_line_2 = "...wants to be saved."

@@ -146,7 +146,7 @@ export class Game {
                 }
             }
             this.renderer.camera.follow(this.player.sprite.position, deltaTime);
-            this.environment.update(this.renderer.camera.camera.position);
+            this.environment.update(this.renderer.camera.cam.position);
             this.ui.updateHUD(this.player, this.light);
             
             // Player attacks enemies

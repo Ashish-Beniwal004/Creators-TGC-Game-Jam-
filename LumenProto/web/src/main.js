@@ -1,6 +1,8 @@
 import { Game } from './game/Game.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Ensure window focus so keyboard events fire immediately without clicking
+    window.focus();
     try {
         const game = new Game();
         await game.init();

@@ -509,3 +509,15 @@ Implemented:
 Files modified:
 - scenes/environment/VineBlock.tscn
 - scenes/main/Main.tscn
+
+### 16F — Enemy/Boss Visuals
+Status: PASS
+Implemented:
+- Added `FrostAura` (CPUParticles2D) to `FrostEnemy.tscn` to emphasize its chilling effect.
+- Added `BossAura` (CPUParticles2D) to `ColdBlood.tscn` to dramatically scale its visual footprint.
+- Added `JungleAura` to `JungleEnemy.tscn` and a massive `BossAura` to `Overgrowth.tscn` to tie them organically to the falling spores of the Jungle biome atmosphere.
+Files modified:
+- scenes/enemies/FrostEnemy.tscn
+- scenes/enemies/ColdBlood.tscn
+- scenes/enemies/JungleEnemy.tscn
+- scenes/enemies/Overgrowth.tscn

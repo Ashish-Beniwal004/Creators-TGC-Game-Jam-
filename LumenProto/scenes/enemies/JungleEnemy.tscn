@@ -23,3 +23,10 @@ shape = SubResource("CapsuleShape2D_jungle")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = SubResource("GradientTexture2D_jungle")
+
+[node name="JungleAura" type="CPUParticles2D" parent="."]
+amount = 15
+emission_shape = 3
+emission_rect_extents = Vector2(20, 30)
+gravity = Vector2(0, 15)
+color = Color(0.1, 0.8, 0.1, 0.5)

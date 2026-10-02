@@ -23,3 +23,12 @@ shape = SubResource("CapsuleShape2D_boss")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = SubResource("GradientTexture2D_boss")
+
+[node name="BossAura" type="CPUParticles2D" parent="."]
+amount = 60
+emission_shape = 3
+emission_rect_extents = Vector2(40, 60)
+gravity = Vector2(0, 20)
+scale_amount_min = 2.0
+scale_amount_max = 6.0
+color = Color(0.1, 0.9, 0.1, 0.4)

@@ -11,9 +11,14 @@ export class CombatSystem {
         const dx = defender.body.position.x;
         const dy = defender.body.position.y;
         
-        // Check if defender is in front of attacker and within range
+        // Check if defender is generally in front or overlapping
         const dist = dx - ax;
-        if (Math.sign(dist) === Math.sign(directionX) && Math.abs(dist) <= range && Math.abs(dy - ay) < 60) {
+        const sameDirection = Math.sign(dist) === Math.sign(directionX) || Math.abs(dist) < 50;
+        
+        console.log(`CombatCheck: Attacker Dir: ${directionX}, Dist: ${dist}, sameDir: ${sameDirection}, dy: ${dy}, ay: ${ay}`);
+        
+        if (sameDirection && Math.abs(dist) <= range && Math.abs(dy - ay) < 100) {
+            console.log("HIT TRUE!");
             return true;
         }
         return false;

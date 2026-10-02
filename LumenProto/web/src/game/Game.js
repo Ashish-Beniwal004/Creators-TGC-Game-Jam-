@@ -164,10 +164,10 @@ export class Game {
                 }
             }
             
-            // Enemies touch player
+            // Enemies attack player
             for (let e of this.enemies) {
-                if (e.health > 0 && !this.player.isHurt) {
-                    if (this.combat.checkMeleeHit(e, this.player, 50, e.direction)) {
+                if (e.health > 0 && e.isAttacking && !this.player.isHurt) {
+                    if (this.combat.checkMeleeHit(e, this.player, 80, e.direction)) {
                         this.player.takeDamage(10, e.direction);
                         this.audio.playHit();
                         this.renderer.camera.shake(5, 0.2);

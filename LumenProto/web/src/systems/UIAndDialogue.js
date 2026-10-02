@@ -76,7 +76,20 @@ export class UIAndDialogue {
         this.isPaused = !this.isPaused;
         if (this.isPaused) {
             this.overlay.style.display = 'flex';
-            this.overlay.innerHTML = `<div>PAUSED</div><div style="font-size:2vw; margin-top:20px;">Press 'ESC' or 'P' to Resume</div>`;
+            this.overlay.innerHTML = `
+                <div style="text-align: center; border: 4px solid #fff; padding: 40px; background: rgba(0,0,0,0.9); border-radius: 10px;">
+                    <div style="font-size: 5vw; margin-bottom: 30px;">PAUSED</div>
+                    <div style="font-size: 2vw; text-align: left; margin: 0 auto; width: fit-content; line-height: 1.5;">
+                        <span style="color: #aaa;">P</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Resume<br><br>
+                        <span style="color: #aaa;">A / D</span> &nbsp;&nbsp; Move<br>
+                        <span style="color: #aaa;">SPACE</span> &nbsp;&nbsp; Jump<br>
+                        <span style="color: #aaa;">X</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Attack<br><br>
+                        <span style="color: #aaa;">ENTER</span> &nbsp;&nbsp; Continue Dialogue<br>
+                        <span style="color: #aaa;">R</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Restart<br>
+                    </div>
+                    <div style="font-size: 1.5vw; margin-top: 30px; color: #888;">Press P to Resume</div>
+                </div>
+            `;
         } else {
             this.overlay.style.display = 'none';
         }
@@ -105,11 +118,8 @@ export class UIAndDialogue {
     
     handleInput(inputSystem) {
         // Handle Pause
-        if ((inputSystem.isDown('Escape') || inputSystem.isDown('KeyP')) && !this.pausePressed) {
-            this.pausePressed = true;
+        if (inputSystem.isJustPressed('Escape') || inputSystem.isJustPressed('KeyP')) {
             this.togglePause();
-        } else if (!inputSystem.isDown('Escape') && !inputSystem.isDown('KeyP')) {
-            this.pausePressed = false;
         }
         
         // Debounced enter key for dialogue

@@ -1,0 +1,145 @@
+[
+    {
+        "id": "asset_0_layer",
+        "type": "layer",
+        "source_region": [
+            46,
+            42,
+            1330,
+            132
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_1_object",
+        "type": "object",
+        "source_region": [
+            0,
+            189,
+            226,
+            84
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_2_layer",
+        "type": "layer",
+        "source_region": [
+            68,
+            189,
+            1240,
+            130
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_3_object",
+        "type": "object",
+        "source_region": [
+            1225,
+            189,
+            151,
+            82
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_4_layer",
+        "type": "layer",
+        "source_region": [
+            46,
+            324,
+            1307,
+            145
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_5_object",
+        "type": "object",
+        "source_region": [
+            0,
+            494,
+            95,
+            9
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_6_layer",
+        "type": "layer",
+        "source_region": [
+            42,
+            494,
+            1329,
+            122
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_7_object",
+        "type": "object",
+        "source_region": [
+            413,
+            494,
+            87,
+            25
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_8_layer",
+        "type": "layer",
+        "source_region": [
+            114,
+            619,
+            1125,
+            136
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_9_object",
+        "type": "object",
+        "source_region": [
+            1248,
+            619,
+            14,
+            20
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_10_object",
+        "type": "object",
+        "source_region": [
+            1262,
+            640,
+            18,
+            20
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_11_object",
+        "type": "object",
+        "source_region": [
+            1252,
+            661,
+            19,
+            51
+        ],
+        "parallax": 0.1
+    },
+    {
+        "id": "asset_12_object",
+        "type": "object",
+        "source_region": [
+            1240,
+            709,
+            10,
+            20
+        ],
+        "parallax": 0.1
+    }
+]

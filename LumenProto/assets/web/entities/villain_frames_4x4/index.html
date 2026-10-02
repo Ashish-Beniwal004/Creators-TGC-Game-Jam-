@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body style="background: #333; color: white;">
+    <h1>Villain Frames 4x4</h1>
+    <div style="display: flex; flex-wrap: wrap;">
+        <script>
+            for(let r=0; r<4; r++) {
+                for(let c=0; c<4; c++) {
+                    document.write(`
+                        <div style="margin: 10px; text-align: center; border: 1px solid #666;">
+                            <img src="villain_${r}_${c}.png" style="max-height: 200px; display: block;" />
+                            <span>Row ${r} Col ${c}</span>
+                        </div>
+                    `);
+                }
+            }
+        </script>
+    </div>
+</body>
+</html>

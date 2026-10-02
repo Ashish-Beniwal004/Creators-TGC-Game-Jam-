@@ -20,6 +20,10 @@ export class Enemy {
         this.health = 30;
         this.isHurt = false;
         this.hurtTimer = 0;
+        
+        this.isAttacking = false;
+        this.attackTimer = 0;
+        this.attackCooldown = 0;
     }
     
     async init(x, y) {
@@ -44,7 +48,7 @@ export class Enemy {
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
-        this.animator.baseScale = 0.15; // Villain is huge (1500px), scale down!
+        this.animator.baseScale = 0.3; // Match 100px body height
         this.animator.play("idle", 8);
     }
     
@@ -54,17 +58,30 @@ export class Enemy {
         if (this.isHurt) {
             this.hurtTimer -= delta;
             if (this.hurtTimer <= 0) this.isHurt = false;
+        } else if (this.isAttacking) {
+            this.attackTimer -= delta;
+            if (this.attackTimer <= 0) this.isAttacking = false;
+            Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
         } else {
+            if (this.attackCooldown > 0) this.attackCooldown -= delta;
+            
             // Simple AI: Move towards player
             if (playerBody) {
                 const dist = playerBody.position.x - this.body.position.x;
-                if (Math.abs(dist) > 50) {
+                if (Math.abs(dist) > 70) {
                     this.direction = Math.sign(dist);
+                    Matter.Body.setVelocity(this.body, { x: this.direction * this.speed, y: this.body.velocity.y });
                 } else {
-                    this.direction = 0;
+                    this.direction = Math.sign(dist) || this.direction;
+                    Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                    
+                    if (this.attackCooldown <= 0) {
+                        this.isAttacking = true;
+                        this.attackTimer = 0.5; // 500ms attack animation
+                        this.attackCooldown = 1.5; // 1.5s between attacks
+                    }
                 }
             }
-            Matter.Body.setVelocity(this.body, { x: this.direction * this.speed, y: this.body.velocity.y });
         }
         
         let state = "idle";
@@ -72,7 +89,10 @@ export class Enemy {
             state = "death";
         } else if (this.isHurt) {
             state = "hurt";
-        } else if (this.direction !== 0) {
+        } else if (this.isAttacking) {
+            state = "attack";
+            this.animator.setFlipX(this.direction < 0);
+        } else if (Math.abs(this.body.velocity.x) > 0.1) {
             state = "run";
             this.animator.setFlipX(this.direction < 0);
         }
@@ -91,6 +111,7 @@ export class Enemy {
         this.health -= amount;
         this.isHurt = true;
         this.hurtTimer = 0.5;
+        this.isAttacking = false; // Cancel attack
         
         // Knockback
         Matter.Body.setVelocity(this.body, { x: knockbackDir * 5, y: -5 });

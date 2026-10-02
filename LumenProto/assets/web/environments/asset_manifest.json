@@ -1,0 +1,137 @@
+{
+    "source": "Nano Banana generated environment",
+    "assets": [
+        {
+            "id": "dark_sky",
+            "type": "background_layer",
+            "source_region": [
+                69,
+                42,
+                1238,
+                130
+            ],
+            "parallax": 0.02,
+            "url": "./dark/dark_sky.png"
+        },
+        {
+            "id": "dark_far",
+            "type": "background_layer",
+            "source_region": [
+                69,
+                198,
+                1238,
+                120
+            ],
+            "parallax": 0.05,
+            "url": "./dark/dark_far.png"
+        },
+        {
+            "id": "dark_mid",
+            "type": "background_layer",
+            "source_region": [
+                46,
+                331,
+                1284,
+                138
+            ],
+            "parallax": 0.12,
+            "url": "./dark/dark_mid.png"
+        },
+        {
+            "id": "dark_decor_3",
+            "type": "decorative_object",
+            "source_region": [
+                472,
+                342,
+                34,
+                57
+            ],
+            "parallax": 0.12,
+            "url": "./dark/dark_decor_3.png"
+        },
+        {
+            "id": "dark_foreground",
+            "type": "background_layer",
+            "source_region": [
+                46,
+                502,
+                1284,
+                109
+            ],
+            "parallax": 0.2,
+            "url": "./dark/dark_foreground.png"
+        },
+        {
+            "id": "dark_decor_5",
+            "type": "decorative_object",
+            "source_region": [
+                849,
+                651,
+                274,
+                102
+            ],
+            "parallax": 0.2,
+            "url": "./dark/dark_decor_5.png"
+        },
+        {
+            "id": "dark_decor_6",
+            "type": "decorative_object",
+            "source_region": [
+                229,
+                656,
+                321,
+                97
+            ],
+            "parallax": 0.2,
+            "url": "./dark/dark_decor_6.png"
+        },
+        {
+            "id": "dark_decor_7",
+            "type": "decorative_object",
+            "source_region": [
+                711,
+                662,
+                68,
+                46
+            ],
+            "parallax": 0.2,
+            "url": "./dark/dark_decor_7.png"
+        },
+        {
+            "id": "dark_decor_8",
+            "type": "decorative_object",
+            "source_region": [
+                780,
+                685,
+                22,
+                23
+            ],
+            "parallax": 0.2,
+            "url": "./dark/dark_decor_8.png"
+        },
+        {
+            "id": "dark_decor_9",
+            "type": "decorative_object",
+            "source_region": [
+                551,
+                686,
+                137,
+                67
+            ],
+            "parallax": 0.2,
+            "url": "./dark/dark_decor_9.png"
+        },
+        {
+            "id": "dark_decor_10",
+            "type": "decorative_object",
+            "source_region": [
+                803,
+                708,
+                22,
+                23
+            ],
+            "parallax": 0.2,
+            "url": "./dark/dark_decor_10.png"
+        }
+    ]
+}

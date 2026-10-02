@@ -100,7 +100,7 @@ export class Player {
             }
             
             // Attack trigger
-            if (this.input.isDown('KeyX') && !this.isAttacking) {
+            if (this.input.isJustPressed('KeyX') && !this.isAttacking) {
                 this.isAttacking = true;
                 this.attackTimer = 0.3; // 300ms attack duration
                 // Stop moving while attacking (hit-stop)
@@ -155,6 +155,7 @@ export class Player {
         this.health -= amount;
         this.isHurt = true;
         this.hurtTimer = 0.5;
+        this.isAttacking = false; // Cancel attack
         
         // Knockback
         Matter.Body.setVelocity(this.body, { x: knockbackDir * 5, y: -5 });

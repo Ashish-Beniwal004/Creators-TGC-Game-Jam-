@@ -1,0 +1,9 @@
+{
+    "input_dir": "../../assets/genrated assests",
+    "output_dir": "../../assets/web/environments",
+    "categories": {
+        "dark_background": ["*m4xjd0*.png", "*m4xjd0*.webp", "*m4xjd0*.jpeg", "*m4xjd0*.jpg"],
+        "ice_background": ["*tvqq9i*.png", "*tvqq9i*.webp", "*tvqq9i*.jpeg", "*tvqq9i*.jpg"],
+        "jungle_background": ["*l3bl6g*.png", "*l3bl6g*.webp", "*l3bl6g*.jpeg", "*l3bl6g*.jpg"]
+    }
+}

@@ -605,3 +605,18 @@ Implemented:
 Files modified:
 - scenes/projectiles/Projectile.tscn
 - scripts/player/Player.gd
+
+### 17I — Dialogue / Story Presentation
+Status: PASS
+Implemented:
+- Verified `DialogueContainer` in `UI.tscn` correctly acts as a subtle bottom-margin subtitle box with a semi-transparent black backing.
+- Verified there are no giant center-screen text interruptions blocking gameplay during narrative moments.
+
+### 17J — Visual Scale Audit
+Status: PASS
+Implemented:
+- Generated `docs/PHASE_17_VISUAL_SCALE_AUDIT.md`.
+- Verified Lumen constitutes ~10-15% of vertical space at 1.5x zoom.
+- Verified Bosses are 3-4x larger than Lumen, establishing threat without obscuring layout.
+Files created:
+- docs/PHASE_17_VISUAL_SCALE_AUDIT.md

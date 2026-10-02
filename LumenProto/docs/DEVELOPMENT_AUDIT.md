@@ -482,3 +482,12 @@ Implemented:
 Files modified:
 - scenes/player/Player.tscn
 - scripts/player/Player.gd
+
+### 16C — World Background
+Status: PASS
+Implemented:
+- Renamed and organized `ParallaxBackground` into `FarBackground`, `MidBackground`, and `Atmosphere` layers.
+- Introduced `DustParticles` (CPUParticles2D) into the `Atmosphere` layer to provide subtle ambient movement in the dark world.
+- Added a `ForegroundParallax` with a layer index of 10 and a >1.0 motion scale to render dark foreground silhouettes that pass in front of Lumen.
+Files modified:
+- scenes/main/Main.tscn

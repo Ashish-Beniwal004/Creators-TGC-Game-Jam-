@@ -27,25 +27,54 @@ color = Color(0.05, 0.05, 0.1, 1)
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
-[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_scale = Vector2(0.3, 0.3)
+[node name="FarBackground" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.2, 0.2)
 motion_mirroring = Vector2(2000, 0)
 
-[node name="ColorRect" type="ColorRect" parent="ParallaxBackground/ParallaxLayer"]
+[node name="ColorRect" type="ColorRect" parent="ParallaxBackground/FarBackground"]
 offset_top = -200.0
 offset_right = 2000.0
 offset_bottom = 600.0
-color = Color(0.05, 0.05, 0.08, 1)
+color = Color(0.02, 0.02, 0.04, 1)
 
-[node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_scale = Vector2(0.6, 0.6)
+[node name="MidBackground" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.5, 0.5)
 motion_mirroring = Vector2(2000, 0)
 
-[node name="ColorRect" type="ColorRect" parent="ParallaxBackground/ParallaxLayer2"]
+[node name="ColorRect" type="ColorRect" parent="ParallaxBackground/MidBackground"]
 offset_top = 100.0
 offset_right = 2000.0
 offset_bottom = 700.0
-color = Color(0.1, 0.1, 0.15, 1)
+color = Color(0.08, 0.08, 0.1, 1)
+
+[node name="Atmosphere" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.8, 0.8)
+motion_mirroring = Vector2(2000, 0)
+
+[node name="DustParticles" type="CPUParticles2D" parent="ParallaxBackground/Atmosphere"]
+position = Vector2(1000, 200)
+amount = 100
+emission_shape = 3
+emission_rect_extents = Vector2(1000, 600)
+gravity = Vector2(0, -5)
+initial_velocity_min = 5.0
+initial_velocity_max = 15.0
+scale_amount_min = 1.0
+scale_amount_max = 3.0
+color = Color(0.5, 0.5, 0.5, 0.3)
+
+[node name="ForegroundParallax" type="ParallaxBackground" parent="."]
+layer = 10
+
+[node name="ForegroundDecor" type="ParallaxLayer" parent="ForegroundParallax"]
+motion_scale = Vector2(1.2, 1.2)
+motion_mirroring = Vector2(2000, 0)
+
+[node name="ColorRect" type="ColorRect" parent="ForegroundParallax/ForegroundDecor"]
+offset_top = 450.0
+offset_right = 2000.0
+offset_bottom = 600.0
+color = Color(0.01, 0.01, 0.01, 0.8)
 
 [node name="Environment" type="Node2D" parent="."]
 

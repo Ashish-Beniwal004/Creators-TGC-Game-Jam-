@@ -145,6 +145,13 @@ func _fire_projectile():
 		proj.speed = proj.speed * light_power.get_speed_multiplier()
 	proj.scale = Vector3.ONE * light_power.get_size_multiplier()
 	
+	if proj.has_node("MeshInstance3D"):
+		var mat = StandardMaterial3D.new()
+		mat.albedo_color = light_power.get_light_color_value()
+		mat.emission_enabled = true
+		mat.emission = light_power.get_light_color_value()
+		proj.get_node("MeshInstance3D").material_override = mat
+	
 	get_tree().create_timer(projectile_cooldown).timeout.connect(func(): can_fire_projectile = true)
 
 func _sync_light_visuals():

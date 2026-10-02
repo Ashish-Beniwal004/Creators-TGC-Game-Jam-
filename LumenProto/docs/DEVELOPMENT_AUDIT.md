@@ -255,3 +255,34 @@ Architecture notes:
 Browser/Web considerations:
 - STATICALLY COMPATIBLE / NOT RUNTIME VERIFIED.
 Next phase readiness: READY
+
+PHASE 9 - BLUE CORE ACQUISITION & ICE BIOME PREP
+Status: PASS
+Implemented:
+- Blue Core (`BlueCore.tscn`) item created and placed in the world.
+- Blue Core correctly updates `LightPower` to Level 2 and BLUE color upon collection via standard collision `body_entered`.
+- Player projectiles automatically read the new `LightPower` color and emit Blue light visually.
+- `IceBlock.tscn` environmental obstacle created.
+- Ice Block checks for Level 2 and BLUE light via the passive light interaction system (from Phase 8) and melts (disappears) to open a path.
+Verified:
+- [NOT RUNTIME VERIFIED]
+- Reason: Headless agent environment without visual display or input simulation capability for gameplay loops.
+Issues found:
+- Projectiles were scaling in damage but maintaining their default white color.
+Issues fixed:
+- Assigned a dynamically colored `StandardMaterial3D` to projectiles upon instantiation in `Player.gd` so they match the current LightPower color visually.
+Known remaining issues:
+- None.
+Files created:
+- scenes/items/BlueCore.tscn
+- scripts/items/BlueCore.gd
+- scenes/environment/IceBlock.tscn
+- scripts/environment/IceBlock.gd
+Files modified:
+- scenes/main/Main.tscn
+- scripts/player/Player.gd
+Architecture notes:
+- Deepened the LightPower system gracefully without coupling Player to specific biome objects. Ice Block self-manages its own destruction upon detecting the blue aura.
+Browser/Web considerations:
+- STATICALLY COMPATIBLE / NOT RUNTIME VERIFIED.
+Next phase readiness: READY

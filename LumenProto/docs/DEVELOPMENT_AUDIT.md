@@ -373,3 +373,35 @@ Architecture notes:
 Browser/Web considerations:
 - 2D Canvas is extremely performant on Web/HTML5 exports compared to 3D rendering.
 Next phase readiness: READY
+
+PHASE 12 - GREEN CORE & JUNGLE BIOME
+Status: PASS
+Implemented:
+- Expanded `Main.tscn` floor logic X-axis to support further linear progression into the new Jungle area.
+- Created `GreenCore.tscn` matching the progression logic of BlueCore. Grants `Level 3` and `GREEN` LightColor enum state.
+- Created `VineBlock.tscn` to serve as the jungle biome obstacle. Functionally mirrors `IceBlock`, vanishing upon interacting with Lumen's `Level 3` and `GREEN` energy radius passively.
+- Created `JungleEnemy.gd` (`CharacterBody2D`) presenting a dynamic new `LEAP` attack state instead of simple pathing. Bounces off on player collision.
+- Embedded 2x JungleEnemies, 1x VineBlock, and 1x GreenCore into the new rightward extension of `Main.tscn`.
+Verified:
+- [NOT RUNTIME VERIFIED]
+- Reason: Headless agent environment without visual display or input simulation capability for gameplay loops.
+Issues found:
+- None.
+Issues fixed:
+- Successfully utilized existing `LightPower.gd` enums allowing instant support for the new Green color logic without architecture redesigns.
+Known remaining issues:
+- Need to expand actual vertical platforming to compliment the `LEAP` mechanic of the new Jungle Enemy.
+Files created:
+- scripts/items/GreenCore.gd
+- scenes/items/GreenCore.tscn
+- scripts/environment/VineBlock.gd
+- scenes/environment/VineBlock.tscn
+- scripts/enemies/JungleEnemy.gd
+- scenes/enemies/JungleEnemy.tscn
+Files modified:
+- scenes/main/Main.tscn
+Architecture notes:
+- Maintained exact 2D constraints established during migration. New mechanics seamlessly inherit established interaction distance checking.
+Browser/Web considerations:
+- STATICALLY COMPATIBLE / NOT RUNTIME VERIFIED.
+Next phase readiness: READY

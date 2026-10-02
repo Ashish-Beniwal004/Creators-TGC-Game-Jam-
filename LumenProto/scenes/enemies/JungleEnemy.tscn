@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/JungleEnemy.gd" id="1_script"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jungle"]
+radius = 20.0
+height = 60.0
+
+[sub_resource type="Gradient" id="Gradient_jungle"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.1, 0.8, 0.1, 1, 0.05, 0.3, 0.05, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_jungle"]
+gradient = SubResource("Gradient_jungle")
+width = 40
+height = 60
+
+[node name="JungleEnemy" type="CharacterBody2D"]
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_jungle")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_jungle")

@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/environment/VineBlock.gd" id="1_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vine"]
+size = Vector2(64, 160)
+
+[sub_resource type="Gradient" id="Gradient_vine"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.1, 0.4, 0.1, 1, 0.05, 0.2, 0.05, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vine"]
+gradient = SubResource("Gradient_vine")
+width = 64
+height = 160
+
+[node name="VineBlock" type="StaticBody2D"]
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_vine")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_vine")

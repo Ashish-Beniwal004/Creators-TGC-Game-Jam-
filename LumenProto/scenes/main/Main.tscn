@@ -7,9 +7,12 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/FrostEnemy.tscn" id="6_frost"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/ColdBlood.tscn" id="7_boss"]
 [ext_resource type="Script" path="res://scripts/environment/BossArenaTrigger.gd" id="8_trigger"]
+[ext_resource type="PackedScene" path="res://scenes/environment/VineBlock.tscn" id="9_vine"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/JungleEnemy.tscn" id="10_jungle"]
+[ext_resource type="PackedScene" path="res://scenes/items/GreenCore.tscn" id="11_green"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
-size = Vector2(4000, 100)
+size = Vector2(8000, 100)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
 size = Vector2(200, 600)
@@ -22,15 +25,15 @@ color = Color(0.05, 0.05, 0.1, 1)
 [node name="Environment" type="Node2D" parent="."]
 
 [node name="Floor" type="StaticBody2D" parent="Environment"]
-position = Vector2(1000, 500)
+position = Vector2(3000, 500)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Environment/Floor"]
 shape = SubResource("RectangleShape2D_floor")
 
 [node name="ColorRect" type="ColorRect" parent="Environment/Floor"]
-offset_left = -2000.0
+offset_left = -4000.0
 offset_top = -50.0
-offset_right = 2000.0
+offset_right = 4000.0
 offset_bottom = 50.0
 color = Color(0.2, 0.2, 0.2, 1)
 
@@ -48,6 +51,12 @@ position = Vector2(1800, 400)
 [node name="ColdBloodBoss" parent="Enemies" instance=ExtResource("7_boss")]
 position = Vector2(3000, 400)
 
+[node name="JungleEnemy1" parent="Enemies" instance=ExtResource("10_jungle")]
+position = Vector2(3800, 400)
+
+[node name="JungleEnemy2" parent="Enemies" instance=ExtResource("10_jungle")]
+position = Vector2(4500, 400)
+
 [node name="Interactables" type="Node2D" parent="."]
 
 [node name="LightReceptor1" parent="Interactables" instance=ExtResource("3_receptor")]
@@ -55,6 +64,12 @@ position = Vector2(600, 400)
 
 [node name="IceBlock1" parent="Interactables" instance=ExtResource("5_iceblock")]
 position = Vector2(1500, 380)
+
+[node name="VineBlock1" parent="Interactables" instance=ExtResource("9_vine")]
+position = Vector2(3400, 380)
+
+[node name="GreenCore1" parent="Interactables" instance=ExtResource("11_green")]
+position = Vector2(5000, 400)
 
 [node name="BossTrigger" type="Area2D" parent="."]
 position = Vector2(2500, 400)

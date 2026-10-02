@@ -17,6 +17,7 @@ var jump_velocity: float = 5.0
 var gravity: float = 12.0
 var max_fall_speed: float = -40.0
 var mouse_sensitivity: float = 0.005
+var is_dead: bool = false
 
 @onready var camera = $Camera3D
 @onready var attack_ray = $Camera3D/AttackRay
@@ -55,6 +56,11 @@ func _setup_inputs():
 		InputMap.action_add_event("attack", ev)
 
 func _unhandled_input(event):
+	if is_dead:
+		if event is InputEventKey and event.pressed and event.keycode == KEY_R:
+			get_tree().reload_current_scene()
+		return
+
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		camera.rotate_x(-event.relative.y * mouse_sensitivity)
@@ -66,6 +72,14 @@ func _unhandled_input(event):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _physics_process(delta):
+	if is_dead:
+		velocity.x = move_toward(velocity.x, 0, deceleration * delta)
+		velocity.z = move_toward(velocity.z, 0, deceleration * delta)
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+		move_and_slide()
+		return
+
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 		if velocity.y < max_fall_speed:
@@ -131,6 +145,8 @@ func _level_up():
 	print("Leveled up to ", level, "! Base damage is now ", base_damage)
 
 func take_damage(amount: int):
+	if is_dead:
+		return
 	current_hp -= amount
 	ui.update_ui(current_hp, level, xp)
 	print("Player took ", amount, " damage. HP: ", current_hp)
@@ -138,7 +154,9 @@ func take_damage(amount: int):
 		die()
 
 func die():
+	is_dead = true
 	print("Player died!")
-	# Game over logic (Phase 5 will fully implement)
-	# For now, just reload the scene to reset
-	get_tree().reload_current_scene()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	if ui.has_method("show_death_screen"):
+		ui.show_death_screen()
+

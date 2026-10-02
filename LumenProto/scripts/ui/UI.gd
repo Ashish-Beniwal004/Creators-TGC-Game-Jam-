@@ -8,3 +8,7 @@ func update_ui(hp: int, level: int, xp: int):
 	hp_label.text = "HP: " + str(hp)
 	level_label.text = "Level: " + str(level)
 	xp_label.text = "XP: " + str(xp)
+
+func show_death_screen():
+	if has_node("DeathScreen"):
+		$DeathScreen.visible = true

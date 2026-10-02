@@ -1,0 +1,16 @@
+{
+    "environments": {
+        "dark_background": [
+            "dark_background_Gemini_Generated_Image_m4xjd0m4xjd0m4xj.webp",
+            "dark_background_Gemini_Generated_Image_m4xjd0m4xjd0m4xj_transparent.webp"
+        ],
+        "ice_background": [
+            "ice_background_Gemini_Generated_Image_tvqq9itvqq9itvqq.webp",
+            "ice_background_Gemini_Generated_Image_tvqq9itvqq9itvqq_transparent.webp"
+        ],
+        "jungle_background": [
+            "jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl.webp",
+            "jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl_transparent.webp"
+        ]
+    }
+}

@@ -13,6 +13,11 @@ export class LevelManager {
         // In a real game, this would read from a JSON file mapped by Godot.
         // For now, we procedurally generate based on biome rules.
         
+        // Load the visual environment layer
+        if (this.game.environment) {
+            this.game.environment.loadBiome(biomeName).catch(e => console.error("Failed to load biome visual:", e));
+        }
+        
         // Clear old
         for (let p of this.game.platforms) {
             this.game.renderer.scene.remove(p.mesh);

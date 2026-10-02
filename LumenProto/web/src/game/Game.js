@@ -10,6 +10,7 @@ import { LightSystem } from '../systems/LightSystem.js';
 import { LevelManager } from '../levels/LevelManager.js';
 import { UIAndDialogue } from '../systems/UIAndDialogue.js';
 import { AudioManager } from '../systems/AudioManager.js';
+import { EnvironmentRenderer } from '../rendering/EnvironmentRenderer.js';
 import * as Matter from 'matter-js';
 
 export class Game {
@@ -23,6 +24,7 @@ export class Game {
         this.ui = new UIAndDialogue();
         this.audio = new AudioManager();
         this.levels = new LevelManager(this);
+        this.environment = new EnvironmentRenderer(this.renderer.scene, this.assets);
         
         this.player = null;
         this.enemies = [];
@@ -52,7 +54,9 @@ export class Game {
         this.player = new Player(this.physics, this.renderer.scene, this.input, this.assets);
         await this.player.init(100, 300);
         
-        // Create level
+        // Create level and environments
+        await this.environment.init();
+        await this.environment.loadBiome('dark');
         this.levels.loadLevel('dark');
         
         // Add InstancedBufferGeometry particles (Spores/Dust)
@@ -135,6 +139,7 @@ export class Game {
                 }
             }
             this.renderer.camera.follow(this.player.sprite.position, deltaTime);
+            this.environment.update(this.renderer.camera.camera.position);
             this.ui.updateHUD(this.player, this.light);
             
             // Player attacks enemies

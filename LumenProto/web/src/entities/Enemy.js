@@ -16,6 +16,10 @@ export class Enemy {
         this.direction = 1;
         
         this.isGrounded = false;
+        
+        this.health = 30;
+        this.isHurt = false;
+        this.hurtTimer = 0;
     }
     
     async init(x, y) {
@@ -43,22 +47,30 @@ export class Enemy {
     }
     
     update(delta, playerBody) {
-        if (!this.body) return;
+        if (!this.body || this.health <= 0) return;
         
-        // Simple AI: Move towards player
-        if (playerBody) {
-            const dist = playerBody.position.x - this.body.position.x;
-            if (Math.abs(dist) > 50) {
-                this.direction = Math.sign(dist);
-            } else {
-                this.direction = 0;
+        if (this.isHurt) {
+            this.hurtTimer -= delta;
+            if (this.hurtTimer <= 0) this.isHurt = false;
+        } else {
+            // Simple AI: Move towards player
+            if (playerBody) {
+                const dist = playerBody.position.x - this.body.position.x;
+                if (Math.abs(dist) > 50) {
+                    this.direction = Math.sign(dist);
+                } else {
+                    this.direction = 0;
+                }
             }
+            Matter.Body.setVelocity(this.body, { x: this.direction * this.speed, y: this.body.velocity.y });
         }
         
-        Matter.Body.setVelocity(this.body, { x: this.direction * this.speed, y: this.body.velocity.y });
-        
         let state = "idle";
-        if (this.direction !== 0) {
+        if (this.health <= 0) {
+            state = "death";
+        } else if (this.isHurt) {
+            state = "hurt";
+        } else if (this.direction !== 0) {
             state = "run";
             this.animator.setFlipX(this.direction < 0);
         }
@@ -69,5 +81,23 @@ export class Enemy {
         // Sync
         this.sprite.position.x = this.body.position.x;
         this.sprite.position.y = -this.body.position.y;
+    }
+    
+    takeDamage(amount, knockbackDir) {
+        if (this.isHurt || this.health <= 0) return;
+        
+        this.health -= amount;
+        this.isHurt = true;
+        this.hurtTimer = 0.5;
+        
+        // Knockback
+        Matter.Body.setVelocity(this.body, { x: knockbackDir * 5, y: -5 });
+        
+        if (this.health <= 0) {
+            // Die
+            this.scene.remove(this.sprite);
+            Matter.Composite.remove(this.physics.engine.world, this.body);
+            this.body = null;
+        }
     }
 }

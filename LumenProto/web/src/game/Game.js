@@ -5,6 +5,9 @@ import { Enemy } from '../entities/Enemy.js';
 import { InputSystem } from '../systems/InputSystem.js';
 import { ParticleSystem } from '../systems/ParticleSystem.js';
 import { AssetManager } from '../rendering/AssetManager.js';
+import { CombatSystem } from '../systems/CombatSystem.js';
+import { LightSystem } from '../systems/LightSystem.js';
+import { LevelManager } from '../levels/LevelManager.js';
 import * as Matter from 'matter-js';
 
 export class Game {
@@ -13,6 +16,9 @@ export class Game {
         this.physics = new PhysicsWorld();
         this.input = new InputSystem();
         this.assets = new AssetManager();
+        this.combat = new CombatSystem(this.physics);
+        this.light = new LightSystem();
+        this.levels = new LevelManager(this);
         
         this.player = null;
         this.enemy = null;
@@ -37,7 +43,7 @@ export class Game {
         this.input.init();
         
         // Create level
-        this.createLevel();
+        this.levels.loadLevel('dark');
         
         // Create player
         this.player = new Player(this.physics, this.renderer.scene, this.input, this.assets);
@@ -57,22 +63,6 @@ export class Game {
         console.log("Lumen Web Boot Complete");
     }
     
-    createLevel() {
-        // Floor
-        const floor = Matter.Bodies.rectangle(400, 500, 1000, 40, { isStatic: true });
-        Matter.Composite.add(this.physics.engine.world, floor);
-        
-        // Add a visual block for the floor
-        this.renderer.createBox(400, 500, 1000, 40, 0x222222);
-        
-        // A platform
-        const plat = Matter.Bodies.rectangle(600, 380, 200, 20, { isStatic: true });
-        Matter.Composite.add(this.physics.engine.world, plat);
-        this.renderer.createBox(600, 380, 200, 20, 0x333333);
-        
-        this.platforms.push(floor, plat);
-    }
-
     loop(currentTime) {
         const deltaTime = (currentTime - this.lastTime) / 1000;
         this.lastTime = currentTime;
@@ -91,10 +81,44 @@ export class Game {
         // Update physics step (60Hz)
         this.physics.update(1000/60);
         
+        // Handle Core collection sensors
+        if (this.player && this.player.body) {
+            const playerBounds = this.player.body.bounds;
+            const bodies = Matter.Composite.allBodies(this.physics.engine.world);
+            for (let b of bodies) {
+                if (b.isSensor && b.label.startsWith('core_')) {
+                    if (Matter.Bounds.overlaps(playerBounds, b.bounds)) {
+                        const color = b.label.split('_')[1];
+                        this.light.acquireCore(color);
+                        Matter.Composite.remove(this.physics.engine.world, b);
+                        b.label = "collected"; // prevent multiple triggers
+                        console.log(`Acquired ${color} core! LightPower is now ${this.light.lightPower}`);
+                    }
+                }
+            }
+        }
+        
+        // Update Level
+        this.levels.update(this.player);
+        
         // Update entities
         if (this.player) {
             this.player.update(deltaTime);
             this.renderer.camera.follow(this.player.sprite.position);
+            
+            // Player attacks enemy
+            if (this.player.isAttacking && this.enemy && this.enemy.health > 0) {
+                if (this.combat.checkMeleeHit(this.player, this.enemy, 80, this.player.direction)) {
+                    this.enemy.takeDamage(10, this.player.direction);
+                }
+            }
+            
+            // Enemy touches player
+            if (this.enemy && this.enemy.health > 0 && !this.player.isHurt) {
+                if (this.combat.checkMeleeHit(this.enemy, this.player, 50, this.enemy.direction)) {
+                    this.player.takeDamage(10, this.enemy.direction);
+                }
+            }
         }
         
         if (this.enemy) {
@@ -119,9 +143,12 @@ export class Game {
             const anim = this.player.animator;
             debugUI.innerHTML = `
                 FPS: ${this.fps}<br>
+                Biome: ${this.levels.currentBiome}<br>
                 Player Pos: ${Math.round(pos.x)}, ${Math.round(pos.y)}<br>
                 Player State: ${anim ? anim.currentState : 'none'}<br>
-                Frame: ${anim ? anim.frameIndex + 1 + '/' + anim.frames.length : '0'}<br>
+                Player Health: ${this.player.health}<br>
+                Enemy Health: ${this.enemy ? this.enemy.health : 0}<br>
+                LightPower: ${this.light.lightPower}<br>
             `;
         }
     }

@@ -14,6 +14,8 @@
 [ext_resource type="PackedScene" path="res://scenes/environment/Platform.tscn" id="13_plat"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DialogueTrigger.tscn" id="14_diag"]
 [ext_resource type="Script" path="res://scripts/environment/Floor.gd" id="15_floor"]
+[ext_resource type="Script" path="res://scripts/environment/Background.gd" id="16_bg"]
+[ext_resource type="Script" path="res://scripts/environment/Foreground.gd" id="17_fg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(8000, 100)
@@ -27,6 +29,7 @@ size = Vector2(200, 600)
 color = Color(0.05, 0.05, 0.1, 1)
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+script = ExtResource("16_bg")
 
 [node name="FarBackground" type="ParallaxLayer" parent="ParallaxBackground"]
 motion_scale = Vector2(0.2, 0.2)
@@ -94,6 +97,7 @@ layer = 10
 [node name="ForegroundDecor" type="ParallaxLayer" parent="ForegroundParallax"]
 motion_scale = Vector2(1.2, 1.2)
 motion_mirroring = Vector2(2000, 0)
+script = ExtResource("17_fg")
 
 [node name="ColorRect" type="ColorRect" parent="ForegroundParallax/ForegroundDecor"]
 offset_top = 450.0

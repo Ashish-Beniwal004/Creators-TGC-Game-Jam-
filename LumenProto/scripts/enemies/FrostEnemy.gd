@@ -30,9 +30,9 @@ func _ready():
 		atlas.atlas = tex
 		atlas.region = Rect2(1454, 515, 414, 221) # Shadow Bat
 		$Sprite2D.texture = atlas
-		$Sprite2D.scale = Vector2(0.2, 0.2)
+		$Sprite2D.scale = Vector2(0.25, 0.25)
 		$Sprite2D.position.y = -10
-
+		
 func _physics_process(delta):
 	if current_state == State.DEATH:
 		return
@@ -101,8 +101,9 @@ func _attack_player():
 		return
 	
 	can_attack = false
+	var base_scale = sprite.scale
 	var tween = get_tree().create_tween()
-	tween.tween_property(sprite, "scale", Vector2(1.2, 0.8), 0.3)
+	tween.tween_property(sprite, "scale", Vector2(base_scale.x * 1.2, base_scale.y * 0.8), 0.3)
 	tween.tween_callback(func():
 		if current_state != State.DEATH and player and global_position.distance_to(player.global_position) <= attack_range + 20:
 			AudioManager.play_sfx("frost_bite_attack")
@@ -116,7 +117,7 @@ func _attack_player():
 			retreat_timer = retreat_duration
 		
 		var reset_tween = get_tree().create_tween()
-		reset_tween.tween_property(sprite, "scale", Vector2.ONE, 0.1)
+		reset_tween.tween_property(sprite, "scale", base_scale, 0.1)
 	)
 		
 	get_tree().create_timer(attack_cooldown).timeout.connect(func(): can_attack = true)

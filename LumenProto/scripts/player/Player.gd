@@ -54,20 +54,30 @@ func _setup_sprite_frames():
 		return
 		
 	var frames = SpriteFrames.new()
-	var grid_w = 8
-	var grid_h = 6
-	var w = 344
-	var h = 256
+	var raw_rects = [
+		Rect2(91, 62, 207, 243), Rect2(331, 62, 205, 243), Rect2(560, 62, 186, 243),
+		Rect2(773, 62, 181, 243), Rect2(993, 62, 192, 243), Rect2(1217, 63, 209, 242),
+		Rect2(1834, 166, 168, 196), Rect2(2057, 103, 180, 266), Rect2(2292, 74, 189, 242),
+		Rect2(91, 366, 198, 236), Rect2(309, 371, 189, 232), Rect2(549, 366, 198, 231),
+		Rect2(762, 367, 191, 228), Rect2(996, 371, 209, 228), Rect2(1241, 372, 228, 228),
+		Rect2(1514, 378, 190, 248), Rect2(2023, 423, 196, 168), Rect2(2252, 446, 192, 180),
+		Rect2(91, 693, 193, 231), Rect2(320, 701, 186, 224), Rect2(561, 698, 169, 226),
+		Rect2(808, 716, 226, 208), Rect2(1077, 656, 314, 270), Rect2(1427, 656, 313, 274),
+		Rect2(1765, 710, 181, 214), Rect2(1994, 716, 181, 208), Rect2(2201, 710, 201, 214),
+		Rect2(91, 974, 194, 225), Rect2(326, 979, 174, 220), Rect2(573, 974, 201, 225),
+		Rect2(928, 1013, 214, 186), Rect2(1192, 1073, 231, 126), Rect2(1483, 1089, 249, 110),
+		Rect2(1800, 1106, 248, 93), Rect2(2109, 1123, 254, 76), Rect2(2414, 1128, 247, 71),
+		Rect2(91, 1231, 202, 260), Rect2(360, 1231, 237, 260), Rect2(618, 1232, 229, 259)
+	]
 	
-	# Mapping animations to frame indices
 	var anims = {
-		"idle": [0, 5, 5.0, true],
-		"jump": [6, 8, 5.0, false],
-		"run": [9, 15, 10.0, true],
-		"fall": [16, 17, 5.0, false],
-		"attack": [18, 23, 15.0, false],
-		"hurt": [24, 26, 5.0, false],
-		"death": [27, 35, 5.0, false]
+		"idle": [0, 5, 8.0, true],
+		"jump": [6, 6, 5.0, false],
+		"fall": [7, 8, 5.0, true],
+		"run": [9, 15, 12.0, true],
+		"attack": [18, 23, 20.0, false],
+		"hurt": [24, 26, 8.0, false],
+		"death": [27, 35, 8.0, false]
 	}
 	
 	for anim_name in anims.keys():
@@ -77,18 +87,15 @@ func _setup_sprite_frames():
 		var start_idx = anims[anim_name][0]
 		var end_idx = anims[anim_name][1]
 		for i in range(start_idx, end_idx + 1):
-			var x = (i % grid_w) * w
-			var y = int(i / grid_w) * h
 			var atlas = AtlasTexture.new()
 			atlas.atlas = tex
-			atlas.region = Rect2(x, y, w, h)
+			atlas.region = raw_rects[i]
 			frames.add_frame(anim_name, atlas)
 			
 	anim.sprite_frames = frames
 	anim.play("idle")
-	# Scale down the sprite because the original image is very large
-	anim.scale = Vector2(0.3, 0.3)
-	anim.position.y = -20 # Adjust center
+	anim.scale = Vector2(0.22, 0.22)
+	anim.position.y = -10
 
 
 func _setup_inputs():

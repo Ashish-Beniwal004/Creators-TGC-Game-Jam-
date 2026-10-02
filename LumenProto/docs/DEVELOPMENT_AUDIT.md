@@ -521,3 +521,12 @@ Files modified:
 - scenes/enemies/ColdBlood.tscn
 - scenes/enemies/JungleEnemy.tscn
 - scenes/enemies/Overgrowth.tscn
+
+### 16G — Lighting & Particles
+Status: PASS
+Implemented:
+- Refined Lumen's `PointLight2D` scaling curve in `Player.gd`. 
+- Base light radius reduced from 3.0 scale to 1.5 scale to emphasize the oppressive darkness of the initial world state.
+- Light scales dynamically (+0.5 per level), making the acquisition of Blue and Green cores tangibly push back the darkness.
+Files modified:
+- scripts/player/Player.gd

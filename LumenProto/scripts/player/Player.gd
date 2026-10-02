@@ -106,8 +106,8 @@ func _sync_light_visuals():
 		var point_light = $PointLight2D
 		var color = light_power.get_light_color_value()
 		point_light.color = color
-		point_light.energy = 1.0 + (light_power.current_level * 0.5)
-		point_light.texture_scale = 3.0 + (light_power.current_level * 0.5)
+		point_light.energy = 0.8 + (light_power.current_level * 0.3)
+		point_light.texture_scale = 1.5 + (light_power.current_level * 0.5)
 		if core_glow:
 			core_glow.color = color
 		if hand_glow:

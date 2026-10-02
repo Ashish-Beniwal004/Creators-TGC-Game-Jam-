@@ -119,7 +119,8 @@ export class EnvironmentRenderer {
                 
                 const mat = new THREE.MeshBasicMaterial({ 
                     map: tex, 
-                    transparent: !asset.id.includes('sky'), 
+                    transparent: true, 
+                    alphaTest: 0.1,
                     depthWrite: false 
                 });
                 

@@ -83,6 +83,7 @@ export class UIAndDialogue {
     }
     
     showDialogue(textLines) {
+        console.log("showDialogue called with:", textLines);
         this.queue.push(...textLines);
         if (!this.isTyping && this.dialogueBox.style.display === 'none') {
             this.nextDialogue();
@@ -90,12 +91,15 @@ export class UIAndDialogue {
     }
     
     nextDialogue() {
+        console.log("nextDialogue called. Queue length:", this.queue.length);
         if (this.queue.length === 0) {
+            console.log("Queue empty. Hiding dialogue box.");
             this.dialogueBox.style.display = 'none';
             return;
         }
         this.dialogueBox.style.display = 'block';
         this.currentText = this.queue.shift();
+        console.log("Showing text:", this.currentText);
         this.dialogueBox.innerHTML = this.currentText + " <br><span style='font-size:12px; color:gray'>(Press ENTER)</span>";
     }
     
@@ -109,12 +113,13 @@ export class UIAndDialogue {
         }
         
         // Debounced enter key for dialogue
-        if (inputSystem.isDown('Enter') && this.dialogueBox.style.display === 'block') {
+        if (inputSystem.isJustPressed('Enter') && this.dialogueBox.style.display === 'block') {
             if (!this.enterPressed) {
+                console.log("Enter pressed. Advancing dialogue.");
                 this.enterPressed = true;
                 this.nextDialogue();
             }
-        } else {
+        } else if (!inputSystem.isJustPressed('Enter')) {
             this.enterPressed = false;
         }
     }

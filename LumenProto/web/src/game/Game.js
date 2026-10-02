@@ -88,8 +88,7 @@ export class Game {
             this.updateDebug();
         }
         
-        // Update input
-        this.input.update();
+        // (Input update moved to end of loop)
         
         // Update physics step (60Hz)
         this.physics.update(1000/60);
@@ -212,6 +211,9 @@ export class Game {
         
         // Render
         this.renderer.render();
+        
+        // Clear justPressed for next frame
+        this.input.update();
         
         requestAnimationFrame(this.loop.bind(this));
     }

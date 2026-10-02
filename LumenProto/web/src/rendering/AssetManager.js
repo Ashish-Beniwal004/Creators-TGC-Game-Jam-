@@ -23,6 +23,11 @@ export class AssetManager {
             } else {
                 throw new Error(`Failed to load atlas_meta.json: ${response.statusText}`);
             }
+            
+            // Load isolated entity sprites
+            await this.loadExternalSprite('entities/player.png');
+            await this.loadExternalSprite('entities/villain.png');
+            
             return true;
         } catch (error) {
             console.error("Asset Manager Initialization Error:", error);
@@ -37,6 +42,31 @@ export class AssetManager {
                 `;
             }
             throw error; // Rethrow to halt game loop initialization
+        }
+    }
+
+    async loadExternalSprite(path) {
+        try {
+            const tex = await this.textureLoader.loadAsync('./web/' + path);
+            tex.magFilter = THREE.NearestFilter;
+            tex.minFilter = THREE.NearestFilter;
+            tex.colorSpace = THREE.SRGBColorSpace;
+            
+            this.atlasMeta[path] = {
+                x: 0, y: 0,
+                width: tex.image.width,
+                height: tex.image.height
+            };
+            
+            const material = new THREE.MeshBasicMaterial({
+                map: tex,
+                transparent: true,
+                alphaTest: 0.1,
+                side: THREE.DoubleSide
+            });
+            this.materials.set(path, material);
+        } catch (e) {
+            console.warn("Failed to load external sprite:", path);
         }
     }
 

@@ -117,3 +117,33 @@ Browser/Web considerations:
 - None for this phase.
 Next phase readiness: READY
 
+
+PHASE 4 — ENEMY FOUNDATION
+Status: PASS
+Implemented:
+- State machine for Enemy (IDLE, CHASE, ATTACK, HIT, DEATH).
+- Configurable stats (max_hp, movement_speed, attack_damage, attack_range, attack_cooldown, detection_range, xp_reward).
+- Enemy attacking player.
+- Player taking damage.
+Verified:
+- Enemy chasing player.
+- Enemy attacking player.
+- Enemy taking damage and experiencing hit stun.
+- Enemy dying and awarding XP.
+Issues found:
+- Player did not have take_damage method for the enemy to call.
+Issues fixed:
+- Added take_damage and die logic to Player.gd.
+Known remaining issues:
+- None.
+Files created:
+- None
+Files modified:
+- scripts/enemies/Enemy.gd
+- scripts/player/Player.gd
+Architecture notes:
+- Added simple state machine via enum and match statement.
+Browser/Web considerations:
+- State machine runs entirely in physics_process, safe for web.
+Next phase readiness: READY
+

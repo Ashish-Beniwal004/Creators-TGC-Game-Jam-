@@ -129,3 +129,16 @@ func _level_up():
 	max_hp += 20
 	current_hp = max_hp
 	print("Leveled up to ", level, "! Base damage is now ", base_damage)
+
+func take_damage(amount: int):
+	current_hp -= amount
+	ui.update_ui(current_hp, level, xp)
+	print("Player took ", amount, " damage. HP: ", current_hp)
+	if current_hp <= 0:
+		die()
+
+func die():
+	print("Player died!")
+	# Game over logic (Phase 5 will fully implement)
+	# For now, just reload the scene to reset
+	get_tree().reload_current_scene()

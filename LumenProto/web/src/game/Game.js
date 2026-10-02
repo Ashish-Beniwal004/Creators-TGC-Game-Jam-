@@ -1,8 +1,10 @@
 import { Renderer } from '../rendering/Renderer.js';
 import { PhysicsWorld } from '../physics/PhysicsWorld.js';
 import { Player } from '../entities/Player.js';
+import { Enemy } from '../entities/Enemy.js';
 import { InputSystem } from '../systems/InputSystem.js';
 import { ParticleSystem } from '../systems/ParticleSystem.js';
+import { AssetManager } from '../rendering/AssetManager.js';
 import * as Matter from 'matter-js';
 
 export class Game {
@@ -10,8 +12,10 @@ export class Game {
         this.renderer = new Renderer();
         this.physics = new PhysicsWorld();
         this.input = new InputSystem();
+        this.assets = new AssetManager();
         
         this.player = null;
+        this.enemy = null;
         this.platforms = [];
         this.particles = null;
         
@@ -22,8 +26,9 @@ export class Game {
     }
 
     async init() {
-        // Init renderer
+        // Init renderer & assets
         await this.renderer.init();
+        await this.assets.init();
         
         // Init physics
         this.physics.init();
@@ -35,8 +40,12 @@ export class Game {
         this.createLevel();
         
         // Create player
-        this.player = new Player(this.physics, this.renderer.scene, this.input);
+        this.player = new Player(this.physics, this.renderer.scene, this.input, this.assets);
         await this.player.init(100, 300);
+        
+        // Create enemy
+        this.enemy = new Enemy(this.physics, this.renderer.scene, this.assets);
+        await this.enemy.init(600, 300);
         
         // Add InstancedBufferGeometry particles (Spores/Dust)
         this.particles = new ParticleSystem(this.renderer.scene);
@@ -84,8 +93,12 @@ export class Game {
         
         // Update entities
         if (this.player) {
-            this.player.update();
+            this.player.update(deltaTime);
             this.renderer.camera.follow(this.player.sprite.position);
+        }
+        
+        if (this.enemy) {
+            this.enemy.update(deltaTime, this.player ? this.player.body : null);
         }
         
         // Update particles
@@ -103,10 +116,12 @@ export class Game {
         const debugUI = document.getElementById('debug-ui');
         if (debugUI && this.player) {
             const pos = this.player.body.position;
+            const anim = this.player.animator;
             debugUI.innerHTML = `
                 FPS: ${this.fps}<br>
                 Player Pos: ${Math.round(pos.x)}, ${Math.round(pos.y)}<br>
-                Grounded: ${this.player.isGrounded}
+                Player State: ${anim ? anim.currentState : 'none'}<br>
+                Frame: ${anim ? anim.frameIndex + 1 + '/' + anim.frames.length : '0'}<br>
             `;
         }
     }

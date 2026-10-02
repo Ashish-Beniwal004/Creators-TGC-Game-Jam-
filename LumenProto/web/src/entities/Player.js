@@ -1,15 +1,17 @@
 import * as THREE from 'three';
 import * as Matter from 'matter-js';
+import { AtlasAnimator } from '../rendering/AtlasAnimator.js';
 
 export class Player {
-    constructor(physicsWorld, scene, inputSystem) {
+    constructor(physicsWorld, scene, inputSystem, assetManager) {
         this.physics = physicsWorld;
         this.scene = scene;
         this.input = inputSystem;
+        this.assetManager = assetManager;
         
         this.body = null;
         this.sprite = null;
-        this.material = null;
+        this.animator = null;
         
         this.isGrounded = false;
         
@@ -19,59 +21,82 @@ export class Player {
     }
     
     async init(x, y) {
-        // Matter.js body
         this.body = Matter.Bodies.rectangle(x, y, 40, 80, {
-            inertia: Infinity, // don't rotate
+            inertia: Infinity,
             friction: 0.05,
             frictionAir: 0.02,
-            restitution: 0.0 // don't bounce
+            restitution: 0.0
         });
         Matter.Composite.add(this.physics.engine.world, this.body);
         
-        // Load actual sprite (first frame of idle)
-        const textureLoader = new THREE.TextureLoader();
-        try {
-            const texture = await textureLoader.loadAsync('/web/Gemini_Generated_Image_1en0xl1en0xl1en0_000.webp');
-            this.material = new THREE.MeshBasicMaterial({ 
-                map: texture,
-                transparent: true,
-                alphaTest: 0.1
-            });
-            const geo = new THREE.PlaneGeometry(80, 80); // Size relative to extracted webp
-            this.sprite = new THREE.Mesh(geo, this.material);
-            this.scene.add(this.sprite);
-        } catch (e) {
-            console.error("Failed to load player sprite, using fallback block", e);
-            const geo = new THREE.BoxGeometry(40, 80, 10);
-            this.material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-            this.sprite = new THREE.Mesh(geo, this.material);
-            this.scene.add(this.sprite);
-        }
+        // Setup Three.js sprite
+        const geo = new THREE.PlaneGeometry(1, 1); // Scale handled by animator
+        this.sprite = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ transparent: true }));
+        this.scene.add(this.sprite);
+        
+        // Setup Animator
+        const animMap = {
+            "idle": ["Gemini_Generated_Image_1en0xl1en0xl1en0_000.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_001.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_002.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_003.webp"],
+            "run": ["Gemini_Generated_Image_1en0xl1en0xl1en0_004.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_005.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_006.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_007.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_008.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_009.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_010.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_011.webp"],
+            "jump": ["Gemini_Generated_Image_1en0xl1en0xl1en0_012.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_013.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_014.webp"],
+            "fall": ["Gemini_Generated_Image_1en0xl1en0xl1en0_015.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_016.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_017.webp"],
+            "attack": ["Gemini_Generated_Image_1en0xl1en0xl1en0_018.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_019.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_020.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_021.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_022.webp"]
+        };
+        
+        this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
+        this.animator.baseScale = 0.4; // Tune to match Godot scale
+        this.animator.play("idle", 8);
     }
     
-    update() {
-        // Check grounded (simple vertical velocity check + raycast ideally, but simple vel check for Phase 24)
+    update(delta) {
+        if (!this.body) return;
+        
         this.isGrounded = Math.abs(this.body.velocity.y) < 0.1;
         
-        // Horizontal movement
         let moveX = 0;
+        let isMoving = false;
         if (this.input.isDown('ArrowLeft') || this.input.isDown('KeyA')) {
             moveX = -1;
-            this.sprite.scale.x = -1; // flip sprite
+            isMoving = true;
+            this.animator.setFlipX(true);
         } else if (this.input.isDown('ArrowRight') || this.input.isDown('KeyD')) {
             moveX = 1;
-            this.sprite.scale.x = 1;
+            isMoving = true;
+            this.animator.setFlipX(false);
         }
         
         Matter.Body.setVelocity(this.body, { x: moveX * this.speed, y: this.body.velocity.y });
         
-        // Jump
         if ((this.input.isDown('ArrowUp') || this.input.isDown('KeyW') || this.input.isDown('Space')) && this.isGrounded) {
             Matter.Body.setVelocity(this.body, { x: this.body.velocity.x, y: this.jumpForce });
+            this.isGrounded = false;
         }
         
-        // Sync Three.js mesh to Matter.js body
-        // Matter.js Y is down, Three.js Y is up
+        // Animation State Machine
+        let state = "idle";
+        let fps = 8;
+        
+        if (!this.isGrounded) {
+            if (this.body.velocity.y < 0) {
+                state = "jump";
+            } else {
+                state = "fall";
+            }
+        } else if (isMoving) {
+            state = "run";
+            fps = 12;
+        }
+        
+        // Attack override (placeholder for actual combat state)
+        if (this.input.isDown('KeyX')) {
+            state = "attack";
+            fps = 15;
+        }
+        
+        this.animator.play(state, fps);
+        this.animator.update(delta);
+        
+        // Sync
         this.sprite.position.x = this.body.position.x;
         this.sprite.position.y = -this.body.position.y;
     }

@@ -405,3 +405,28 @@ Architecture notes:
 Browser/Web considerations:
 - STATICALLY COMPATIBLE / NOT RUNTIME VERIFIED.
 Next phase readiness: READY
+
+PHASE 13 - JUNGLE BOSS (OVERGROWTH)
+Status: PASS
+Implemented:
+- `Overgrowth.gd` Boss created incorporating side-scrolling LEAP and SUMMON attacks. Uses 2D distance checks and bounding boxes.
+- Overgrowth dynamically instantiates `GreenCore.tscn` upon death.
+- Integrated into `Main.tscn` via a new `BossArenaTrigger2`.
+- Maintained 2D platformer constraints. No 3D logic.
+Verified:
+- [NOT RUNTIME VERIFIED]
+- Reason: Headless agent environment without visual display or input simulation capability for gameplay loops.
+Issues found:
+- Replaced the statically placed Green Core with a boss drop.
+Issues fixed:
+- Removed static `GreenCore1` from Main scene to properly flow progression through the boss.
+Files created:
+- scripts/enemies/Overgrowth.gd
+- scenes/enemies/Overgrowth.tscn
+Files modified:
+- scenes/main/Main.tscn
+Architecture notes:
+- Boss safely shares `BossHealthBar` UI with ColdBlood, utilizing unique initialization names.
+Browser/Web considerations:
+- STATICALLY COMPATIBLE / NOT RUNTIME VERIFIED.
+Next phase readiness: READY

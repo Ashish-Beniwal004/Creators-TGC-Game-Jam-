@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/environment/VineBlock.tscn" id="9_vine"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/JungleEnemy.tscn" id="10_jungle"]
 [ext_resource type="PackedScene" path="res://scenes/items/GreenCore.tscn" id="11_green"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/Overgrowth.tscn" id="12_overgrowth"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(8000, 100)
@@ -57,6 +58,9 @@ position = Vector2(3800, 400)
 [node name="JungleEnemy2" parent="Enemies" instance=ExtResource("10_jungle")]
 position = Vector2(4500, 400)
 
+[node name="OvergrowthBoss" parent="Enemies" instance=ExtResource("12_overgrowth")]
+position = Vector2(5500, 400)
+
 [node name="Interactables" type="Node2D" parent="."]
 
 [node name="LightReceptor1" parent="Interactables" instance=ExtResource("3_receptor")]
@@ -68,13 +72,18 @@ position = Vector2(1500, 380)
 [node name="VineBlock1" parent="Interactables" instance=ExtResource("9_vine")]
 position = Vector2(3400, 380)
 
-[node name="GreenCore1" parent="Interactables" instance=ExtResource("11_green")]
-position = Vector2(5000, 400)
-
 [node name="BossTrigger" type="Area2D" parent="."]
 position = Vector2(2500, 400)
 script = ExtResource("8_trigger")
 boss_path = NodePath("../Enemies/ColdBloodBoss")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BossTrigger"]
+shape = SubResource("RectangleShape2D_trigger")
+
+[node name="BossTrigger2" type="Area2D" parent="."]
+position = Vector2(5000, 400)
+script = ExtResource("8_trigger")
+boss_path = NodePath("../Enemies/OvergrowthBoss")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="BossTrigger2"]
 shape = SubResource("RectangleShape2D_trigger")

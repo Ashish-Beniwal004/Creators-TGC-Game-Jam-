@@ -49,46 +49,7 @@ export class EnvironmentRenderer {
         }
         this.layers = [];
         
-        const biomeKey = `${biomeId}_background`;
-        const images = this.manifest.environments[biomeKey] || [];
-        
-        if (images.length === 0) return;
-        
-        // Find the non-transparent one for the sky/distant background
-        let skyImage = images.find(img => !img.includes('transparent')) || images[0];
-        // Find transparent one for midground/foreground
-        let midImage = images.find(img => img.includes('transparent')) || images[0];
-        
-        // Load textures
-        const skyTex = await this.assets.textureLoader.loadAsync(`./web/environments/${skyImage}`);
-        skyTex.colorSpace = THREE.SRGBColorSpace;
-        
-        const midTex = await this.assets.textureLoader.loadAsync(`./web/environments/${midImage}`);
-        midTex.colorSpace = THREE.SRGBColorSpace;
-        
-        // Create Sky (Tile horizontally)
-        skyTex.wrapS = THREE.RepeatWrapping;
-        skyTex.repeat.set(5, 1);
-        
-        const skyMat = new THREE.MeshBasicMaterial({ map: skyTex, depthWrite: false });
-        const skyGeo = new THREE.PlaneGeometry(10000, 2000);
-        const skyMesh = new THREE.Mesh(skyGeo, skyMat);
-        skyMesh.position.set(0, 500, -500); // Push far back
-        skyMesh.userData = { type: 'sky', parallaxX: this.parallaxRates['sky'] };
-        this.group.add(skyMesh);
-        this.layers.push(skyMesh);
-        
-        // Create Midground (Parallax Layer)
-        midTex.wrapS = THREE.RepeatWrapping;
-        midTex.repeat.set(3, 1);
-        
-        const midMat = new THREE.MeshBasicMaterial({ map: midTex, transparent: true, depthWrite: false });
-        const midGeo = new THREE.PlaneGeometry(6000, 1500);
-        const midMesh = new THREE.Mesh(midGeo, midMat);
-        midMesh.position.set(0, 300, -200);
-        midMesh.userData = { type: 'midground', parallaxX: this.parallaxRates['midground'] };
-        this.group.add(midMesh);
-        this.layers.push(midMesh);
+        const biomeManifest = this.manifest[biomeId];
         
         // Fog/Lighting atmosphere color based on biome
         if (biomeId === 'dark') {
@@ -97,6 +58,58 @@ export class EnvironmentRenderer {
             this.scene.background = new THREE.Color(0x88ccff);
         } else if (biomeId === 'jungle') {
             this.scene.background = new THREE.Color(0x0f2a1a);
+        }
+
+        if (!biomeManifest) return;
+
+        // Configuration for depth and scale per layer
+        const layerConfig = {
+            'sky': { z: -500, y: 300, scale: 2000, parallax: 0.02 },
+            'far': { z: -400, y: 150, scale: 1500, parallax: 0.05 },
+            'mid': { z: -200, y: 50, scale: 1000, parallax: 0.12 },
+            'foreground': { z: -100, y: -50, scale: 1000, parallax: 0.20 },
+            'atmosphere': { z: 50, y: 0, scale: 1200, parallax: 0.08 }
+        };
+
+        for (const [layerName, path] of Object.entries(biomeManifest)) {
+            const config = layerConfig[layerName] || { z: -300, y: 0, scale: 1000, parallax: 0.1 };
+            
+            try {
+                // Correct path resolution relative to where manifest is loaded
+                const fullPath = `./web/environments/${path.replace('./', '')}`;
+                const tex = await this.assets.textureLoader.loadAsync(fullPath);
+                
+                tex.colorSpace = THREE.SRGBColorSpace;
+                tex.wrapS = THREE.RepeatWrapping;
+                tex.minFilter = THREE.NearestFilter;
+                tex.magFilter = THREE.NearestFilter;
+                
+                // Calculate correct aspect ratio wrapping based on natural image size
+                const aspect = tex.image.width / tex.image.height;
+                const meshWidth = config.scale * aspect;
+                
+                // We want to tile it horizontally
+                tex.repeat.set(4, 1);
+                
+                const mat = new THREE.MeshBasicMaterial({ 
+                    map: tex, 
+                    transparent: layerName !== 'sky', 
+                    depthWrite: false 
+                });
+                
+                // Since we repeat 4 times, plane must be 4 times wider
+                const geo = new THREE.PlaneGeometry(meshWidth * 4, config.scale);
+                const mesh = new THREE.Mesh(geo, mat);
+                
+                mesh.position.set(0, config.y, config.z);
+                mesh.userData = { type: layerName, parallaxX: config.parallax };
+                
+                this.group.add(mesh);
+                this.layers.push(mesh);
+                
+            } catch (err) {
+                console.error(`Failed to load layer ${layerName} for biome ${biomeId}:`, err);
+            }
         }
     }
     

@@ -12,5 +12,12 @@
             "jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl.webp",
             "jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl_transparent.webp"
         ]
+    },
+    "dark": {
+        "sky": "./dark/dark_sky.png",
+        "far": "./dark/dark_far.png",
+        "mid": "./dark/dark_mid.png",
+        "foreground": "./dark/dark_foreground.png",
+        "atmosphere": "./dark/dark_atmosphere.png"
     }
 }

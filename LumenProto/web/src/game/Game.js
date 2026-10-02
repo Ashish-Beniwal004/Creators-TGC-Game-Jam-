@@ -103,8 +103,21 @@ export class Game {
         // Update Level
         this.levels.update(this.player);
         
-        // Handle input for dialogue
+        // Handle input for dialogue and pause
         this.ui.handleInput(this.input);
+        
+        // Handle Restart
+        if (this.ui.isDead && this.input.isDown('KeyR')) {
+            window.location.reload(); // Simple refresh for browser games
+            return;
+        }
+        
+        // Block updates if paused or dead (except rendering/particles)
+        if (this.ui.isPaused || this.ui.isDead) {
+            this.renderer.render();
+            requestAnimationFrame(this.loop.bind(this));
+            return;
+        }
         
         // Update entities
         if (this.player) {

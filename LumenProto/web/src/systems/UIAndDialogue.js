@@ -24,20 +24,62 @@ export class UIAndDialogue {
             backgroundColor: '#fff', color: '#000',
             border: '4px solid #000', borderRadius: '10px',
             boxShadow: '8px 8px 0 rgba(0,0,0,0.5)',
-            fontSize: '20px', fontWeight: 'bold',
+            fontSize: '2vw', fontWeight: 'bold', // Responsive font size
             display: 'none',
             fontFamily: '"Comic Sans MS", "Chalkboard SE", sans-serif'
         });
         this.container.appendChild(this.dialogueBox);
         
+        // Pause/Death Overlay
+        this.overlay = document.createElement('div');
+        Object.assign(this.overlay.style, {
+            position: 'absolute', top: '0', left: '0', width: '100%', height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'none', flexDirection: 'column',
+            justifyContent: 'center', alignItems: 'center',
+            fontSize: '4vw', color: 'white'
+        });
+        this.container.appendChild(this.overlay);
+        
         this.queue = [];
         this.isTyping = false;
         this.currentText = "";
+        
+        this.isPaused = false;
+        this.isDead = false;
+        this.isVictory = false;
     }
     
     updateHUD(player, light) {
         if (!player) return;
         this.hud.innerHTML = `HEALTH: ${Math.max(0, player.health)}/100<br>LIGHT: ${light.lightPower}/2`;
+        
+        if (player.health <= 0 && !this.isDead) {
+            this.showDeathScreen();
+        }
+    }
+    
+    showDeathScreen() {
+        this.isDead = true;
+        this.overlay.style.display = 'flex';
+        this.overlay.innerHTML = `<div>YOU DIED</div><div style="font-size:2vw; margin-top:20px;">Press 'R' to Restart</div>`;
+    }
+    
+    showVictoryScreen() {
+        this.isVictory = true;
+        this.overlay.style.display = 'flex';
+        this.overlay.innerHTML = `<div>LIGHT RESTORED</div><div style="font-size:2vw; margin-top:20px;">The Dark World is safe.</div>`;
+    }
+    
+    togglePause() {
+        if (this.isDead || this.isVictory) return;
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+            this.overlay.style.display = 'flex';
+            this.overlay.innerHTML = `<div>PAUSED</div><div style="font-size:2vw; margin-top:20px;">Press 'ESC' or 'P' to Resume</div>`;
+        } else {
+            this.overlay.style.display = 'none';
+        }
     }
     
     showDialogue(textLines) {
@@ -58,7 +100,15 @@ export class UIAndDialogue {
     }
     
     handleInput(inputSystem) {
-        // Debounced enter key
+        // Handle Pause
+        if ((inputSystem.isDown('Escape') || inputSystem.isDown('KeyP')) && !this.pausePressed) {
+            this.pausePressed = true;
+            this.togglePause();
+        } else if (!inputSystem.isDown('Escape') && !inputSystem.isDown('KeyP')) {
+            this.pausePressed = false;
+        }
+        
+        // Debounced enter key for dialogue
         if (inputSystem.isDown('Enter') && this.dialogueBox.style.display === 'block') {
             if (!this.enterPressed) {
                 this.enterPressed = true;

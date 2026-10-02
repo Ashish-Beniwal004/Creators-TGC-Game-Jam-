@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body style="background: #333; color: white;">
+    <h1>Player Frames</h1>
+    <div style="display: flex; flex-wrap: wrap;">
+        <script>
+            for(let i=0; i<=38; i++) {
+                document.write(`
+                    <div style="margin: 10px; text-align: center; border: 1px solid #666;">
+                        <img src="player_frame_${i}.png" style="max-height: 200px; display: block;" />
+                        <span>Frame ${i}</span>
+                    </div>
+                `);
+            }
+        </script>
+    </div>
+</body>
+</html>

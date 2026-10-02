@@ -24,8 +24,13 @@ export class AssetManager {
                 throw new Error(`Failed to load atlas_meta.json: ${response.statusText}`);
             }
             
-            // Load isolated entity sprites
-            await this.loadExternalSprite('entities/player.png');
+            // Load isolated entity sprites (villain is still single sprite)
+            await this.loadExternalSprite('entities/villain.png');
+            
+            const playerFrames = [0, 1, 2, 3, 5, 6, 12, 17, 20, 21, 25, 28, 36];
+            for (let f of playerFrames) {
+                await this.loadExternalSprite(`entities/player_frames/player_frame_${f}.png`);
+            }
             await this.loadExternalSprite('entities/villain.png');
             
             return true;

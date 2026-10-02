@@ -44,13 +44,26 @@ export class Player {
         
         // Setup Animator
         const animMap = {
-            "idle": ["entities/player.png"],
-            "run": ["entities/player.png"],
-            "jump": ["entities/player.png"],
-            "fall": ["entities/player.png"],
-            "attack": ["entities/player.png"],
-            "hurt": ["entities/player.png"],
-            "death": ["entities/player.png"]
+            "idle": ["entities/player_frames/player_frame_0.png"],
+            "run": [
+                "entities/player_frames/player_frame_0.png",
+                "entities/player_frames/player_frame_1.png",
+                "entities/player_frames/player_frame_2.png",
+                "entities/player_frames/player_frame_3.png",
+                "entities/player_frames/player_frame_5.png",
+                "entities/player_frames/player_frame_20.png"
+            ],
+            "jump": ["entities/player_frames/player_frame_5.png"],
+            "fall": ["entities/player_frames/player_frame_2.png"],
+            "attack": [
+                "entities/player_frames/player_frame_12.png",
+                "entities/player_frames/player_frame_17.png",
+                "entities/player_frames/player_frame_6.png",
+                "entities/player_frames/player_frame_21.png",
+                "entities/player_frames/player_frame_25.png"
+            ],
+            "hurt": ["entities/player_frames/player_frame_28.png"],
+            "death": ["entities/player_frames/player_frame_36.png"]
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);

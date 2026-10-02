@@ -8,6 +8,7 @@ import { AssetManager } from '../rendering/AssetManager.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { LightSystem } from '../systems/LightSystem.js';
 import { LevelManager } from '../levels/LevelManager.js';
+import { UIAndDialogue } from '../systems/UIAndDialogue.js';
 import * as Matter from 'matter-js';
 
 export class Game {
@@ -18,10 +19,12 @@ export class Game {
         this.assets = new AssetManager();
         this.combat = new CombatSystem(this.physics);
         this.light = new LightSystem();
+        this.ui = new UIAndDialogue();
         this.levels = new LevelManager(this);
         
         this.player = null;
-        this.enemy = null;
+        this.enemies = [];
+        this.boss = null;
         this.platforms = [];
         this.particles = null;
         
@@ -42,16 +45,12 @@ export class Game {
         // Init input
         this.input.init();
         
-        // Create level
-        this.levels.loadLevel('dark');
-        
         // Create player
         this.player = new Player(this.physics, this.renderer.scene, this.input, this.assets);
         await this.player.init(100, 300);
         
-        // Create enemy
-        this.enemy = new Enemy(this.physics, this.renderer.scene, this.assets);
-        await this.enemy.init(600, 300);
+        // Create level
+        this.levels.loadLevel('dark');
         
         // Add InstancedBufferGeometry particles (Spores/Dust)
         this.particles = new ParticleSystem(this.renderer.scene);
@@ -101,28 +100,64 @@ export class Game {
         // Update Level
         this.levels.update(this.player);
         
+        // Handle input for dialogue
+        this.ui.handleInput(this.input);
+        
         // Update entities
         if (this.player) {
-            this.player.update(deltaTime);
+            // Disable player movement if dialogue is active
+            if (this.ui.dialogueBox.style.display === 'block') {
+                Matter.Body.setVelocity(this.player.body, { x: 0, y: this.player.body.velocity.y });
+                this.player.animator.play("idle");
+                this.player.animator.update(deltaTime);
+                this.player.sprite.position.x = this.player.body.position.x;
+                this.player.sprite.position.y = -this.player.body.position.y;
+            } else {
+                this.player.update(deltaTime);
+            }
             this.renderer.camera.follow(this.player.sprite.position);
+            this.ui.updateHUD(this.player, this.light);
             
-            // Player attacks enemy
-            if (this.player.isAttacking && this.enemy && this.enemy.health > 0) {
-                if (this.combat.checkMeleeHit(this.player, this.enemy, 80, this.player.direction)) {
-                    this.enemy.takeDamage(10, this.player.direction);
+            // Player attacks enemies
+            if (this.player.isAttacking) {
+                for (let e of this.enemies) {
+                    if (e.health > 0 && this.combat.checkMeleeHit(this.player, e, 80, this.player.direction)) {
+                        e.takeDamage(10, this.player.direction);
+                    }
+                }
+                if (this.boss && this.boss.health > 0 && this.combat.checkMeleeHit(this.player, this.boss, 120, this.player.direction)) {
+                    this.boss.takeDamage(10, this.player.direction);
                 }
             }
             
-            // Enemy touches player
-            if (this.enemy && this.enemy.health > 0 && !this.player.isHurt) {
-                if (this.combat.checkMeleeHit(this.enemy, this.player, 50, this.enemy.direction)) {
-                    this.player.takeDamage(10, this.enemy.direction);
+            // Enemies touch player
+            for (let e of this.enemies) {
+                if (e.health > 0 && !this.player.isHurt) {
+                    if (this.combat.checkMeleeHit(e, this.player, 50, e.direction)) {
+                        this.player.takeDamage(10, e.direction);
+                    }
+                }
+            }
+            
+            // Boss attacks player
+            if (this.boss && this.boss.health > 0 && this.boss.state === "attack" && !this.player.isHurt) {
+                if (this.combat.checkMeleeHit(this.boss, this.player, 150, this.boss.direction)) {
+                    this.player.takeDamage(20, this.boss.direction);
                 }
             }
         }
         
-        if (this.enemy) {
-            this.enemy.update(deltaTime, this.player ? this.player.body : null);
+        // Update Enemies
+        for (let i = this.enemies.length - 1; i >= 0; i--) {
+            let e = this.enemies[i];
+            e.update(deltaTime, this.player ? this.player.body : null);
+            if (!e.body) {
+                this.enemies.splice(i, 1);
+            }
+        }
+        
+        if (this.boss) {
+            this.boss.update(deltaTime, this.player ? this.player.body : null);
         }
         
         // Update particles
@@ -147,7 +182,8 @@ export class Game {
                 Player Pos: ${Math.round(pos.x)}, ${Math.round(pos.y)}<br>
                 Player State: ${anim ? anim.currentState : 'none'}<br>
                 Player Health: ${this.player.health}<br>
-                Enemy Health: ${this.enemy ? this.enemy.health : 0}<br>
+                Enemies: ${this.enemies.length}<br>
+                Boss Health: ${this.boss ? this.boss.health : 0}<br>
                 LightPower: ${this.light.lightPower}<br>
             `;
         }

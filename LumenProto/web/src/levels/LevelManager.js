@@ -1,8 +1,10 @@
 import * as Matter from 'matter-js';
+import { Enemy } from '../entities/Enemy.js';
+import { Boss } from '../entities/Boss.js';
 
 export class LevelManager {
     constructor(game) {
-        this.game = game; // reference to Game to access renderer, physics, assets
+        this.game = game;
         this.currentBiome = 'dark';
     }
     
@@ -18,6 +20,19 @@ export class LevelManager {
         }
         this.game.platforms = [];
         
+        for (let e of this.game.enemies) {
+            if(e.body) Matter.Composite.remove(this.game.physics.engine.world, e.body);
+            if(e.sprite) this.game.renderer.scene.remove(e.sprite);
+        }
+        this.game.enemies = [];
+        
+        if (this.game.boss) {
+            if(this.game.boss.body) Matter.Composite.remove(this.game.physics.engine.world, this.game.boss.body);
+            if(this.game.boss.sprite) this.game.renderer.scene.remove(this.game.boss.sprite);
+            if(this.game.boss.telegraphMesh) this.game.renderer.scene.remove(this.game.boss.telegraphMesh);
+            this.game.boss = null;
+        }
+        
         let color = 0x222222;
         if (biomeName === 'ice') color = 0x88ccff;
         if (biomeName === 'jungle') color = 0x228822;
@@ -27,12 +42,33 @@ export class LevelManager {
         this.createPlatform(600, 380, 200, 20, color);
         this.createPlatform(900, 300, 200, 20, color);
         
+        this.createPlatform(1500, 300, 400, 40, color); // Biome gate platform
+        
         // Spawn core if needed based on biome
         if (biomeName === 'dark' && !this.game.light.hasBlueCore) {
             this.createCore(1000, 250, 'blue');
+            this.spawnEnemy(600, 300);
+            this.spawnEnemy(900, 200);
+            this.game.ui.showDialogue(["Welcome to the Dark World.", "The light has faded.", "Find the Blue Core to restore the Ice."]);
         } else if (biomeName === 'ice' && !this.game.light.hasGreenCore) {
             this.createCore(1200, 200, 'green');
+            this.spawnBoss(1000, 300, "cold_blood");
+            this.game.ui.showDialogue(["The Ice Biome.", "Cold Blood guards the Green Core."]);
+        } else if (biomeName === 'jungle') {
+            this.spawnBoss(1000, 300, "overgrowth");
+            this.game.ui.showDialogue(["The Jungle.", "Overgrowth stands in your way.", "Defeat it to reveal the truth."]);
         }
+    }
+    
+    async spawnEnemy(x, y) {
+        const e = new Enemy(this.game.physics, this.game.renderer.scene, this.game.assets);
+        await e.init(x, y);
+        this.game.enemies.push(e);
+    }
+    
+    async spawnBoss(x, y, type) {
+        this.game.boss = new Boss(this.game.physics, this.game.renderer.scene, this.game.assets, type);
+        await this.game.boss.init(x, y);
     }
     
     createPlatform(x, y, w, h, color) {

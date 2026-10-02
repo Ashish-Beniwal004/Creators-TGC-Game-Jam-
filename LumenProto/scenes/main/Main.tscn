@@ -75,6 +75,18 @@ scale_amount_min = 2.0
 scale_amount_max = 4.0
 color = Color(0.8, 0.9, 1, 0.6)
 
+[node name="JungleSpores" type="CPUParticles2D" parent="ParallaxBackground/Atmosphere"]
+position = Vector2(4500, 200)
+amount = 200
+emission_shape = 3
+emission_rect_extents = Vector2(1500, 600)
+gravity = Vector2(0, -10)
+initial_velocity_min = 2.0
+initial_velocity_max = 8.0
+scale_amount_min = 1.0
+scale_amount_max = 2.5
+color = Color(0.5, 0.8, 0.5, 0.4)
+
 [node name="ForegroundParallax" type="ParallaxBackground" parent="."]
 layer = 10
 

@@ -22,3 +22,10 @@ shape = SubResource("RectangleShape2D_vine")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = SubResource("GradientTexture2D_vine")
+
+[node name="VineAura" type="CPUParticles2D" parent="."]
+amount = 25
+emission_shape = 3
+emission_rect_extents = Vector2(30, 80)
+gravity = Vector2(0, 5)
+color = Color(0.3, 0.8, 0.3, 0.5)

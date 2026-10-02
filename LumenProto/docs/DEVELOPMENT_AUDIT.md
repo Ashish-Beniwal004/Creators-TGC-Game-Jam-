@@ -500,3 +500,12 @@ Implemented:
 Files modified:
 - scenes/environment/IceBlock.tscn
 - scenes/main/Main.tscn
+
+### 16E — Jungle Visuals
+Status: PASS
+Implemented:
+- Added `JungleSpores` (CPUParticles2D) to the `Atmosphere` ParallaxLayer positioned squarely over the Jungle Biome (X: 3500 to 6000) to introduce ambient biological dust/spore movement.
+- Attached a `VineAura` particle system to `VineBlock.tscn` to visually telegraph the Green Light progression requirement.
+Files modified:
+- scenes/environment/VineBlock.tscn
+- scenes/main/Main.tscn

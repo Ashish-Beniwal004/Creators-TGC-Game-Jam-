@@ -61,3 +61,32 @@ Architecture notes:
 Browser/Web considerations:
 - GL Compatibility renderer ensures WebGL support.
 Next phase readiness: READY
+
+PHASE 2 — PLAYER CONTROLLER
+Status: PASS
+Implemented:
+- Smooth acceleration and deceleration for WASD movement.
+- Mouse sensitivity variable.
+- Fall handling (max fall speed).
+Verified:
+- Walking and running.
+- Jumping and falling.
+- Camera control.
+- Collision with ground.
+Issues found:
+- None
+Issues fixed:
+- Replaced instantaneous velocity changes with lerp for smooth movement.
+- Added max_fall_speed to prevent infinite downward velocity acceleration.
+Known remaining issues:
+- None.
+Files created:
+- None
+Files modified:
+- scripts/player/Player.gd
+Architecture notes:
+- Kept movement logic in CharacterBody3D physics_process.
+Browser/Web considerations:
+- None for this phase.
+Next phase readiness: READY
+

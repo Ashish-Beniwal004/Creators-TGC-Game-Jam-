@@ -8,8 +8,12 @@ var xp_to_next_level: int = 10
 var base_damage: int = 10
 
 var speed: float = 6.0
+var acceleration: float = 10.0
+var deceleration: float = 12.0
 var jump_velocity: float = 5.0
 var gravity: float = 12.0
+var max_fall_speed: float = -40.0
+var mouse_sensitivity: float = 0.005
 
 @onready var camera = $Camera3D
 @onready var attack_ray = $Camera3D/AttackRay
@@ -49,8 +53,8 @@ func _setup_inputs():
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		rotate_y(-event.relative.x * 0.005)
-		camera.rotate_x(-event.relative.y * 0.005)
+		rotate_y(-event.relative.x * mouse_sensitivity)
+		camera.rotate_x(-event.relative.y * mouse_sensitivity)
 		camera.rotation.x = clamp(camera.rotation.x, -PI/2, PI/2)
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -61,6 +65,8 @@ func _unhandled_input(event):
 func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= gravity * delta
+		if velocity.y < max_fall_speed:
+			velocity.y = max_fall_speed
 
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
@@ -68,11 +74,11 @@ func _physics_process(delta):
 	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
-		velocity.x = direction.x * speed
-		velocity.z = direction.z * speed
+		velocity.x = lerp(velocity.x, direction.x * speed, acceleration * delta)
+		velocity.z = lerp(velocity.z, direction.z * speed, acceleration * delta)
 	else:
-		velocity.x = move_toward(velocity.x, 0, speed)
-		velocity.z = move_toward(velocity.z, 0, speed)
+		velocity.x = lerp(velocity.x, 0.0, deceleration * delta)
+		velocity.z = lerp(velocity.z, 0.0, deceleration * delta)
 
 	move_and_slide()
 

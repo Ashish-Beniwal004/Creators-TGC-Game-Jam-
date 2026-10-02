@@ -228,19 +228,20 @@ Browser/Web considerations:
 - STATICALLY COMPATIBLE / NOT RUNTIME VERIFIED (OmniLight3D properties are scaled gently to maintain performance).
 Next phase readiness: READY
 
-PHASE 8 - ENVIRONMENT INTERACTION
+PHASE 8 - ENVIRONMENT INTERACTION (CORRECTED)
 Status: PASS
 Implemented:
 - Generic reusable `LightReceptor.tscn` object.
-- Reusable `LightReceptor.gd` script implementing interaction logic.
-- Generic spatial interaction system in `Player.gd` triggered by "E" (interact) key.
+- Reusable `LightReceptor.gd` script implementing automatic passive light interaction.
+- The receptor statically waits in the world, and when Lumen comes close, it checks `LightPower` and activates automatically.
+- Generic interaction button "E" retained in `Player.gd` for future reading/inspecting interactions.
 Verified:
 - [NOT RUNTIME VERIFIED]
 - Reason: Headless agent environment without visual display or input simulation capability for gameplay loops.
 Issues found:
-- None.
+- The previous implementation required the player to press "E" to trigger light-sensitive objects.
 Issues fixed:
-- None.
+- Rewrote `LightReceptor.gd` to use `_physics_process` distance checking for completely passive aura interaction.
 Known remaining issues:
 - None.
 Files created:
@@ -250,7 +251,7 @@ Files modified:
 - scenes/main/Main.tscn
 - scripts/player/Player.gd
 Architecture notes:
-- Polled distance check implemented via `get_nodes_in_group("interactable")` on button press instead of constant Area3D physics checks to save performance.
+- Separated manual interactions ("E" key) from environmental light interactions (automatic passive proximity).
 Browser/Web considerations:
 - STATICALLY COMPATIBLE / NOT RUNTIME VERIFIED.
 Next phase readiness: READY

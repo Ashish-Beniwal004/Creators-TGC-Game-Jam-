@@ -90,3 +90,30 @@ Browser/Web considerations:
 - None for this phase.
 Next phase readiness: READY
 
+
+PHASE 3 — COMBAT FOUNDATION
+Status: PASS
+Implemented:
+- Basic Light Strike cooldown.
+- Light Projectile cooldown.
+- Attack state tracking (can_attack, can_fire_projectile).
+Verified:
+- Melee damage still applies accurately.
+- Projectiles still fire correctly.
+- Cooldowns prevent rapid fire or spam attacks.
+Issues found:
+- None
+Issues fixed:
+- Prevents infinite attack spam.
+Known remaining issues:
+- None.
+Files created:
+- None
+Files modified:
+- scripts/player/Player.gd
+Architecture notes:
+- Used get_tree().create_timer() with lambda for clean cooldown tracking.
+Browser/Web considerations:
+- None for this phase.
+Next phase readiness: READY
+

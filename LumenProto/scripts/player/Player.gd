@@ -6,7 +6,10 @@ var level: int = 1
 var xp: int = 0
 var xp_to_next_level: int = 10
 var base_damage: int = 10
-
+var attack_cooldown: float = 0.5
+var can_attack: bool = true
+var projectile_cooldown: float = 1.0
+var can_fire_projectile: bool = true
 var speed: float = 6.0
 var acceleration: float = 10.0
 var deceleration: float = 12.0
@@ -89,18 +92,28 @@ func _physics_process(delta):
 		_fire_projectile()
 
 func _perform_melee_attack():
+	if not can_attack:
+		return
+	can_attack = false
 	if attack_ray.is_colliding():
 		var target = attack_ray.get_collider()
 		if target and target.has_method("take_damage"):
 			target.take_damage(base_damage)
+	
+	get_tree().create_timer(attack_cooldown).timeout.connect(func(): can_attack = true)
 
 func _fire_projectile():
+	if not can_fire_projectile:
+		return
+	can_fire_projectile = false
 	var proj = PROJECTILE_SCENE.instantiate()
 	get_tree().current_scene.add_child(proj)
 	proj.global_transform = camera.global_transform
 	# Offset it a bit forward so it doesn't spawn exactly inside the camera
 	proj.global_position += -proj.global_transform.basis.z * 0.5
 	proj.damage = int(base_damage * 1.5)
+	
+	get_tree().create_timer(projectile_cooldown).timeout.connect(func(): can_fire_projectile = true)
 
 func add_xp(amount: int):
 	xp += amount

@@ -183,9 +183,10 @@ Verified:
 - [NOT RUNTIME VERIFIED]
 - Reason: Headless agent environment without visual display or input simulation capability for gameplay loops.
 Issues found:
-- None.
+- XP accumulation logic missed multiple level-ups simultaneously.
 Issues fixed:
 - Replaced basic XP text with visual progress bar.
+- Converted `if xp >= xp_to_next_level` to `while` loop for correct overflow handling during audit.
 Known remaining issues:
 - None.
 Files created:
@@ -224,5 +225,32 @@ Files modified:
 Architecture notes:
 - Clean modular component attached to player. Easy to query globally if needed.
 Browser/Web considerations:
-- Used basic OmniLight3D compatible with GL Compatibility.
+- STATICALLY COMPATIBLE / NOT RUNTIME VERIFIED (OmniLight3D properties are scaled gently to maintain performance).
+Next phase readiness: READY
+
+PHASE 8 - ENVIRONMENT INTERACTION
+Status: PASS
+Implemented:
+- Generic reusable `LightReceptor.tscn` object.
+- Reusable `LightReceptor.gd` script implementing interaction logic.
+- Generic spatial interaction system in `Player.gd` triggered by "E" (interact) key.
+Verified:
+- [NOT RUNTIME VERIFIED]
+- Reason: Headless agent environment without visual display or input simulation capability for gameplay loops.
+Issues found:
+- None.
+Issues fixed:
+- None.
+Known remaining issues:
+- None.
+Files created:
+- scenes/main/LightReceptor.tscn
+- scripts/systems/LightReceptor.gd
+Files modified:
+- scenes/main/Main.tscn
+- scripts/player/Player.gd
+Architecture notes:
+- Polled distance check implemented via `get_nodes_in_group("interactable")` on button press instead of constant Area3D physics checks to save performance.
+Browser/Web considerations:
+- STATICALLY COMPATIBLE / NOT RUNTIME VERIFIED.
 Next phase readiness: READY

@@ -42,7 +42,8 @@ func _setup_inputs():
 		"move_left": KEY_A,
 		"move_right": KEY_D,
 		"jump": KEY_SPACE,
-		"fire_projectile": KEY_Q
+		"fire_projectile": KEY_Q,
+		"interact": KEY_E
 	}
 	for action in inputs:
 		if not InputMap.has_action(action):
@@ -108,6 +109,16 @@ func _physics_process(delta):
 		
 	if Input.is_action_just_pressed("fire_projectile"):
 		_fire_projectile()
+		
+	if Input.is_action_just_pressed("interact"):
+		_interact()
+
+func _interact():
+	var interactables = get_tree().get_nodes_in_group("interactable")
+	for obj in interactables:
+		if "interaction_range" in obj and obj.global_position.distance_to(global_position) <= obj.interaction_range:
+			if obj.has_method("on_interact"):
+				obj.on_interact(self)
 
 func _perform_melee_attack():
 	if not can_attack:
@@ -143,7 +154,7 @@ func _sync_light_visuals():
 
 func add_xp(amount: int):
 	xp += amount
-	if xp >= xp_to_next_level:
+	while xp >= xp_to_next_level:
 		_level_up()
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
 

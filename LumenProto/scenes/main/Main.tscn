@@ -63,6 +63,18 @@ scale_amount_min = 1.0
 scale_amount_max = 3.0
 color = Color(0.5, 0.5, 0.5, 0.3)
 
+[node name="SnowParticles" type="CPUParticles2D" parent="ParallaxBackground/Atmosphere"]
+position = Vector2(2000, -200)
+amount = 300
+emission_shape = 3
+emission_rect_extents = Vector2(1500, 100)
+gravity = Vector2(15, 60)
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+scale_amount_min = 2.0
+scale_amount_max = 4.0
+color = Color(0.8, 0.9, 1, 0.6)
+
 [node name="ForegroundParallax" type="ParallaxBackground" parent="."]
 layer = 10
 

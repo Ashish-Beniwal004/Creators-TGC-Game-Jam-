@@ -22,3 +22,10 @@ shape = SubResource("RectangleShape2D_ice")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = SubResource("GradientTexture2D_ice")
+
+[node name="IceAura" type="CPUParticles2D" parent="."]
+amount = 20
+emission_shape = 3
+emission_rect_extents = Vector2(30, 60)
+gravity = Vector2(0, -10)
+color = Color(0.3, 0.7, 1, 0.5)

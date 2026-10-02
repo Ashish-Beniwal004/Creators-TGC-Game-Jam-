@@ -491,3 +491,12 @@ Implemented:
 - Added a `ForegroundParallax` with a layer index of 10 and a >1.0 motion scale to render dark foreground silhouettes that pass in front of Lumen.
 Files modified:
 - scenes/main/Main.tscn
+
+### 16D — Ice Visuals
+Status: PASS
+Implemented:
+- Added `SnowParticles` (CPUParticles2D) to the `Atmosphere` ParallaxLayer positioned squarely over the Frost Biome (X: 1000 to 3000) to create constant, ambient snowfall decoupled from Lumen's position.
+- Attached an `IceAura` particle system directly to `IceBlock.tscn` to radiate subtle blue energy, hinting at the Blue Light restoration mechanic requirements prior to unlocking it.
+Files modified:
+- scenes/environment/IceBlock.tscn
+- scenes/main/Main.tscn

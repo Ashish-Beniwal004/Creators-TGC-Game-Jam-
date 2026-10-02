@@ -9,6 +9,7 @@ import { CombatSystem } from '../systems/CombatSystem.js';
 import { LightSystem } from '../systems/LightSystem.js';
 import { LevelManager } from '../levels/LevelManager.js';
 import { UIAndDialogue } from '../systems/UIAndDialogue.js';
+import { AudioManager } from '../systems/AudioManager.js';
 import * as Matter from 'matter-js';
 
 export class Game {
@@ -20,6 +21,7 @@ export class Game {
         this.combat = new CombatSystem(this.physics);
         this.light = new LightSystem();
         this.ui = new UIAndDialogue();
+        this.audio = new AudioManager();
         this.levels = new LevelManager(this);
         
         this.player = null;
@@ -35,8 +37,9 @@ export class Game {
     }
 
     async init() {
-        // Init renderer & assets
+        // Init renderer, audio & assets
         await this.renderer.init();
+        this.audio.init();
         await this.assets.init();
         
         // Init physics
@@ -114,8 +117,11 @@ export class Game {
                 this.player.sprite.position.y = -this.player.body.position.y;
             } else {
                 this.player.update(deltaTime);
+                if (this.player.input.isDown('ArrowUp') || this.player.input.isDown('KeyW') || this.player.input.isDown('Space')) {
+                    if (this.player.isGrounded) this.audio.playJump();
+                }
             }
-            this.renderer.camera.follow(this.player.sprite.position);
+            this.renderer.camera.follow(this.player.sprite.position, deltaTime);
             this.ui.updateHUD(this.player, this.light);
             
             // Player attacks enemies
@@ -123,10 +129,14 @@ export class Game {
                 for (let e of this.enemies) {
                     if (e.health > 0 && this.combat.checkMeleeHit(this.player, e, 80, this.player.direction)) {
                         e.takeDamage(10, this.player.direction);
+                        this.audio.playHit();
+                        this.renderer.camera.shake(2, 0.1);
                     }
                 }
                 if (this.boss && this.boss.health > 0 && this.combat.checkMeleeHit(this.player, this.boss, 120, this.player.direction)) {
                     this.boss.takeDamage(10, this.player.direction);
+                    this.audio.playHit();
+                    this.renderer.camera.shake(4, 0.15);
                 }
             }
             
@@ -135,6 +145,8 @@ export class Game {
                 if (e.health > 0 && !this.player.isHurt) {
                     if (this.combat.checkMeleeHit(e, this.player, 50, e.direction)) {
                         this.player.takeDamage(10, e.direction);
+                        this.audio.playHit();
+                        this.renderer.camera.shake(5, 0.2);
                     }
                 }
             }
@@ -143,6 +155,8 @@ export class Game {
             if (this.boss && this.boss.health > 0 && this.boss.state === "attack" && !this.player.isHurt) {
                 if (this.combat.checkMeleeHit(this.boss, this.player, 150, this.boss.direction)) {
                     this.player.takeDamage(20, this.boss.direction);
+                    this.audio.playHit();
+                    this.renderer.camera.shake(8, 0.3);
                 }
             }
         }

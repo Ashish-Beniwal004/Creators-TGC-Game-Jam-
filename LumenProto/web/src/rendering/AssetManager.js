@@ -9,19 +9,34 @@ export class AssetManager {
     }
 
     async init() {
-        // Load atlas texture
-        this.atlasTexture = await this.textureLoader.loadAsync('/web/characters_atlas.webp');
-        this.atlasTexture.magFilter = THREE.NearestFilter;
-        this.atlasTexture.minFilter = THREE.NearestFilter;
-        this.atlasTexture.colorSpace = THREE.SRGBColorSpace;
-        
-        // Load atlas metadata
-        const response = await fetch('/atlas_meta.json');
-        if (response.ok) {
-            this.atlasMeta = await response.json();
-        } else {
-            console.error("Failed to load atlas_meta.json");
-            this.atlasMeta = {};
+        try {
+            // Load atlas texture
+            this.atlasTexture = await this.textureLoader.loadAsync('./web/characters_atlas.webp');
+            this.atlasTexture.magFilter = THREE.NearestFilter;
+            this.atlasTexture.minFilter = THREE.NearestFilter;
+            this.atlasTexture.colorSpace = THREE.SRGBColorSpace;
+            
+            // Load atlas metadata
+            const response = await fetch('./atlas_meta.json');
+            if (response.ok) {
+                this.atlasMeta = await response.json();
+            } else {
+                throw new Error(`Failed to load atlas_meta.json: ${response.statusText}`);
+            }
+            return true;
+        } catch (error) {
+            console.error("Asset Manager Initialization Error:", error);
+            const debugUI = document.getElementById('debug-ui');
+            if (debugUI) {
+                debugUI.innerHTML = `
+                    <div style="color:red; background:black; padding:20px; border:2px solid red;">
+                        LUMEN FAILED TO LOAD<br><br>
+                        Error:<br>${error.message}<br><br>
+                        Open browser console for details.
+                    </div>
+                `;
+            }
+            throw error; // Rethrow to halt game loop initialization
         }
     }
 

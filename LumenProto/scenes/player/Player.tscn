@@ -17,6 +17,49 @@ gradient = SubResource("Gradient_sprite")
 width = 32
 height = 48
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_lumen"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("GradientTexture2D_sprite")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("GradientTexture2D_sprite")
+}],
+"loop": true,
+"name": &"run",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("GradientTexture2D_sprite")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("GradientTexture2D_sprite")
+}],
+"loop": false,
+"name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("GradientTexture2D_sprite")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 10.0
+}]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_melee"]
 size = Vector2(40, 48)
 
@@ -37,8 +80,25 @@ script = ExtResource("1_script")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_player")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = SubResource("GradientTexture2D_sprite")
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Visual"]
+sprite_frames = SubResource("SpriteFrames_lumen")
+animation = &"idle"
+
+[node name="CoreGlow" type="ColorRect" parent="Visual"]
+offset_left = -4.0
+offset_top = -10.0
+offset_right = 4.0
+offset_bottom = -2.0
+color = Color(1, 1, 1, 1)
+
+[node name="HandGlow" type="ColorRect" parent="Visual"]
+offset_left = 6.0
+offset_top = -2.0
+offset_right = 10.0
+offset_bottom = 2.0
+color = Color(1, 1, 1, 1)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.5, 1.5)

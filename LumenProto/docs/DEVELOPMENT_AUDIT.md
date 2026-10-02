@@ -471,3 +471,14 @@ Implemented:
 - Established clean reusable asset folder structure under `assets/` to prepare for art integration.
 Files created:
 - assets/characters/lumen/.gitkeep (and other environment/enemy/ui folders)
+
+### 16B — Lumen Visual
+Status: PASS
+Implemented:
+- Refactored `Player.tscn` to decouple logic from visuals by replacing `Sprite2D` with a `Visual` Node2D structure holding an `AnimatedSprite2D`, `CoreGlow`, and `HandGlow`.
+- Established `idle`, `run`, `jump`, `fall`, and `attack` placeholder animations using Godot's built-in SpriteFrames resource.
+- Updated `Player.gd` to manipulate `visual.scale.x` for bidirectional facing, inherently flipping custom asymmetrical sub-glows (hand/chest) perfectly without mirroring collision shapes incorrectly.
+- Integrated `_sync_light_visuals` to dynamically inject the LightPower color into the `CoreGlow` and `HandGlow` ColorRects.
+Files modified:
+- scenes/player/Player.tscn
+- scripts/player/Player.gd

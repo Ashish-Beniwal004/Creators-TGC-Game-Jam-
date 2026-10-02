@@ -24,7 +24,10 @@ var facing_right: bool = true
 
 @onready var ui = $UI
 @onready var light_power = $LightPower
-@onready var sprite = $Sprite2D
+@onready var visual = $Visual
+@onready var anim = $Visual/AnimatedSprite2D
+@onready var core_glow = $Visual/CoreGlow
+@onready var hand_glow = $Visual/HandGlow
 @onready var melee_area = $MeleeArea
 
 func _ready():
@@ -73,14 +76,25 @@ func _physics_process(delta):
 		velocity.x = direction * speed
 		if direction > 0:
 			facing_right = true
-			sprite.flip_h = false
+			visual.scale.x = 1
 			melee_area.position.x = abs(melee_area.position.x)
 		elif direction < 0:
 			facing_right = false
-			sprite.flip_h = true
+			visual.scale.x = -1
 			melee_area.position.x = -abs(melee_area.position.x)
 	else:
 		velocity.x = move_toward(velocity.x, 0, speed)
+
+	if is_on_floor():
+		if direction == 0:
+			if can_attack: anim.play("idle")
+		else:
+			if can_attack: anim.play("run")
+	else:
+		if velocity.y < 0:
+			if can_attack: anim.play("jump")
+		else:
+			if can_attack: anim.play("fall")
 
 	move_and_slide()
 
@@ -90,9 +104,14 @@ func _process(delta):
 func _sync_light_visuals():
 	if has_node("PointLight2D") and light_power:
 		var point_light = $PointLight2D
-		point_light.color = light_power.get_light_color_value()
+		var color = light_power.get_light_color_value()
+		point_light.color = color
 		point_light.energy = 1.0 + (light_power.current_level * 0.5)
 		point_light.texture_scale = 3.0 + (light_power.current_level * 0.5)
+		if core_glow:
+			core_glow.color = color
+		if hand_glow:
+			hand_glow.color = color
 
 func _input(event):
 	if is_dead:
@@ -111,6 +130,7 @@ func _perform_light_attack():
 	if not can_attack:
 		return
 	can_attack = false
+	anim.play("attack")
 	
 	var base_damage = 10
 	var damage = int(base_damage * light_power.get_damage_multiplier())

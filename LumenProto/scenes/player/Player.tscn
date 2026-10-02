@@ -58,6 +58,22 @@ animations = [{
 "loop": false,
 "name": &"attack",
 "speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("GradientTexture2D_sprite")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("GradientTexture2D_sprite")
+}],
+"loop": false,
+"name": &"death",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_melee"]

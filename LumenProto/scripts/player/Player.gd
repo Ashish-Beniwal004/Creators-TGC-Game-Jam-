@@ -194,6 +194,10 @@ func take_damage(amount: int):
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
 	if current_hp <= 0:
 		die()
+	else:
+		anim.play("hurt")
+		can_attack = false
+		get_tree().create_timer(0.3).timeout.connect(func(): can_attack = true)
 
 func apply_slow(duration: float, speed_multiplier: float = 0.5):
 	if is_slowed or is_dead:
@@ -207,4 +211,5 @@ func apply_slow(duration: float, speed_multiplier: float = 0.5):
 
 func die():
 	is_dead = true
+	anim.play("death")
 	ui.show_death_screen()

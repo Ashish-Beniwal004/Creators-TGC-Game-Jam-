@@ -554,3 +554,13 @@ Implemented:
 - Generated `docs/PHASE_17_ASSET_INVENTORY.md` to catalog all missing `.png` requirements for future art passes.
 Files created:
 - docs/PHASE_17_ASSET_INVENTORY.md
+
+### 17B — Lumen Character
+Status: PASS
+Implemented:
+- Added `hurt` and `death` states to Lumen's `AnimatedSprite2D` structure in `Player.tscn`.
+- Updated `take_damage` and `die` in `Player.gd` to trigger the `hurt` and `death` animations correctly.
+- Confirmed collision layers, scaling, and lighting were unaffected by the animation expansion.
+Files modified:
+- scenes/player/Player.tscn
+- scripts/player/Player.gd

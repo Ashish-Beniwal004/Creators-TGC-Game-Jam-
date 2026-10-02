@@ -620,3 +620,17 @@ Implemented:
 - Verified Bosses are 3-4x larger than Lumen, establishing threat without obscuring layout.
 Files created:
 - docs/PHASE_17_VISUAL_SCALE_AUDIT.md
+
+### 17K — Gameplay Regression Audit
+Status: PASS
+Implemented:
+- Conducted static code analysis of `Player.gd`, `Enemy.gd`, `Boss.gd`, `IceBlock.gd`, and `Main.tscn`.
+- Confirmed that modifications strictly targeted `AnimatedSprite2D`, `CPUParticles2D`, and `PointLight2D` nodes.
+- No collision bounds (`CollisionShape2D`), physics queries (`move_and_slide`), or area checks (`get_overlapping_bodies`) were mutated.
+- The critical path (`Cold Blood → Blue Core → Ice restoration → Jungle → Overgrowth → Green Core`) remains structurally intact.
+
+### 17L — Final 2D Architecture Check
+Status: PASS
+Implemented:
+- Ran global regex grep for `Area3D|CharacterBody3D|StaticBody3D|CollisionShape3D|Camera3D|RayCast3D|MeshInstance3D|OmniLight3D|GPUParticles3D|Vector3`.
+- Result: 0 matches in `.tscn` and `.gd` files. 3D eradication is complete and maintained.

@@ -21,12 +21,21 @@ export class EnvironmentRenderer {
     }
     
     async init() {
-        // Fetch manifest to know which assets belong to which biome
-        const response = await fetch('./environments/manifest.json');
-        if (response.ok) {
-            this.manifest = await response.json();
-        } else {
-            console.warn("No environment manifest found. Using default.");
+        try {
+            // Fetch manifest to know which assets belong to which biome
+            const response = await fetch('./web/environments/manifest.json');
+            if (response.ok) {
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    this.manifest = await response.json();
+                } else {
+                    throw new Error("Manifest URL returned non-JSON content (likely a 404 fallback to index.html)");
+                }
+            } else {
+                throw new Error(`Manifest fetch failed: ${response.status} ${response.statusText}`);
+            }
+        } catch (e) {
+            console.warn("Failed to load environment manifest. Proceeding with blank background. Error:", e);
             this.manifest = { environments: {} };
         }
     }
@@ -51,10 +60,10 @@ export class EnvironmentRenderer {
         let midImage = images.find(img => img.includes('transparent')) || images[0];
         
         // Load textures
-        const skyTex = await this.assets.textureLoader.loadAsync(`./environments/${skyImage}`);
+        const skyTex = await this.assets.textureLoader.loadAsync(`./web/environments/${skyImage}`);
         skyTex.colorSpace = THREE.SRGBColorSpace;
         
-        const midTex = await this.assets.textureLoader.loadAsync(`./environments/${midImage}`);
+        const midTex = await this.assets.textureLoader.loadAsync(`./web/environments/${midImage}`);
         midTex.colorSpace = THREE.SRGBColorSpace;
         
         // Create Sky (Tile horizontally)

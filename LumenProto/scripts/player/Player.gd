@@ -22,6 +22,8 @@ var is_dead: bool = false
 @onready var camera = $Camera3D
 @onready var attack_ray = $Camera3D/AttackRay
 @onready var ui = $UI
+@onready var light_power = $LightPower
+@onready var lumen_light = $LumenLight
 
 const PROJECTILE_SCENE = preload("res://scenes/projectiles/Projectile.tscn")
 
@@ -72,6 +74,8 @@ func _unhandled_input(event):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _physics_process(delta):
+	_sync_light_visuals()
+
 	if is_dead:
 		velocity.x = move_toward(velocity.x, 0, deceleration * delta)
 		velocity.z = move_toward(velocity.z, 0, deceleration * delta)
@@ -125,9 +129,17 @@ func _fire_projectile():
 	proj.global_transform = camera.global_transform
 	# Offset it a bit forward so it doesn't spawn exactly inside the camera
 	proj.global_position += -proj.global_transform.basis.z * 0.5
-	proj.damage = int(base_damage * 1.5)
+	proj.damage = int(base_damage * 1.5 * light_power.get_damage_multiplier())
+	if "speed" in proj:
+		proj.speed = proj.speed * light_power.get_speed_multiplier()
+	proj.scale = Vector3.ONE * light_power.get_size_multiplier()
 	
 	get_tree().create_timer(projectile_cooldown).timeout.connect(func(): can_fire_projectile = true)
+
+func _sync_light_visuals():
+	if lumen_light and light_power:
+		lumen_light.light_energy = light_power.get_light_energy()
+		lumen_light.light_color = light_power.get_light_color_value()
 
 func add_xp(amount: int):
 	xp += amount

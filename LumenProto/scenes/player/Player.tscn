@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/player/Player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/ui/UI.tscn" id="2_ui"]
+[ext_resource type="Script" path="res://scripts/systems/LightPower.gd" id="3_light"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.5
@@ -27,3 +28,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 target_position = Vector3(0, 0, -2.5)
 
 [node name="UI" parent="." instance=ExtResource("2_ui")]
+
+[node name="LightPower" type="Node" parent="."]
+script = ExtResource("3_light")
+
+[node name="LumenLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+omni_range = 10.0
+omni_attenuation = 1.5

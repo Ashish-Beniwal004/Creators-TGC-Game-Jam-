@@ -1,0 +1,77 @@
+{
+    "source": "Nano Banana generated environment",
+    "assets": [
+        {
+            "id": "dark_sky",
+            "type": "background_layer",
+            "source_region": [
+                46,
+                42,
+                1330,
+                132
+            ],
+            "parallax": 0.02,
+            "url": "./dark/dark_sky.png"
+        },
+        {
+            "id": "dark_decor_1",
+            "type": "decorative_object",
+            "source_region": [
+                0,
+                189,
+                226,
+                84
+            ],
+            "parallax": 0.05,
+            "url": "./dark/dark_decor_1.png"
+        },
+        {
+            "id": "dark_far",
+            "type": "background_layer",
+            "source_region": [
+                68,
+                189,
+                1240,
+                130
+            ],
+            "parallax": 0.05,
+            "url": "./dark/dark_far.png"
+        },
+        {
+            "id": "dark_mid",
+            "type": "background_layer",
+            "source_region": [
+                46,
+                324,
+                1307,
+                145
+            ],
+            "parallax": 0.12,
+            "url": "./dark/dark_mid.png"
+        },
+        {
+            "id": "dark_foreground",
+            "type": "background_layer",
+            "source_region": [
+                42,
+                494,
+                1329,
+                122
+            ],
+            "parallax": 0.2,
+            "url": "./dark/dark_foreground.png"
+        },
+        {
+            "id": "dark_atmosphere",
+            "type": "background_layer",
+            "source_region": [
+                114,
+                619,
+                1125,
+                136
+            ],
+            "parallax": 0.08,
+            "url": "./dark/dark_atmosphere.png"
+        }
+    ]
+}

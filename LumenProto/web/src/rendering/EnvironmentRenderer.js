@@ -23,7 +23,7 @@ export class EnvironmentRenderer {
     async init() {
         try {
             // Fetch manifest to know which assets belong to which biome
-            const response = await fetch('./web/environments/manifest.json');
+            const response = await fetch('./web/environments/asset_manifest.json');
             if (response.ok) {
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") !== -1) {
@@ -36,7 +36,7 @@ export class EnvironmentRenderer {
             }
         } catch (e) {
             console.warn("Failed to load environment manifest. Proceeding with blank background. Error:", e);
-            this.manifest = { environments: {} };
+            this.manifest = { assets: [] };
         }
     }
     
@@ -49,7 +49,8 @@ export class EnvironmentRenderer {
         }
         this.layers = [];
         
-        const biomeManifest = this.manifest[biomeId];
+        // Filter assets by biome (e.g. all assets starting with 'dark_')
+        const biomeAssets = (this.manifest.assets || []).filter(a => a.id.startsWith(biomeId));
         
         // Fog/Lighting atmosphere color based on biome
         if (biomeId === 'dark') {
@@ -60,55 +61,77 @@ export class EnvironmentRenderer {
             this.scene.background = new THREE.Color(0x0f2a1a);
         }
 
-        if (!biomeManifest) return;
+        if (biomeAssets.length === 0) return;
 
-        // Configuration for depth and scale per layer
-        const layerConfig = {
-            'sky': { z: -500, y: 300, scale: 2000, parallax: 0.02 },
-            'far': { z: -400, y: 150, scale: 1500, parallax: 0.05 },
-            'mid': { z: -200, y: 50, scale: 1000, parallax: 0.12 },
-            'foreground': { z: -100, y: -50, scale: 1000, parallax: 0.20 },
-            'atmosphere': { z: 50, y: 0, scale: 1200, parallax: 0.08 }
+        // Base Z depths per layer type to ensure correct rendering order
+        const depthConfig = {
+            'sky': -500,
+            'far': -400,
+            'mid': -200,
+            'foreground': -100,
+            'atmosphere': 50
         };
 
-        for (const [layerName, path] of Object.entries(biomeManifest)) {
-            const config = layerConfig[layerName] || { z: -300, y: 0, scale: 1000, parallax: 0.1 };
-            
+        for (const asset of biomeAssets) {
             try {
-                // Correct path resolution relative to where manifest is loaded
-                const fullPath = `./web/environments/${path.replace('./', '')}`;
+                const fullPath = `./web/environments/${asset.url.replace('./', '')}`;
                 const tex = await this.assets.textureLoader.loadAsync(fullPath);
                 
                 tex.colorSpace = THREE.SRGBColorSpace;
-                tex.wrapS = THREE.RepeatWrapping;
                 tex.minFilter = THREE.NearestFilter;
                 tex.magFilter = THREE.NearestFilter;
                 
-                // Calculate correct aspect ratio wrapping based on natural image size
-                const aspect = tex.image.width / tex.image.height;
-                const meshWidth = config.scale * aspect;
+                let isLayer = asset.type === 'background_layer';
                 
-                // We want to tile it horizontally
-                tex.repeat.set(4, 1);
+                if (isLayer) {
+                    tex.wrapS = THREE.RepeatWrapping;
+                    tex.repeat.set(4, 1);
+                }
+                
+                // Determine z-depth based on ID for layers, or relative for objects
+                let baseZ = -300;
+                let baseY = 0;
+                let scaleY = 1000;
+                
+                if (asset.id.includes('sky')) { baseZ = -500; baseY = 300; scaleY = 2000; }
+                else if (asset.id.includes('far')) { baseZ = -400; baseY = 150; scaleY = 1500; }
+                else if (asset.id.includes('mid')) { baseZ = -200; baseY = 50; scaleY = 1000; }
+                else if (asset.id.includes('foreground')) { baseZ = -100; baseY = -50; scaleY = 1000; }
+                else if (asset.id.includes('atmosphere')) { baseZ = 50; baseY = 0; scaleY = 1200; }
+                else if (asset.type === 'decorative_object') {
+                    // Place it at the depth of the layer it belongs to based on parallax
+                    if (asset.parallax <= 0.05) { baseZ = -350; baseY = 150; scaleY = 500; }
+                    else if (asset.parallax <= 0.12) { baseZ = -150; baseY = 50; scaleY = 500; }
+                    else { baseZ = -50; baseY = -50; scaleY = 500; }
+                }
+                
+                const aspect = tex.image.width / tex.image.height;
+                const meshWidth = scaleY * aspect;
                 
                 const mat = new THREE.MeshBasicMaterial({ 
                     map: tex, 
-                    transparent: layerName !== 'sky', 
+                    transparent: !asset.id.includes('sky'), 
                     depthWrite: false 
                 });
                 
-                // Since we repeat 4 times, plane must be 4 times wider
-                const geo = new THREE.PlaneGeometry(meshWidth * 4, config.scale);
+                // If it's a layer, tile it. If object, just place it.
+                const geo = isLayer 
+                    ? new THREE.PlaneGeometry(meshWidth * 4, scaleY)
+                    : new THREE.PlaneGeometry(meshWidth, scaleY);
+                    
                 const mesh = new THREE.Mesh(geo, mat);
                 
-                mesh.position.set(0, config.y, config.z);
-                mesh.userData = { type: layerName, parallaxX: config.parallax };
+                // For objects, shift X so they aren't all stacked at 0
+                let offsetX = isLayer ? 0 : (Math.random() * 2000 - 1000);
+                
+                mesh.position.set(offsetX, baseY, baseZ);
+                mesh.userData = { type: asset.id, parallaxX: asset.parallax };
                 
                 this.group.add(mesh);
                 this.layers.push(mesh);
                 
             } catch (err) {
-                console.error(`Failed to load layer ${layerName} for biome ${biomeId}:`, err);
+                console.error(`Failed to load asset ${asset.id}:`, err);
             }
         }
     }

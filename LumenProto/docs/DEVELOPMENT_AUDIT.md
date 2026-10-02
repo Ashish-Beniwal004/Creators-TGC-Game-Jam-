@@ -656,3 +656,23 @@ Implemented:
 - Confirmed that the game will continue using procedural placeholders until real assets are supplied, as per instruction to not fake art assets.
 Files created:
 - docs/PHASE_18_ASSET_AUDIT.md
+
+### 18B - 18K — External Asset Integration (Characters, Bosses, Biomes)
+Status: BLOCKED / AWAITING ASSETS
+Implemented:
+- As documented in Phase 18A, zero production-ready `.png` assets currently exist. 
+- The architectural nodes (AnimatedSprite2D, Sprite2D, CPUParticles2D, ParallaxBackground) established in Phases 16 and 17 remain structurally prepared for asset swap-ins. Collision masks and hitboxes are fully decoupled from visual sizes.
+- Procedural placeholders actively maintained to preserve gameplay readability.
+
+### 18L — UI / Dialogue Polish
+Status: PASS
+Implemented:
+- Confirmed that `UI.tscn` heavily restricts HUD bloat. 
+- Dialogue remains strictly bound to the bottom margin via `DialogueContainer`.
+
+### 18M — Final Visual Integration Audit
+Status: PASS
+Implemented:
+- Verified 0 3D dependencies (`Area3D`, `Vector3`, etc.).
+- Verified Sprite scalings do not mutate `CollisionShape2D` bounds.
+- Created `docs/PHASE_18_VISUAL_INTEGRATION_AUDIT.md`.

@@ -39,3 +39,13 @@ texture = SubResource("GradientTexture2D_proj")
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
 texture = SubResource("GradientTexture2D_light")
+
+[node name="TrailParticles" type="CPUParticles2D" parent="."]
+amount = 20
+lifetime = 0.5
+emission_shape = 1
+emission_sphere_radius = 4.0
+gravity = Vector2(0, 0)
+scale_amount_min = 1.0
+scale_amount_max = 3.0
+color = Color(1, 1, 1, 0.5)

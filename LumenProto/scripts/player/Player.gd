@@ -163,6 +163,9 @@ func _fire_projectile():
 		if proj.has_node("Sprite2D"):
 			proj.get_node("Sprite2D").modulate = light_power.get_light_color_value()
 			
+		if proj.has_node("TrailParticles"):
+			proj.get_node("TrailParticles").color = light_power.get_light_color_value()
+			
 		if proj.has_node("PointLight2D"):
 			proj.get_node("PointLight2D").color = light_power.get_light_color_value()
 		

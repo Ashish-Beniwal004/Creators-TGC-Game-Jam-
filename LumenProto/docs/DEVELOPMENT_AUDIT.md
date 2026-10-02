@@ -596,3 +596,12 @@ Implemented:
 Status: PASS
 Implemented:
 - Verified `JungleSpores` and `VineAura` established in Phase 16E correctly telegraph the Green Light mechanic and corrupted vegetation.
+
+### 17H — Projectiles and Light Effects
+Status: PASS
+Implemented:
+- Added a `TrailParticles` system (CPUParticles2D) to Lumen's `Projectile.tscn` to give attacks physical impact and trailing light.
+- Updated `Player.gd` to dynamically apply the current LightPower tint (White, Blue, Green) to the particle trail.
+Files modified:
+- scenes/projectiles/Projectile.tscn
+- scripts/player/Player.gd

@@ -44,15 +44,17 @@ export class Player {
         
         // Setup Animator
         const animMap = {
-            "idle": ["Gemini_Generated_Image_1en0xl1en0xl1en0_000.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_001.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_002.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_003.webp"],
-            "run": ["Gemini_Generated_Image_1en0xl1en0xl1en0_004.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_005.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_006.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_007.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_008.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_009.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_010.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_011.webp"],
-            "jump": ["Gemini_Generated_Image_1en0xl1en0xl1en0_012.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_013.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_014.webp"],
-            "fall": ["Gemini_Generated_Image_1en0xl1en0xl1en0_015.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_016.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_017.webp"],
-            "attack": ["Gemini_Generated_Image_1en0xl1en0xl1en0_018.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_019.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_020.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_021.webp", "Gemini_Generated_Image_1en0xl1en0xl1en0_022.webp"]
+            "idle": ["entities/player.png"],
+            "run": ["entities/player.png"],
+            "jump": ["entities/player.png"],
+            "fall": ["entities/player.png"],
+            "attack": ["entities/player.png"],
+            "hurt": ["entities/player.png"],
+            "death": ["entities/player.png"]
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
-        this.animator.baseScale = 0.4; // Tune to match Godot scale
+        this.animator.baseScale = 0.35; // Tune to match Godot scale
         this.animator.play("idle", 8);
     }
     

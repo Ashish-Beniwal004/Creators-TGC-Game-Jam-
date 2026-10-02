@@ -36,13 +36,15 @@ export class Enemy {
         this.scene.add(this.sprite);
         
         const animMap = {
-            "idle": ["Gemini_Generated_Image_tvqq9itvqq9itvqq_000.webp"],
-            "run": ["Gemini_Generated_Image_tvqq9itvqq9itvqq_000.webp"], // Fake run since we only have 1 frame extracted clearly
-            "attack": ["Gemini_Generated_Image_tvqq9itvqq9itvqq_000.webp"]
+            "idle": ["entities/villain.png"],
+            "run": ["entities/villain.png"],
+            "attack": ["entities/villain.png"],
+            "hurt": ["entities/villain.png"],
+            "death": ["entities/villain.png"]
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
-        this.animator.baseScale = 0.6; // Slightly larger than player
+        this.animator.baseScale = 0.15; // Villain is huge (1500px), scale down!
         this.animator.play("idle", 8);
     }
     

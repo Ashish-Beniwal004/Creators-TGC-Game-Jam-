@@ -176,12 +176,18 @@ export class Game {
                 }
             }
             
-            // Boss attacks player
             if (this.boss && this.boss.health > 0 && this.boss.state === "attack" && !this.player.isHurt) {
                 if (this.combat.checkMeleeHit(this.boss, this.player, 150, this.boss.direction)) {
                     this.player.takeDamage(20, this.boss.direction);
                     this.audio.playHit();
                     this.renderer.camera.shake(8, 0.3);
+                }
+            }
+            
+            // ISSUE 3: Void Death
+            if (this.player.body.position.y > 1500) {
+                if (this.player.health > 0) {
+                    this.player.health = 0; // Triggers showDeathScreen() via UI update
                 }
             }
         }

@@ -40,15 +40,16 @@ export class Boss {
         this.sprite = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ transparent: true }));
         this.scene.add(this.sprite);
         
-        // Re-use enemy frames since we lack boss assets in atlas, just scaled up.
         const animMap = {
-            "idle": ["Gemini_Generated_Image_tvqq9itvqq9itvqq_000.webp"],
-            "run": ["Gemini_Generated_Image_tvqq9itvqq9itvqq_000.webp"],
-            "attack": ["Gemini_Generated_Image_tvqq9itvqq9itvqq_000.webp"]
+            "idle": ["entities/villain.png"],
+            "run": ["entities/villain.png"],
+            "attack": ["entities/villain.png"],
+            "hurt": ["entities/villain.png"],
+            "death": ["entities/villain.png"]
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
-        this.animator.baseScale = 1.2; // Huge
+        this.animator.baseScale = 0.25; // Huge
         this.animator.play("idle", 8);
         
         // Telegraph Mesh

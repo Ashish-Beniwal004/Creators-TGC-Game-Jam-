@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://scenes/items/BlueCore.tscn" id="4_bluecore"]
 [ext_resource type="PackedScene" path="res://scenes/environment/IceBlock.tscn" id="5_iceblock"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/FrostEnemy.tscn" id="6_frost"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ColdBlood.tscn" id="7_boss"]
+[ext_resource type="Script" path="res://scripts/environment/BossArenaTrigger.gd" id="8_trigger"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_main"]
 
@@ -97,3 +99,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 8)
 
 [node name="FrostEnemy1" parent="." instance=ExtResource("6_frost")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1.5, 8)
+
+[node name="ColdBloodBoss" parent="." instance=ExtResource("7_boss")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 25)
+
+[node name="BossTrigger" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 15)
+script = ExtResource("8_trigger")
+boss_path = NodePath("../ColdBloodBoss")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BossTrigger"]
+shape = SubResource("BoxShape3D_ground")

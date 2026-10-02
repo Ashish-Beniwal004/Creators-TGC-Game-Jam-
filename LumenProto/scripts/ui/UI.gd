@@ -5,6 +5,12 @@ extends Control
 @onready var xp_bar = $MarginContainer/VBoxContainer/XPBar
 @onready var xp_label = $MarginContainer/VBoxContainer/XPBar/XPLabel
 @onready var level_up_label = $MarginContainer/VBoxContainer/LevelUpLabel
+@onready var boss_health_container = $BossHealthContainer
+@onready var boss_name_label = $BossHealthContainer/BossNameLabel
+@onready var boss_health_bar = $BossHealthContainer/BossHealthBar
+
+func _ready():
+	add_to_group("ui")
 
 func update_ui(hp: int, level: int, xp: int, max_xp: int = 10):
 	hp_label.text = "HP: " + str(hp)
@@ -21,3 +27,15 @@ func show_level_up():
 func show_death_screen():
 	if has_node("DeathScreen"):
 		$DeathScreen.visible = true
+
+func show_boss_health(boss_name: String, current_hp: int, max_hp: int):
+	boss_health_container.visible = true
+	boss_name_label.text = boss_name
+	boss_health_bar.max_value = max_hp
+	boss_health_bar.value = current_hp
+
+func update_boss_health(current_hp: int):
+	boss_health_bar.value = current_hp
+
+func hide_boss_health():
+	boss_health_container.visible = false

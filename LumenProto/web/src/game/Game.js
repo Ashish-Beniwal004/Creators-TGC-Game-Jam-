@@ -36,6 +36,13 @@ export class Game {
         this.frameCount = 0;
         this.fps = 0;
         this.lastFpsTime = this.lastTime;
+        
+        this.DEBUG_MODE = false;
+        
+        if (!this.DEBUG_MODE) {
+            const debugUI = document.getElementById('debug-ui');
+            if (debugUI) debugUI.style.display = 'none';
+        }
     }
 
     async init() {
@@ -204,6 +211,8 @@ export class Game {
     }
     
     updateDebug() {
+        if (!this.DEBUG_MODE) return;
+        
         const debugUI = document.getElementById('debug-ui');
         if (debugUI && this.player) {
             const pos = this.player.body.position;

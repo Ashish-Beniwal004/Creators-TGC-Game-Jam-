@@ -18,6 +18,9 @@ var gravity: float = 12.0
 var max_fall_speed: float = -40.0
 var mouse_sensitivity: float = 0.005
 var is_dead: bool = false
+var is_slowed: bool = false
+var original_speed: float = 6.0
+var original_acceleration: float = 10.0
 
 @onready var camera = $Camera3D
 @onready var attack_ray = $Camera3D/AttackRay
@@ -34,6 +37,8 @@ func _ready():
 	current_hp = max_hp
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	original_speed = speed
+	original_acceleration = acceleration
 
 func _setup_inputs():
 	var inputs = {
@@ -184,6 +189,18 @@ func take_damage(amount: int):
 	print("Player took ", amount, " damage. HP: ", current_hp)
 	if current_hp <= 0:
 		die()
+
+func apply_slow(duration: float, speed_multiplier: float = 0.5):
+	if is_slowed or is_dead:
+		return
+	is_slowed = true
+	speed = original_speed * speed_multiplier
+	acceleration = original_acceleration * 0.5
+	get_tree().create_timer(duration).timeout.connect(func():
+		speed = original_speed
+		acceleration = original_acceleration
+		is_slowed = false
+	)
 
 func die():
 	is_dead = true

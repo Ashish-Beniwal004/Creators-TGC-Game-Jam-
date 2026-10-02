@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/main/LightReceptor.tscn" id="3_receptor"]
 [ext_resource type="PackedScene" path="res://scenes/items/BlueCore.tscn" id="4_bluecore"]
 [ext_resource type="PackedScene" path="res://scenes/environment/IceBlock.tscn" id="5_iceblock"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/FrostEnemy.tscn" id="6_frost"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_main"]
 
@@ -93,3 +94,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1, 5)
 
 [node name="IceBlock1" parent="." instance=ExtResource("5_iceblock")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 8)
+
+[node name="FrostEnemy1" parent="." instance=ExtResource("6_frost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1.5, 8)

@@ -108,6 +108,15 @@ export class Game {
                         this.light.acquireCore(color);
                         Matter.Composite.remove(this.physics.engine.world, b);
                         b.label = "collected"; // prevent multiple triggers
+                        
+                        // Remove visual mesh
+                        for (let i = 0; i < this.platforms.length; i++) {
+                            if (this.platforms[i].body === b) {
+                                this.renderer.scene.remove(this.platforms[i].mesh);
+                                break;
+                            }
+                        }
+                        
                         console.log(`Acquired ${color} core! LightPower is now ${this.light.lightPower}`);
                     }
                 }

@@ -40,29 +40,47 @@ export class Boss {
         this.sprite = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ transparent: true }));
         this.scene.add(this.sprite);
         
+        let folder = "villain_frames_4x4";
+        let prefix = "villain";
+        
+        if (this.type === "cold_blood") {
+            folder = "ice_boss_frames";
+            prefix = "iceboss";
+        } else if (this.type === "overgrowth") {
+            folder = "jungle_boss_frames";
+            prefix = "jungleboss";
+        } else if (this.type === "dark_boss") {
+            folder = "dark_boss_frames";
+            prefix = "darkboss";
+        }
+        
         const animMap = {
             "idle": [
-                "entities/villain_frames_4x4/villain_0_0.png",
-                "entities/villain_frames_4x4/villain_0_1.png",
-                "entities/villain_frames_4x4/villain_0_2.png",
-                "entities/villain_frames_4x4/villain_0_3.png"
+                `entities/${folder}/${prefix}_0_0.png`,
+                `entities/${folder}/${prefix}_0_1.png`,
+                `entities/${folder}/${prefix}_0_2.png`,
+                `entities/${folder}/${prefix}_0_3.png`
             ],
-            "run": [
-                "entities/villain_frames_4x4/villain_1_0.png",
-                "entities/villain_frames_4x4/villain_1_1.png",
-                "entities/villain_frames_4x4/villain_1_2.png",
-                "entities/villain_frames_4x4/villain_1_3.png"
+            "run": [ // Row 1 is a charge/attack for bosses, let's use idle for run, or row 0
+                `entities/${folder}/${prefix}_0_0.png`,
+                `entities/${folder}/${prefix}_0_1.png`,
+                `entities/${folder}/${prefix}_0_2.png`,
+                `entities/${folder}/${prefix}_0_3.png`
             ],
-            "attack": [
-                "entities/villain_frames_4x4/villain_2_0.png",
-                "entities/villain_frames_4x4/villain_2_1.png",
-                "entities/villain_frames_4x4/villain_2_2.png",
-                "entities/villain_frames_4x4/villain_2_3.png"
+            "attack": [ // Row 2 is typically the big swing
+                `entities/${folder}/${prefix}_2_0.png`,
+                `entities/${folder}/${prefix}_2_1.png`,
+                `entities/${folder}/${prefix}_2_2.png`,
+                `entities/${folder}/${prefix}_2_3.png`
             ],
-            "hurt": ["entities/villain_frames_4x4/villain_3_0.png"],
-            "death": [
-                "entities/villain_frames_4x4/villain_3_2.png",
-                "entities/villain_frames_4x4/villain_3_3.png"
+            "hurt": [ // Row 3 start
+                `entities/${folder}/${prefix}_3_0.png`,
+                `entities/${folder}/${prefix}_3_1.png`
+            ],
+            "death": [ // Row 3 end
+                `entities/${folder}/${prefix}_3_1.png`,
+                `entities/${folder}/${prefix}_3_2.png`,
+                `entities/${folder}/${prefix}_3_3.png`
             ]
         };
         

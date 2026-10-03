@@ -27,10 +27,13 @@ export class AssetManager {
             // Load isolated entity sprites (villain is still single sprite fallback)
             await this.loadExternalSprite('entities/villain_cleaned.png');
             
-            // Load villain frames
+            // Load villain and boss frames
             for (let row = 0; row < 4; row++) {
                 for (let col = 0; col < 4; col++) {
                     await this.loadExternalSprite(`entities/villain_frames_4x4/villain_${row}_${col}.png`);
+                    await this.loadExternalSprite(`entities/dark_boss_frames/darkboss_${row}_${col}.png`);
+                    await this.loadExternalSprite(`entities/ice_boss_frames/iceboss_${row}_${col}.png`);
+                    await this.loadExternalSprite(`entities/jungle_boss_frames/jungleboss_${row}_${col}.png`);
                 }
             }
             

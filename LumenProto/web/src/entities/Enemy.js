@@ -47,10 +47,10 @@ export class Enemy {
                 "entities/villain_frames_4x4/villain_0_3.png"
             ],
             "run": [
-                "entities/villain_frames_4x4/villain_1_0.png",
-                "entities/villain_frames_4x4/villain_1_1.png",
-                "entities/villain_frames_4x4/villain_1_2.png",
-                "entities/villain_frames_4x4/villain_1_3.png"
+                "entities/villain_frames_4x4/villain_0_0.png",
+                "entities/villain_frames_4x4/villain_0_1.png",
+                "entities/villain_frames_4x4/villain_0_2.png",
+                "entities/villain_frames_4x4/villain_0_3.png"
             ],
             "attack": [
                 "entities/villain_frames_4x4/villain_2_0.png",
@@ -58,8 +58,12 @@ export class Enemy {
                 "entities/villain_frames_4x4/villain_2_2.png",
                 "entities/villain_frames_4x4/villain_2_3.png"
             ],
-            "hurt": ["entities/villain_frames_4x4/villain_3_0.png"],
+            "hurt": [
+                "entities/villain_frames_4x4/villain_3_0.png",
+                "entities/villain_frames_4x4/villain_3_1.png"
+            ],
             "death": [
+                "entities/villain_frames_4x4/villain_3_1.png",
                 "entities/villain_frames_4x4/villain_3_2.png",
                 "entities/villain_frames_4x4/villain_3_3.png"
             ]

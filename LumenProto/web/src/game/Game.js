@@ -143,6 +143,7 @@ export class Game {
         // Block updates if paused or dead (except rendering/particles)
         if (this.ui.isPaused || this.ui.isDead) {
             this.renderer.render();
+            this.input.update(); // Fix: Clear input buffer
             requestAnimationFrame(this.loop.bind(this));
             return;
         }

@@ -80,8 +80,15 @@ export class Boss {
             if (Math.abs(dist) > 80) {
                 this.direction = Math.sign(dist);
                 Matter.Body.setVelocity(this.body, { x: this.direction * this.speed, y: this.body.velocity.y });
+                this.animator.play("run");
+            } else {
+                Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                // If in range, stop running and start telegraphing
+                if (this.stateTimer > 0) {
+                    this.state = "telegraph";
+                    this.stateTimer = 1.0;
+                }
             }
-            this.animator.play("run");
         } else if (this.state === "idle") {
             Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
             this.animator.play("idle");

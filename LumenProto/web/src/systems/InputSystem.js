@@ -27,6 +27,6 @@ export class InputSystem {
     }
     
     isJustPressed(code) {
-        return this.justPressed[code] === true || this.keys[code] === true;
+        return this.justPressed[code] === true;
     }
 }

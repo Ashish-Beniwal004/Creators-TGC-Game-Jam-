@@ -115,7 +115,7 @@ export class LevelManager {
     }
     
     update(player) {
-        if (!player || !player.body) return;
+        if (!player || !player.body || this.game.ui.isDead) return;
         
         // Handle Checkpoint
         if (this.checkpoint && !this.checkpoint.isActivated) {

@@ -24,14 +24,20 @@ export class AssetManager {
                 throw new Error(`Failed to load atlas_meta.json: ${response.statusText}`);
             }
             
-            // Load isolated entity sprites (villain is still single sprite)
+            // Load isolated entity sprites (villain is still single sprite fallback)
             await this.loadExternalSprite('entities/villain_cleaned.png');
+            
+            // Load villain frames
+            for (let row = 0; row < 4; row++) {
+                for (let col = 0; col < 4; col++) {
+                    await this.loadExternalSprite(`entities/villain_frames_4x4/villain_${row}_${col}.png`);
+                }
+            }
             
             const playerFrames = [0, 1, 2, 3, 5, 6, 12, 17, 20, 21, 25, 28, 36];
             for (let f of playerFrames) {
                 await this.loadExternalSprite(`entities/player_frames/player_frame_${f}.png`);
             }
-            await this.loadExternalSprite('entities/villain_cleaned.png');
             
             return true;
         } catch (error) {

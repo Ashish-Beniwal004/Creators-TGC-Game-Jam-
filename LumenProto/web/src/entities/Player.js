@@ -148,8 +148,10 @@ export class Player {
         this.animator.play(state, fps);
         this.animator.update(delta);
         
-        // Visual indicator for blocking
-        if (this.isBlocking && this.sprite.material) {
+        // Visual indicator for blocking and hurt
+        if (this.isHurt && this.sprite.material) {
+            this.sprite.material.color.setHex(0xff5555);
+        } else if (this.isBlocking && this.sprite.material) {
             this.sprite.material.color.setHex(0x55aaff);
         } else if (this.sprite.material) {
             this.sprite.material.color.setHex(0xffffff);

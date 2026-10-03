@@ -40,11 +40,29 @@ export class Enemy {
         this.scene.add(this.sprite);
         
         const animMap = {
-            "idle": ["entities/villain_cleaned.png"],
-            "run": ["entities/villain_cleaned.png"],
-            "attack": ["entities/villain_cleaned.png"],
-            "hurt": ["entities/villain_cleaned.png"],
-            "death": ["entities/villain_cleaned.png"]
+            "idle": [
+                "entities/villain_frames_4x4/villain_0_0.png",
+                "entities/villain_frames_4x4/villain_0_1.png",
+                "entities/villain_frames_4x4/villain_0_2.png",
+                "entities/villain_frames_4x4/villain_0_3.png"
+            ],
+            "run": [
+                "entities/villain_frames_4x4/villain_1_0.png",
+                "entities/villain_frames_4x4/villain_1_1.png",
+                "entities/villain_frames_4x4/villain_1_2.png",
+                "entities/villain_frames_4x4/villain_1_3.png"
+            ],
+            "attack": [
+                "entities/villain_frames_4x4/villain_2_0.png",
+                "entities/villain_frames_4x4/villain_2_1.png",
+                "entities/villain_frames_4x4/villain_2_2.png",
+                "entities/villain_frames_4x4/villain_2_3.png"
+            ],
+            "hurt": ["entities/villain_frames_4x4/villain_3_0.png"],
+            "death": [
+                "entities/villain_frames_4x4/villain_3_2.png",
+                "entities/villain_frames_4x4/villain_3_3.png"
+            ]
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
@@ -99,6 +117,13 @@ export class Enemy {
         
         this.animator.play(state, 8);
         this.animator.update(delta);
+        
+        // Visual Hit Flash
+        if (this.isHurt && this.sprite.material) {
+            this.sprite.material.color.setHex(0xff5555);
+        } else if (this.sprite.material) {
+            this.sprite.material.color.setHex(0xffffff);
+        }
         
         // Sync
         this.sprite.position.x = this.body.position.x;

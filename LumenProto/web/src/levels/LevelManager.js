@@ -53,25 +53,46 @@ export class LevelManager {
         if (biomeName === 'ice') color = 0x88ccff;
         if (biomeName === 'jungle') color = 0x228822;
         
-        // Create floors and platforms
-        this.createPlatform(400, 500, 2000, 40, color);
-        this.createPlatform(600, 380, 200, 20, color);
-        this.createPlatform(900, 300, 200, 20, color);
-        
-        this.createPlatform(1500, 300, 400, 40, color); // Biome gate platform
-        
-        // Spawn core if needed based on biome
-        if (biomeName === 'dark' && !this.game.light.hasBlueCore) {
-            this.createCore(1000, 250, 'blue');
-            this.spawnEnemy(800, 300);
-            this.spawnEnemy(1200, 200);
+        // Create floors, platforms, and entities based on biome
+        if (biomeName === 'dark') {
+            // Dark Biome: Intro, simple gaps, vertical platforms
+            this.createPlatform(300, 500, 600, 40, color); // Start floor
+            this.createPlatform(675, 400, 150, 20, color); // Gap platform
+            this.createPlatform(1000, 500, 500, 40, color); // Mid floor
+            this.createPlatform(1150, 350, 200, 20, color); // Upper platform
+            this.createPlatform(1600, 500, 600, 40, color); // Gate floor
+            
+            if (!this.game.light.hasBlueCore) {
+                this.createCore(1150, 250, 'blue');
+            }
+            this.spawnEnemy(1000, 400);
+            this.spawnEnemy(1150, 250);
             this.game.ui.showDialogue(["Welcome to the Dark World.", "The light has faded.", "Find the Blue Core to restore the Ice."]);
-        } else if (biomeName === 'ice' && !this.game.light.hasGreenCore) {
-            this.createCore(1200, 200, 'green');
-            this.spawnBoss(1000, 300, "cold_blood");
-            this.game.ui.showDialogue(["The Ice Biome.", "Cold Blood guards the Green Core."]);
+            
+        } else if (biomeName === 'ice') {
+            // Ice Biome: Sunken arena for boss
+            this.createPlatform(200, 500, 600, 40, color); // Start floor
+            this.createPlatform(550, 400, 150, 20, color); // Step down
+            this.createPlatform(900, 600, 800, 40, color); // Boss Arena (lower)
+            this.createPlatform(1250, 400, 150, 20, color); // Step up
+            this.createPlatform(1600, 500, 600, 40, color); // Gate floor
+            
+            if (!this.game.light.hasGreenCore) {
+                this.createCore(900, 450, 'green');
+            }
+            this.spawnBoss(900, 500, "cold_blood");
+            this.game.ui.showDialogue(["The Ice Biome.", "Cold Blood guards the Green Core.", "Prepare for battle."]);
+            
         } else if (biomeName === 'jungle') {
-            this.spawnBoss(1000, 300, "overgrowth");
+            // Jungle Biome: Vertical climbing
+            this.createPlatform(200, 500, 400, 40, color); // Start floor
+            this.createPlatform(450, 380, 150, 20, color); // Step 1
+            this.createPlatform(700, 260, 150, 20, color); // Step 2
+            this.createPlatform(1100, 260, 600, 40, color); // High Boss Arena
+            this.createPlatform(1600, 500, 400, 40, color); // Low Gate exit
+            this.createPlatform(1350, 380, 150, 20, color); // Step down
+            
+            this.spawnBoss(1100, 150, "overgrowth");
             this.game.ui.showDialogue(["The Jungle.", "Overgrowth stands in your way.", "Defeat it to reveal the truth."]);
         }
         

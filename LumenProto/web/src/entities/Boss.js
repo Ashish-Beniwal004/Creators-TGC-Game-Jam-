@@ -41,11 +41,11 @@ export class Boss {
         this.scene.add(this.sprite);
         
         const animMap = {
-            "idle": ["entities/villain.png"],
-            "run": ["entities/villain.png"],
-            "attack": ["entities/villain.png"],
-            "hurt": ["entities/villain.png"],
-            "death": ["entities/villain.png"]
+            "idle": ["entities/villain_cleaned.png"],
+            "run": ["entities/villain_cleaned.png"],
+            "attack": ["entities/villain_cleaned.png"],
+            "hurt": ["entities/villain_cleaned.png"],
+            "death": ["entities/villain_cleaned.png"]
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
@@ -135,5 +135,12 @@ export class Boss {
             Matter.Composite.remove(this.physics.engine.world, this.body);
             this.body = null;
         }
+    }
+    
+    canDealDamage() {
+        if (this.state !== "attack") return false;
+        // Attack state lasts 0.5s (stateTimer counts down from 0.5 to 0)
+        // Only deal damage in the middle of the attack
+        return this.stateTimer <= 0.4 && this.stateTimer >= 0.2;
     }
 }

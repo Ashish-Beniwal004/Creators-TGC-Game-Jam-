@@ -195,7 +195,7 @@ export class Game {
                     }
                 }
                 
-                if (this.boss && this.boss.health > 0 && this.boss.state === "attack" && !this.player.isHurt) {
+                if (this.boss && this.boss.health > 0 && this.boss.canDealDamage() && !this.player.isHurt) {
                     if (this.combat.checkMeleeHit(this.boss, this.player, 150, this.boss.direction)) {
                         this.player.takeDamage(20, this.boss.direction);
                         this.audio.playHit();

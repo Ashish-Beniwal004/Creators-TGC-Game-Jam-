@@ -181,6 +181,14 @@ export class Player {
         Matter.Body.setVelocity(this.body, { x: knockbackDir * 5, y: -5 });
     }
     
+    die() {
+        this.health = 0;
+        this.isHurt = true;
+        this.isAttacking = false;
+        this.isBlocking = false;
+        Matter.Body.setVelocity(this.body, { x: 0, y: 0 });
+    }
+    
     reset() {
         this.health = 100;
         this.isHurt = false;

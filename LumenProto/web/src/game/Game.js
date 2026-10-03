@@ -214,7 +214,7 @@ export class Game {
             // ISSUE 3: Void Death
             if (this.player.body.position.y > 1500) {
                 if (this.player.health > 0) {
-                    this.player.health = 0; // Triggers showDeathScreen() via UI update
+                    this.player.die();
                 }
             }
         }

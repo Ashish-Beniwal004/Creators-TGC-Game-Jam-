@@ -81,6 +81,11 @@ export class Boss {
     update(delta, playerBody) {
         if (!this.body || this.health <= 0) return;
         
+        if (this.body.position.y > 1500) {
+            this.die();
+            return;
+        }
+        
         if (this.isHurt) {
             this.hurtTimer -= delta;
             if (this.hurtTimer <= 0) this.isHurt = false;
@@ -162,8 +167,15 @@ export class Boss {
         this.hurtTimer = 0.2; // Less hitstun for boss
         
         if (this.health <= 0) {
-            this.scene.remove(this.sprite);
-            this.scene.remove(this.telegraphMesh);
+            this.die();
+        }
+    }
+    
+    die() {
+        this.health = 0;
+        this.scene.remove(this.sprite);
+        this.scene.remove(this.telegraphMesh);
+        if (this.body) {
             Matter.Composite.remove(this.physics.engine.world, this.body);
             this.body = null;
         }

@@ -138,7 +138,6 @@ export class Game {
             if (this.respawnPoint) {
                 this.levels.loadLevel(this.respawnPoint.biome);
                 Matter.Body.setPosition(this.player.body, { x: this.respawnPoint.x, y: this.respawnPoint.y });
-                if (this.levels.checkpoint) this.levels.checkpoint.activate();
             } else {
                 this.levels.loadLevel('dark');
                 Matter.Body.setPosition(this.player.body, { x: 100, y: 300 });
@@ -165,8 +164,9 @@ export class Game {
                 this.player.sprite.position.y = -this.player.body.position.y;
             } else {
                 this.player.update(deltaTime);
-                if (this.player.input.isDown('ArrowUp') || this.player.input.isDown('KeyW') || this.player.input.isDown('Space')) {
-                    if (this.player.isGrounded) this.audio.playJump();
+                if (this.player.justJumped) {
+                    this.audio.playJump();
+                    this.player.justJumped = false;
                 }
             }
             this.renderer.camera.follow(this.player.sprite.position, deltaTime);
@@ -230,8 +230,13 @@ export class Game {
             }
         }
         
-        if (this.boss && !isDialogueActive) {
-            this.boss.update(deltaTime, this.player ? this.player.body : null);
+        if (this.boss) {
+            if (!isDialogueActive) {
+                this.boss.update(deltaTime, this.player ? this.player.body : null);
+            }
+            if (!this.boss.body) {
+                this.boss = null;
+            }
         }
         
         // Update particles

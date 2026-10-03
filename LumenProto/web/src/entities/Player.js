@@ -99,9 +99,10 @@ export class Player {
             
             Matter.Body.setVelocity(this.body, { x: moveX * currentSpeed, y: this.body.velocity.y });
             
-            if ((this.input.isDown('ArrowUp') || this.input.isDown('KeyW') || this.input.isDown('Space')) && this.isGrounded) {
+            if ((this.input.isJustPressed('ArrowUp') || this.input.isJustPressed('KeyW') || this.input.isJustPressed('Space')) && this.isGrounded) {
                 Matter.Body.setVelocity(this.body, { x: this.body.velocity.x, y: this.jumpForce });
                 this.isGrounded = false;
+                this.justJumped = true;
             }
             
             // Attack trigger

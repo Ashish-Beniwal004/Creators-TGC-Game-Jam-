@@ -13,6 +13,11 @@ export class InputSystem {
         window.addEventListener('keyup', (e) => {
             this.keys[e.code] = false;
         });
+        
+        window.addEventListener('blur', () => {
+            this.keys = {};
+            this.justPressed = {};
+        });
     }
     
     init() {}

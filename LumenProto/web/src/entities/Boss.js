@@ -52,6 +52,9 @@ export class Boss {
         } else if (this.type === "dark_boss") {
             folder = "dark_boss_frames";
             prefix = "darkboss";
+        } else if (this.type === "ancient_dragon") {
+            folder = "ancient_dragon_frames";
+            prefix = "ancient_dragon";
         }
         
         const animMap = {

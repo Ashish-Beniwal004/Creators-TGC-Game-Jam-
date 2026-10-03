@@ -1,23 +1,27 @@
 import * as THREE from 'three';
 import * as Matter from 'matter-js';
 import { AtlasAnimator } from '../rendering/AtlasAnimator.js';
+import { CreatureConfig, getAnimMap } from './CreatureConfig.js';
 
 export class Enemy {
-    constructor(physicsWorld, scene, assetManager) {
+    constructor(physicsWorld, scene, assetManager, type = "wolf") {
         this.physics = physicsWorld;
         this.scene = scene;
         this.assetManager = assetManager;
+        
+        this.type = type;
+        this.config = CreatureConfig[type] || CreatureConfig["villain"];
         
         this.body = null;
         this.sprite = null;
         this.animator = null;
         
-        this.speed = 2.0;
+        this.speed = this.config.speed;
         this.direction = 1;
         
         this.isGrounded = false;
         
-        this.health = 30;
+        this.health = this.config.hp;
         this.isHurt = false;
         this.hurtTimer = 0;
         
@@ -27,51 +31,34 @@ export class Enemy {
     }
     
     async init(x, y) {
-        this.body = Matter.Bodies.rectangle(x, y, 50, 100, {
+        const isFlying = this.config.movementType === "flying";
+        
+        this.body = Matter.Bodies.rectangle(x, y, this.config.width, this.config.height, {
             inertia: Infinity,
             friction: 0.05,
-            frictionAir: 0.02,
-            restitution: 0.0
+            frictionAir: isFlying ? 0.05 : 0.02,
+            restitution: 0.0,
+            isSensor: isFlying // Flying creatures don't collide with platforms
         });
         Matter.Composite.add(this.physics.engine.world, this.body);
+        
+        // Anti-gravity for flying creatures
+        if (isFlying) {
+            this.body.plugin = { gravityScale: 0 }; 
+            // We'll manually counter gravity in update
+        }
         
         const geo = new THREE.PlaneGeometry(1, 1);
         this.sprite = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ transparent: true }));
         this.scene.add(this.sprite);
         
-        const animMap = {
-            "idle": [
-                "entities/villain_frames_4x4/villain_0_0.png",
-                "entities/villain_frames_4x4/villain_0_1.png",
-                "entities/villain_frames_4x4/villain_0_2.png",
-                "entities/villain_frames_4x4/villain_0_3.png"
-            ],
-            "run": [
-                "entities/villain_frames_4x4/villain_0_0.png",
-                "entities/villain_frames_4x4/villain_0_1.png",
-                "entities/villain_frames_4x4/villain_0_2.png",
-                "entities/villain_frames_4x4/villain_0_3.png"
-            ],
-            "attack": [
-                "entities/villain_frames_4x4/villain_2_0.png",
-                "entities/villain_frames_4x4/villain_2_1.png",
-                "entities/villain_frames_4x4/villain_2_2.png",
-                "entities/villain_frames_4x4/villain_2_3.png"
-            ],
-            "hurt": [
-                "entities/villain_frames_4x4/villain_3_0.png",
-                "entities/villain_frames_4x4/villain_3_1.png"
-            ],
-            "death": [
-                "entities/villain_frames_4x4/villain_3_1.png",
-                "entities/villain_frames_4x4/villain_3_2.png",
-                "entities/villain_frames_4x4/villain_3_3.png"
-            ]
-        };
+        const animMap = getAnimMap(this.config.folder, this.config.prefix);
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
-        this.animator.baseScale = 0.3; // Match 100px body height
-        this.animator.play("idle", 8);
+        this.animator.baseScale = this.config.scale; 
+        
+        // Flying creatures always use 'run' as their flying loop
+        this.animator.play(isFlying ? "run" : "idle", 8);
     }
     
     update(delta, playerBody) {
@@ -82,31 +69,69 @@ export class Enemy {
             return;
         }
         
+        const isFlying = this.config.movementType === "flying";
+        if (isFlying) {
+            Matter.Body.applyForce(this.body, this.body.position, { x: 0, y: -0.001 * this.body.mass });
+        }
+        
         if (this.isHurt) {
             this.hurtTimer -= delta;
             if (this.hurtTimer <= 0) this.isHurt = false;
         } else if (this.isAttacking) {
             this.attackTimer -= delta;
             if (this.attackTimer <= 0) this.isAttacking = false;
-            Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+            
+            if (isFlying) {
+                Matter.Body.setVelocity(this.body, { x: this.body.velocity.x * 0.9, y: this.body.velocity.y * 0.9 });
+            } else {
+                Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+            }
         } else {
             if (this.attackCooldown > 0) this.attackCooldown -= delta;
             
-            // Simple AI: Move towards player
+            // Creature AI
             if (playerBody) {
-                const dist = playerBody.position.x - this.body.position.x;
-                if (Math.abs(dist) > 70) {
-                    this.direction = Math.sign(dist);
-                    Matter.Body.setVelocity(this.body, { x: this.direction * this.speed, y: this.body.velocity.y });
-                } else {
-                    this.direction = Math.sign(dist) || this.direction;
-                    Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                const distX = playerBody.position.x - this.body.position.x;
+                // For flying creatures, they need to fly down to the player
+                const distY = playerBody.position.y - this.body.position.y;
+                const dist = Math.sqrt(distX * distX + distY * distY);
+                
+                if (dist < this.config.detectionRange && dist > this.config.attackRange) {
+                    this.direction = Math.sign(distX);
+                    
+                    if (isFlying) {
+                        const dirX = distX / dist;
+                        const dirY = distY / dist;
+                        Matter.Body.setVelocity(this.body, { x: dirX * this.speed, y: dirY * this.speed });
+                    } else {
+                        Matter.Body.setVelocity(this.body, { x: this.direction * this.speed, y: this.body.velocity.y });
+                    }
+                } else if (dist <= this.config.attackRange) {
+                    this.direction = Math.sign(distX) || this.direction;
+                    if (isFlying) {
+                        Matter.Body.setVelocity(this.body, { x: this.body.velocity.x * 0.8, y: this.body.velocity.y * 0.8 });
+                    } else {
+                        Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                    }
                     
                     if (this.attackCooldown <= 0) {
                         this.isAttacking = true;
-                        this.attackTimer = 0.5; // 500ms attack animation
-                        this.attackCooldown = 1.5; // 1.5s between attacks
+                        this.attackTimer = this.config.attackDuration; 
+                        this.attackCooldown = this.config.attackCooldown; 
                     }
+                } else {
+                    // Out of range, slow down
+                    if (isFlying) {
+                        Matter.Body.setVelocity(this.body, { x: this.body.velocity.x * 0.9, y: this.body.velocity.y * 0.9 });
+                    } else {
+                        Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                    }
+                }
+            } else {
+                if (isFlying) {
+                    Matter.Body.setVelocity(this.body, { x: this.body.velocity.x * 0.9, y: this.body.velocity.y * 0.9 });
+                } else {
+                    Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
                 }
             }
         }
@@ -119,8 +144,10 @@ export class Enemy {
         } else if (this.isAttacking) {
             state = "attack";
             this.animator.setFlipX(this.direction < 0);
-        } else if (Math.abs(this.body.velocity.x) > 0.1) {
+        } else if (Math.abs(this.body.velocity.x) > 0.1 || (isFlying && Math.abs(this.body.velocity.y) > 0.1)) {
             state = "run";
+            this.animator.setFlipX(this.direction < 0);
+        } else {
             this.animator.setFlipX(this.direction < 0);
         }
         

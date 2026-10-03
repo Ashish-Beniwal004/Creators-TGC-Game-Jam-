@@ -28,12 +28,25 @@ export class AssetManager {
             await this.loadExternalSprite('entities/villain_cleaned.png');
             
             // Load villain and boss frames
-            for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 4; col++) {
-                    await this.loadExternalSprite(`entities/villain_frames_4x4/villain_${row}_${col}.png`);
-                    await this.loadExternalSprite(`entities/dark_boss_frames/darkboss_${row}_${col}.png`);
-                    await this.loadExternalSprite(`entities/ice_boss_frames/iceboss_${row}_${col}.png`);
-                    await this.loadExternalSprite(`entities/jungle_boss_frames/jungleboss_${row}_${col}.png`);
+            const folders = [
+                "villain_frames_4x4", "dark_boss_frames", "ice_boss_frames", "jungle_boss_frames",
+                "spider_frames", "scorpion_frames", "crocodile_frames", "wolf_frames",
+                "bat_frames", "lizard_frames", "dragon_frames", "ice_wolf_frames", "ancient_dragon_frames"
+            ];
+            
+            const prefixes = [
+                "villain", "darkboss", "iceboss", "jungleboss",
+                "spider", "scorpion", "crocodile", "wolf",
+                "bat", "lizard", "dragon", "ice_wolf", "ancient_dragon"
+            ];
+            
+            for (let i = 0; i < folders.length; i++) {
+                const folder = folders[i];
+                const prefix = prefixes[i];
+                for (let row = 0; row < 4; row++) {
+                    for (let col = 0; col < 4; col++) {
+                        await this.loadExternalSprite(`entities/${folder}/${prefix}_${row}_${col}.png`);
+                    }
                 }
             }
             

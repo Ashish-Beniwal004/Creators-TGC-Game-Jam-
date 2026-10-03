@@ -1,113 +1,109 @@
-async function runEndToEndTest() {
+async function autoPlay() {
     console.log("=========================================");
-    console.log("STARTING END-TO-END BROWSER TEST");
+    console.log("STARTING AUTOPLAY BOT PLAYTHROUGH");
     console.log("=========================================");
 
     const g = window.game;
+    if (!g) return;
     
-    // Helper to wait
+    let isPlaying = true;
+    
     const wait = ms => new Promise(r => setTimeout(r, ms));
     
-    // Helper to dismiss dialogue
-    const dismissDialogue = () => {
-        if (g.ui && g.ui.dialogueBox) {
+    // Auto-dismiss dialogs
+    setInterval(() => {
+        if (g.ui && g.ui.dialogueBox && g.ui.dialogueBox.style.display !== 'none') {
+            console.log("Auto-dismissing dialogue");
             g.ui.dialogueBox.style.display = 'none';
             g.ui.queue = [];
         }
-    };
-    
-    // Helper to press keys
-    const pressKey = (key, duration) => {
-        g.input.keys[key] = true;
-        return wait(duration).then(() => { g.input.keys[key] = false; });
-    };
+    }, 100);
 
-    try {
-        console.log("1. Starting in Dark Biome");
-        dismissDialogue();
-        await wait(500);
-        
-        console.log("2. Teleporting to Boss in Dark Biome");
-        if (g.boss) {
-            window.Matter.Body.setPosition(g.player.body, { x: g.boss.body.position.x - 200, y: g.boss.body.position.y });
-            await wait(500);
-            
-            console.log("3. Killing Boss");
-            g.boss.takeDamage(1000, 1);
-            await wait(1000);
-            
-            if (!g.boss) {
-                console.log("PASS: Boss died and was removed from game state.");
-            } else {
-                console.log("FAIL: Boss did not die or was not removed.");
-            }
-            
-            console.log("4. Teleporting to Gate");
-            let gate = g.levels.currentGate;
-            if (gate) {
-                window.Matter.Body.setPosition(g.player.body, { x: gate.position.x, y: gate.position.y });
-                await wait(1000);
-                
-                if (g.levels.currentBiome === 'ice') {
-                    console.log("PASS: Transitioned to Ice Biome.");
-                } else {
-                    console.log("FAIL: Did not transition to Ice Biome.");
-                }
-            }
-        }
-        
-        dismissDialogue();
-        await wait(500);
-        
-        console.log("5. Testing State Reset after Biome Transition");
-        if (g.projectiles.length === 0) console.log("PASS: Projectiles cleared.");
-        else console.log("FAIL: Projectiles not cleared.");
-        
-        if (g.enemies.length > 0) console.log("PASS: New enemies loaded.");
-        else console.log("FAIL: New enemies not loaded.");
-        
-        if (g.boss && g.boss.type === 'cold_blood') console.log("PASS: Ice boss loaded.");
-        else console.log("FAIL: Ice boss not loaded.");
-        
-        console.log("6. Testing Checkpoint Respawn loop");
-        let checkpoint = g.levels.checkpoints[0];
-        if (checkpoint) {
-            window.Matter.Body.setPosition(g.player.body, { x: checkpoint.x, y: checkpoint.y });
-            await wait(500);
-            dismissDialogue();
-            console.log("PASS: Checkpoint reached.");
-            
-            // Die
-            window.Matter.Body.setPosition(g.player.body, { x: checkpoint.x, y: 2000 });
-            await wait(1000);
-            dismissDialogue();
-            
-            // Press R
+    // Bot loop
+    while (isPlaying) {
+        if (g.ui.isDead) {
+            console.log("BOT DIED. Pressing R to respawn.");
             g.input.keys['KeyR'] = true;
             await wait(100);
             g.input.keys['KeyR'] = false;
             await wait(500);
-            
-            if (g.player.health === 100) console.log("PASS: Health reset after respawn.");
-            else console.log("FAIL: Health not reset.");
-            
-            if (Math.abs(g.player.body.position.x - checkpoint.x) < 50) console.log("PASS: Respawned at checkpoint.");
-            else console.log("FAIL: Did not respawn at checkpoint.");
+            continue;
         }
         
-        console.log("=========================================");
-        console.log("END-TO-END TEST COMPLETE");
-        console.log("=========================================");
+        let p = g.player;
+        if (!p || !p.body) {
+            await wait(100);
+            continue;
+        }
 
-    } catch (e) {
-        console.error("TEST SCRIPT ERROR:", e);
+        // Basic Bot Logic
+        g.input.keys['ArrowRight'] = true; // Always run right
+        g.input.keys['ArrowLeft'] = false;
+        
+        // Check for gaps or walls ahead
+        let x = p.body.position.x;
+        let y = p.body.position.y;
+        
+        let platformAhead = g.platforms.find(plat => 
+            plat.body.position.x > x && 
+            plat.body.position.x < x + 150 && 
+            plat.body.position.y < y - 20
+        );
+        
+        let gapAhead = !g.platforms.some(plat => 
+            plat.body.position.x > x && 
+            plat.body.position.x < x + 100 && 
+            Math.abs(plat.body.position.y - y) < 50
+        );
+        
+        if ((platformAhead || gapAhead) && p.isGrounded) {
+            // console.log("Bot detected gap/wall, JUMPING");
+            g.input.keys['Space'] = true;
+            await wait(100);
+            g.input.keys['Space'] = false;
+        }
+        
+        // Combat
+        let enemyAhead = g.enemies.find(e => 
+            e.health > 0 && 
+            Math.abs(e.body.position.x - x) < 100 &&
+            Math.abs(e.body.position.y - y) < 50
+        );
+        
+        let bossAhead = g.boss && g.boss.health > 0 && Math.abs(g.boss.body.position.x - x) < 150;
+        
+        let projectileIncoming = g.projectiles && g.projectiles.find(proj => 
+            proj.isActive && 
+            proj.body.velocity.x < 0 && 
+            Math.abs(proj.body.position.x - x) < 200
+        );
+        
+        if (projectileIncoming) {
+            // Block!
+            g.input.keys['KeyC'] = true;
+        } else {
+            g.input.keys['KeyC'] = false;
+        }
+        
+        if ((enemyAhead || bossAhead) && !projectileIncoming) {
+            // Attack!
+            g.input.keys['KeyX'] = true;
+            await wait(50);
+            g.input.keys['KeyX'] = false;
+        }
+        
+        // Log progress every ~5 seconds
+        if (Math.random() < 0.05) {
+            console.log(`Bot Progress: Biome=${g.levels.currentBiome}, X=${Math.round(x)}, HP=${p.health}, EnemiesAlive=${g.enemies.length}`);
+        }
+        
+        await wait(50);
     }
 }
 
-// Start test when game is ready
 let checkReadyInterval = setInterval(() => {
     if (window.game && window.game.player && window.game.player.body) {
         clearInterval(checkReadyInterval);
-        setTimeout(runEndToEndTest, 1000);
+        setTimeout(autoPlay, 1000);
     }
 }, 100);

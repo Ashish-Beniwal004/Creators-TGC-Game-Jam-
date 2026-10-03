@@ -21,6 +21,7 @@ export class Player {
         this.hurtTimer = 0;
         this.isAttacking = false;
         this.attackTimer = 0;
+        this.isBlocking = false;
         this.direction = 1;
         
         // Godot equivalents
@@ -80,6 +81,9 @@ export class Player {
         let isMoving = false;
         
         if (!this.isHurt) {
+            this.isBlocking = this.input.isDown('KeyC');
+            const currentSpeed = this.isBlocking ? this.speed * 0.3 : this.speed;
+            
             if (this.input.isDown('ArrowLeft') || this.input.isDown('KeyA')) {
                 moveX = -1;
                 isMoving = true;
@@ -92,7 +96,7 @@ export class Player {
                 this.animator.setFlipX(false);
             }
             
-            Matter.Body.setVelocity(this.body, { x: moveX * this.speed, y: this.body.velocity.y });
+            Matter.Body.setVelocity(this.body, { x: moveX * currentSpeed, y: this.body.velocity.y });
             
             if ((this.input.isDown('ArrowUp') || this.input.isDown('KeyW') || this.input.isDown('Space')) && this.isGrounded) {
                 Matter.Body.setVelocity(this.body, { x: this.body.velocity.x, y: this.jumpForce });
@@ -100,7 +104,7 @@ export class Player {
             }
             
             // Attack trigger
-            if (this.input.isJustPressed('KeyX') && !this.isAttacking) {
+            if (this.input.isJustPressed('KeyX') && !this.isAttacking && !this.isBlocking) {
                 this.isAttacking = true;
                 this.attackTimer = 0.3; // 300ms attack duration
                 // Stop moving while attacking (hit-stop)
@@ -144,6 +148,13 @@ export class Player {
         this.animator.play(state, fps);
         this.animator.update(delta);
         
+        // Visual indicator for blocking
+        if (this.isBlocking && this.sprite.material) {
+            this.sprite.material.color.setHex(0x55aaff);
+        } else if (this.sprite.material) {
+            this.sprite.material.color.setHex(0xffffff);
+        }
+        
         // Sync
         this.sprite.position.x = this.body.position.x;
         this.sprite.position.y = -this.body.position.y;
@@ -151,6 +162,12 @@ export class Player {
     
     takeDamage(amount, knockbackDir) {
         if (this.isHurt || this.health <= 0) return;
+        
+        if (this.isBlocking) {
+            this.health -= Math.floor(amount / 4);
+            Matter.Body.setVelocity(this.body, { x: knockbackDir * 2, y: 0 }); // minimal knockback
+            return;
+        }
         
         this.health -= amount;
         this.isHurt = true;

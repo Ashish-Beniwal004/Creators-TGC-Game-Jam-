@@ -1,6 +1,8 @@
 import * as Matter from 'matter-js';
 import { Enemy } from '../entities/Enemy.js';
 import { Boss } from '../entities/Boss.js';
+import { Checkpoint } from '../entities/Checkpoint.js';
+import { Gate } from '../entities/Gate.js';
 
 export class LevelManager {
     constructor(game) {
@@ -38,6 +40,15 @@ export class LevelManager {
             this.game.boss = null;
         }
         
+        if (this.checkpoint) {
+            this.checkpoint.destroy();
+            this.checkpoint = null;
+        }
+        if (this.gate) {
+            this.gate.destroy();
+            this.gate = null;
+        }
+        
         let color = 0x222222;
         if (biomeName === 'ice') color = 0x88ccff;
         if (biomeName === 'jungle') color = 0x228822;
@@ -62,6 +73,17 @@ export class LevelManager {
         } else if (biomeName === 'jungle') {
             this.spawnBoss(1000, 300, "overgrowth");
             this.game.ui.showDialogue(["The Jungle.", "Overgrowth stands in your way.", "Defeat it to reveal the truth."]);
+        }
+        
+        // Spawn checkpoint at beginning
+        this.checkpoint = new Checkpoint(this.game.physics, this.game.renderer.scene, 100, 400, biomeName);
+        
+        let targetBiome = null;
+        if (biomeName === 'dark') targetBiome = 'ice';
+        else if (biomeName === 'ice') targetBiome = 'jungle';
+        
+        if (targetBiome) {
+            this.gate = new Gate(this.game.physics, this.game.renderer.scene, 1500, 420, targetBiome);
         }
     }
     
@@ -95,19 +117,44 @@ export class LevelManager {
     update(player) {
         if (!player || !player.body) return;
         
-        // Simple progression gating based on X position for Phase 28
-        const px = player.body.position.x;
-        
-        // If we reach the end of the dark level, transition to ice
-        if (this.currentBiome === 'dark' && px > 1500) {
-            if (this.game.light.hasBlueCore) {
-                this.loadLevel('ice');
-                Matter.Body.setPosition(player.body, { x: 100, y: 300 });
+        // Handle Checkpoint
+        if (this.checkpoint && !this.checkpoint.isActivated) {
+            if (Matter.Bounds.overlaps(player.body.bounds, this.checkpoint.body.bounds)) {
+                this.checkpoint.activate();
+                this.game.respawnPoint = { x: this.checkpoint.x, y: this.checkpoint.y - 50, biome: this.checkpoint.biomeId };
+                this.game.ui.showDialogue(["Checkpoint Reached.", "Progress Saved."]);
             }
-        } else if (this.currentBiome === 'ice' && px > 1500) {
-            if (this.game.light.hasGreenCore) {
-                this.loadLevel('jungle');
-                Matter.Body.setPosition(player.body, { x: 100, y: 300 });
+        }
+        
+        // Handle Gate unlocking
+        if (this.gate && !this.gate.isUnlocked) {
+            const enemiesLeft = this.game.enemies.length;
+            const bossAlive = this.game.boss && this.game.boss.health > 0;
+            if (enemiesLeft === 0 && !bossAlive) {
+                this.gate.unlock();
+                this.game.ui.showDialogue(["PATH UNLOCKED"]);
+            }
+        }
+        
+        // Handle Gate transition or locked message
+        if (this.gate) {
+            if (Matter.Bounds.overlaps(player.body.bounds, this.gate.body.bounds)) {
+                if (this.gate.isUnlocked) {
+                    this.loadLevel(this.gate.targetBiome);
+                    Matter.Body.setPosition(player.body, { x: 100, y: 300 });
+                } else if (!this.gate.messageShown) {
+                    const enemiesLeft = this.game.enemies.length;
+                    this.game.ui.showDialogue([
+                        "BIOME NOT CLEARED.",
+                        `${enemiesLeft} ENEMIES REMAIN.`
+                    ]);
+                    this.gate.messageShown = true;
+                    
+                    // Reset message shown after a few seconds so it doesn't spam, but can trigger again
+                    setTimeout(() => {
+                        if (this.gate) this.gate.messageShown = false;
+                    }, 5000);
+                }
             }
         }
     }

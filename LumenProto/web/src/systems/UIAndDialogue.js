@@ -83,7 +83,8 @@ export class UIAndDialogue {
                         <span style="color: #aaa;">P</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Resume<br><br>
                         <span style="color: #aaa;">A / D</span> &nbsp;&nbsp; Move<br>
                         <span style="color: #aaa;">SPACE</span> &nbsp;&nbsp; Jump<br>
-                        <span style="color: #aaa;">X</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Attack<br><br>
+                        <span style="color: #aaa;">X</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Attack<br>
+                        <span style="color: #aaa;">C</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Block<br><br>
                         <span style="color: #aaa;">ENTER</span> &nbsp;&nbsp; Continue Dialogue<br>
                         <span style="color: #aaa;">R</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Restart<br>
                     </div>

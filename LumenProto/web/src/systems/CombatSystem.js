@@ -15,10 +15,7 @@ export class CombatSystem {
         const dist = dx - ax;
         const sameDirection = Math.sign(dist) === Math.sign(directionX) || Math.abs(dist) < 50;
         
-        console.log(`CombatCheck: Attacker Dir: ${directionX}, Dist: ${dist}, sameDir: ${sameDirection}, dy: ${dy}, ay: ${ay}`);
-        
         if (sameDirection && Math.abs(dist) <= range && Math.abs(dy - ay) < 100) {
-            console.log("HIT TRUE!");
             return true;
         }
         return false;

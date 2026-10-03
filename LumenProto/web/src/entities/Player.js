@@ -86,9 +86,11 @@ export class Player {
         let moveX = 0;
         let isMoving = false;
         
-        if (!this.isHurt) {
-            // Cannot block while attacking
+        if (this.health > 0) {
             this.isBlocking = this.input.isDown('KeyC') && !this.isAttacking;
+        }
+        
+        if (!this.isHurt) {
             const currentSpeed = this.isBlocking ? this.speed * 0.3 : this.speed;
             
             if (this.input.isDown('ArrowLeft') || this.input.isDown('KeyA')) {
@@ -194,6 +196,10 @@ export class Player {
         if (this.isBlocking) {
             this.health -= Math.floor(amount / 4);
             Matter.Body.setVelocity(this.body, { x: knockbackDir * 2, y: 0 }); // minimal knockback
+            this.isHurt = true;
+            this.hurtTimer = 0.3; // slightly shorter invincibility for blocking
+            // Do not cancel block, let player keep holding it
+            if (this.health <= 0) this.die();
             return;
         }
         
@@ -201,9 +207,12 @@ export class Player {
         this.isHurt = true;
         this.hurtTimer = 0.5;
         this.isAttacking = false; // Cancel attack
+        this.isBlocking = false;
         
         // Knockback
         Matter.Body.setVelocity(this.body, { x: knockbackDir * 5, y: -5 });
+        
+        if (this.health <= 0) this.die();
     }
     
     die() {
@@ -214,14 +223,29 @@ export class Player {
         Matter.Body.setVelocity(this.body, { x: 0, y: 0 });
     }
     
-    reset() {
+    resetAtCheckpoint(x, y) {
         this.health = 100;
         this.isHurt = false;
         this.hurtTimer = 0;
         this.isAttacking = false;
         this.attackTimer = 0;
         this.isBlocking = false;
+        
+        // Explicitly clear velocity and forces
         Matter.Body.setVelocity(this.body, { x: 0, y: 0 });
+        Matter.Body.setAngularVelocity(this.body, 0);
+        this.body.force = { x: 0, y: 0 };
+        
+        // Explicit teleport
+        Matter.Body.setPosition(this.body, { x: x, y: y });
+        
+        // Visual sync immediately
+        this.sprite.position.x = this.body.position.x;
+        this.sprite.position.y = -this.body.position.y;
+        this.animator.play("idle", 8);
+        if (this.slashMesh) {
+            this.slashMesh.visible = false;
+        }
     }
     
     canDealDamage() {

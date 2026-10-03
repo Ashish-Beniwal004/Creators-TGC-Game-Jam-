@@ -9,9 +9,91 @@ export class LevelManager {
         this.game = game;
         this.currentBiome = 'dark';
         this.checkpoints = [];
+        this.spawnId = 0;
+    }
+    
+    resetEnemies() {
+        this.spawnId++; // Cancel pending spawns
+        for (let e of this.game.enemies) {
+            if(e.body) Matter.Composite.remove(this.game.physics.engine.world, e.body);
+            if(e.sprite) this.game.renderer.scene.remove(e.sprite);
+        }
+        this.game.enemies = [];
+        
+        if (this.game.boss) {
+            if(this.game.boss.body) Matter.Composite.remove(this.game.physics.engine.world, this.game.boss.body);
+            if(this.game.boss.sprite) this.game.renderer.scene.remove(this.game.boss.sprite);
+            if(this.game.boss.telegraphMesh) this.game.renderer.scene.remove(this.game.boss.telegraphMesh);
+            this.game.boss = null;
+        }
+        
+        if (this.gate) {
+            this.gate.isUnlocked = false;
+        }
+        
+        // Mark checkpoint as activated if we spawn there, so it doesn't instantly re-trigger dialogue
+        if (this.game.respawnPoint) {
+            for (let cp of this.checkpoints) {
+                if (cp.x === this.game.respawnPoint.x) {
+                    cp.activate();
+                }
+            }
+        }
+        
+        // Spawn enemies based on biome
+        if (this.currentBiome === 'dark') {
+            this.spawnEnemy(1800, 400, "wolf");
+            this.spawnEnemy(2800, 300, "spider");
+            this.spawnEnemy(3100, 300, "wolf");
+            this.spawnEnemy(3800, 300, "bat");
+            this.spawnEnemy(4300, 400, "scorpion");
+            this.spawnEnemy(4600, 400, "spider");
+            this.spawnEnemy(4700, 400, "wolf");
+            this.spawnEnemy(5000, 500, "scorpion");
+            this.spawnEnemy(5300, 200, "bat");
+            this.spawnEnemy(6300, 400, "wolf");
+            this.spawnEnemy(6500, 400, "spider");
+            this.spawnEnemy(6600, 300, "bat");
+            this.spawnEnemy(6800, 400, "scorpion");
+            this.spawnEnemy(7100, 300, "bat");
+            this.spawnBoss(8400, 400, "dark_boss");
+        } else if (this.currentBiome === 'ice') {
+            this.spawnEnemy(1800, 400, "wolf");
+            this.spawnEnemy(2500, 400, "ice_wolf");
+            this.spawnEnemy(3900, 500, "ice_wolf");
+            this.spawnEnemy(3900, 400, "bat");
+            this.spawnEnemy(4400, 400, "ice_wolf");
+            this.spawnEnemy(4900, 400, "bat");
+            this.spawnEnemy(5400, 400, "ice_wolf");
+            this.spawnEnemy(5600, 400, "wolf");
+            this.spawnEnemy(5500, 300, "bat");
+            this.spawnEnemy(6400, 200, "bat");
+            this.spawnEnemy(7100, 400, "ice_wolf");
+            this.spawnEnemy(7300, 400, "wolf");
+            this.spawnEnemy(7200, 300, "bat");
+            this.spawnEnemy(7400, 400, "ice_wolf");
+            this.spawnBoss(8600, 450, "cold_blood");
+        } else if (this.currentBiome === 'jungle') {
+            this.spawnEnemy(1800, 400, "lizard");
+            this.spawnEnemy(2500, 200, "spider");
+            this.spawnEnemy(2800, 100, "bat");
+            this.spawnEnemy(3500, 500, "crocodile");
+            this.spawnEnemy(3700, 500, "crocodile");
+            this.spawnEnemy(4200, 400, "lizard");
+            this.spawnEnemy(4800, 200, "dragon");
+            this.spawnEnemy(4700, 300, "bat");
+            this.spawnEnemy(5400, 200, "spider");
+            this.spawnEnemy(5700, 100, "bat");
+            this.spawnEnemy(6000, 400, "crocodile");
+            this.spawnEnemy(6800, 300, "lizard");
+            this.spawnEnemy(7000, 300, "spider");
+            this.spawnEnemy(7200, 200, "dragon");
+            this.spawnBoss(8600, 150, "overgrowth");
+        }
     }
     
     loadLevel(biomeName) {
+        this.spawnId++; // Cancel pending spawns
         this.currentBiome = biomeName;
         // Load the visual environment layer
         if (this.game.environment) {
@@ -229,17 +311,37 @@ export class LevelManager {
             this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 3100, 250, biomeName));
             this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 6500, 300, biomeName));
         }
+        
+        // Mark checkpoint as activated if we spawn there
+        if (this.game.respawnPoint) {
+            for (let cp of this.checkpoints) {
+                if (cp.x === this.game.respawnPoint.x) {
+                    cp.activate();
+                }
+            }
+        }
     }
     
     async spawnEnemy(x, y, type = "wolf") {
+        const currentSpawnId = this.spawnId;
         const e = new Enemy(this.game.physics, this.game.renderer.scene, this.game.assets, type);
         await e.init(x, y);
-        this.game.enemies.push(e);
+        if (this.spawnId === currentSpawnId) {
+            this.game.enemies.push(e);
+        } else {
+            e.die();
+        }
     }
     
     async spawnBoss(x, y, type) {
-        this.game.boss = new Boss(this.game.physics, this.game.renderer.scene, this.game.assets, type);
-        await this.game.boss.init(x, y);
+        const currentSpawnId = this.spawnId;
+        const boss = new Boss(this.game.physics, this.game.renderer.scene, this.game.assets, type);
+        await boss.init(x, y);
+        if (this.spawnId === currentSpawnId) {
+            this.game.boss = boss;
+        } else {
+            boss.die();
+        }
     }
     
     createPlatform(x, y, w, h, color) {

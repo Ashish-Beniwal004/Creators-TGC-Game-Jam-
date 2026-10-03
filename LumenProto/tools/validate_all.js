@@ -623,7 +623,7 @@ test('Block reduces damage', playerSrc.includes('amount / 4'), 'No damage reduct
 // R key = Respawn on death
 test('R key triggers respawn', gameSrc.includes("this.input.isJustPressed('KeyR')"), 'R key respawn not found in Game.js');
 test('R key gated by isDead', gameSrc.includes("this.ui.isDead && this.input.isJustPressed('KeyR')"), 'R key not gated by death state');
-test('Respawn resets player', gameSrc.includes('this.player.reset()'), 'Player.reset() not called on respawn');
+test('Respawn resets player', gameSrc.includes('this.player.resetAtCheckpoint('), 'Player.resetAtCheckpoint() not called on respawn');
 test('Respawn uses respawnPoint', gameSrc.includes('this.respawnPoint'), 'respawnPoint not used on respawn');
 test('Respawn reloads level', gameSrc.includes("this.levels.loadLevel(this.respawnPoint.biome)"), 'Level not reloaded on respawn');
 

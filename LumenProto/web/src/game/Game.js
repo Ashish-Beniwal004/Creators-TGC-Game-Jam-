@@ -141,15 +141,27 @@ export class Game {
         if (this.ui.isDead && this.input.isJustPressed('KeyR')) {
             this.ui.isDead = false;
             this.ui.overlay.style.display = 'none';
-            this.player.reset();
+            
+            let spawnX = 100;
+            let spawnY = 300;
             
             if (this.respawnPoint) {
-                this.levels.loadLevel(this.respawnPoint.biome);
-                Matter.Body.setPosition(this.player.body, { x: this.respawnPoint.x, y: this.respawnPoint.y });
+                // Only load if biome changed (prevents unnecessary reloads)
+                if (this.levels.currentBiome !== this.respawnPoint.biome) {
+                    this.levels.loadLevel(this.respawnPoint.biome);
+                } else {
+                    // Just reset enemies if same biome
+                    this.levels.resetEnemies();
+                }
+                spawnX = this.respawnPoint.x;
+                spawnY = this.respawnPoint.y;
             } else {
-                this.levels.loadLevel('dark');
-                Matter.Body.setPosition(this.player.body, { x: 100, y: 300 });
+                if (this.levels.currentBiome !== 'dark') this.levels.loadLevel('dark');
+                else this.levels.resetEnemies();
             }
+            
+            this.player.resetAtCheckpoint(spawnX, spawnY);
+            requestAnimationFrame(this.loop.bind(this));
             return;
         }
         

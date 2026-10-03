@@ -31,7 +31,12 @@ export const CreatureConfig = {
         attackRange: 60, attackCooldown: 0.8, attackDuration: 0.3,
         detectionRange: 200, // Reduced for ambush
         movementType: "ground",
-        aiProfile: "ambush"
+        aiProfile: "ambush",
+        specialAttack: "web",
+        specialAttackRange: 250,
+        specialAttackCooldown: 3.5,
+        specialAttackDamage: 2,
+        specialAttackProjectileSpeed: 4
     },
     "scorpion": {
         folder: "scorpion_frames",
@@ -77,7 +82,12 @@ export const CreatureConfig = {
         attackRange: 60, attackCooldown: 1.0, attackDuration: 0.3,
         detectionRange: 400,
         movementType: "flying",
-        aiProfile: "swoop"
+        aiProfile: "swoop",
+        specialAttack: "acid",
+        specialAttackRange: 250,
+        specialAttackCooldown: 3.0,
+        specialAttackDamage: 10,
+        specialAttackProjectileSpeed: 5
     },
     "dragon": {
         folder: "dragon_frames",

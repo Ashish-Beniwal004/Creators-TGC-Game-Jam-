@@ -17,12 +17,16 @@ export class Player {
         
         // Combat
         this.health = 100;
+        this.damage = 10;
         this.isHurt = false;
         this.hurtTimer = 0;
         this.isAttacking = false;
         this.attackTimer = 0;
         this.isBlocking = false;
         this.direction = 1;
+        
+        this.isWebbed = false;
+        this.webTimer = 0;
         
         // Godot equivalents
         this.speed = 4.0;
@@ -48,6 +52,12 @@ export class Player {
         this.slashMesh = new THREE.Mesh(slashGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.0 }));
         this.slashMesh.visible = false;
         this.scene.add(this.slashMesh);
+        
+        // Setup block visual
+        const blockGeo = new THREE.CircleGeometry(35, 32);
+        this.blockMesh = new THREE.Mesh(blockGeo, new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.4 }));
+        this.blockMesh.visible = false;
+        this.scene.add(this.blockMesh);
         
         // Setup Animator
         const animMap = {
@@ -91,7 +101,8 @@ export class Player {
         }
         
         if (!this.isHurt) {
-            const currentSpeed = this.isBlocking ? this.speed * 0.3 : this.speed;
+            let currentSpeed = this.isBlocking ? this.speed * 0.3 : this.speed;
+            if (this.isWebbed) currentSpeed *= 0.5;
             
             if (this.input.isDown('ArrowLeft') || this.input.isDown('KeyA')) {
                 moveX = -1;
@@ -139,6 +150,11 @@ export class Player {
             if (this.hurtTimer <= 0) this.isHurt = false;
         }
         
+        if (this.isWebbed) {
+            this.webTimer -= delta;
+            if (this.webTimer <= 0) this.isWebbed = false;
+        }
+        
         // Animation State Machine
         let state = "idle";
         let fps = 8;
@@ -169,6 +185,8 @@ export class Player {
             this.sprite.material.color.setHex(0xff5555);
         } else if (this.isBlocking && this.sprite.material) {
             this.sprite.material.color.setHex(0x55aaff);
+        } else if (this.isWebbed && this.sprite.material) {
+            this.sprite.material.color.setHex(0xccffcc); // pale green
         } else if (this.sprite.material) {
             this.sprite.material.color.setHex(0xffffff);
         }
@@ -187,6 +205,12 @@ export class Player {
             } else {
                 this.slashMesh.visible = false;
             }
+        }
+        
+        if (this.blockMesh) {
+            this.blockMesh.position.x = this.body.position.x;
+            this.blockMesh.position.y = -this.body.position.y;
+            this.blockMesh.visible = this.isBlocking;
         }
     }
     
@@ -221,6 +245,7 @@ export class Player {
         this.isAttacking = false;
         this.isBlocking = false;
         Matter.Body.setVelocity(this.body, { x: 0, y: 0 });
+        if (this.blockMesh) this.blockMesh.visible = false;
     }
     
     resetAtCheckpoint(x, y) {
@@ -230,6 +255,8 @@ export class Player {
         this.isAttacking = false;
         this.attackTimer = 0;
         this.isBlocking = false;
+        this.isWebbed = false;
+        this.webTimer = 0;
         
         // Explicitly clear velocity and forces
         Matter.Body.setVelocity(this.body, { x: 0, y: 0 });

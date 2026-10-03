@@ -20,6 +20,11 @@ export class LevelManager {
         }
         this.game.enemies = [];
         
+        if (this.game.projectiles) {
+            for (let p of this.game.projectiles) { p.destroy(); }
+            this.game.projectiles = [];
+        }
+        
         if (this.game.boss) {
             if(this.game.boss.body) Matter.Composite.remove(this.game.physics.engine.world, this.game.boss.body);
             if(this.game.boss.sprite) this.game.renderer.scene.remove(this.game.boss.sprite);
@@ -113,6 +118,11 @@ export class LevelManager {
         }
         this.game.enemies = [];
         
+        if (this.game.projectiles) {
+            for (let p of this.game.projectiles) { p.destroy(); }
+            this.game.projectiles = [];
+        }
+        
         if (this.game.boss) {
             if(this.game.boss.body) Matter.Composite.remove(this.game.physics.engine.world, this.game.boss.body);
             if(this.game.boss.sprite) this.game.renderer.scene.remove(this.game.boss.sprite);
@@ -153,8 +163,8 @@ export class LevelManager {
             this.createPlatform(4500, 500, 700, 40, color); // Hard encounter
             
             // Environmental Challenge
-            this.createPlatform(5000, 350, 200, 20, color); // High route
-            this.createPlatform(5300, 300, 200, 20, color);
+            this.createPlatform(4900, 400, 200, 20, color); // High route (was 5000, 350)
+            this.createPlatform(5200, 320, 200, 20, color); // (was 5300, 300)
             this.createPlatform(5000, 600, 400, 40, color); // Low route pit
             this.createPlatform(5500, 500, 400, 40, color);
             
@@ -203,8 +213,8 @@ export class LevelManager {
             
             // Platforming Slippery gaps
             this.createPlatform(2900, 400, 200, 20, color);
-            this.createPlatform(3150, 300, 200, 20, color);
-            this.createPlatform(3500, 500, 200, 40, color); // Checkpoint
+            this.createPlatform(3100, 320, 200, 20, color);
+            this.createPlatform(3400, 500, 200, 40, color); // Checkpoint
             
             // Ice pits
             this.createPlatform(3900, 600, 400, 40, color); // Pit
@@ -262,10 +272,10 @@ export class LevelManager {
             
             // Vertical Climb
             this.createPlatform(2200, 400, 200, 20, color);
-            this.createPlatform(2500, 300, 200, 20, color);
-            this.createPlatform(2800, 200, 200, 20, color);
+            this.createPlatform(2400, 320, 200, 20, color); // Spider here
+            this.createPlatform(2600, 240, 200, 20, color);
             
-            this.createPlatform(3100, 350, 200, 20, color); // Checkpoint
+            this.createPlatform(2900, 350, 200, 20, color); // Checkpoint
             this.createPlatform(3600, 600, 600, 40, color); // Swamp pit
             
             this.createPlatform(4200, 500, 400, 40, color); // Exploration
@@ -282,8 +292,8 @@ export class LevelManager {
             
             // Enemies (14)
             this.spawnEnemy(1800, 400, "lizard"); // Small
-            this.spawnEnemy(2500, 200, "spider"); // Climb
-            this.spawnEnemy(2800, 100, "bat"); // Climb
+            this.spawnEnemy(2400, 200, "spider"); // Climb
+            this.spawnEnemy(2600, 100, "bat"); // Climb
             
             this.spawnEnemy(3500, 500, "crocodile"); // Swamp
             this.spawnEnemy(3700, 500, "crocodile"); // Swamp

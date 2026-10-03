@@ -1,11 +1,19 @@
 import { Game } from './game/Game.js';
+import * as Matter from 'matter-js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Ensure window focus so keyboard events fire immediately without clicking
     window.focus();
     try {
         const game = new Game();
+        window.game = game; // Exposed for QA
+        window.Matter = Matter;
         await game.init();
+        
+        // Run QA Tests automatically
+        if (window.runQATests) {
+            window.runQATests();
+        }
     } catch (error) {
         console.error("FATAL GAME INITIALIZATION ERROR:", error);
         const container = document.getElementById('game-container') || document.body;

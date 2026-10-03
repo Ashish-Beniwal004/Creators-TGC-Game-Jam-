@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Matter from 'matter-js';
 import { AtlasAnimator } from '../rendering/AtlasAnimator.js';
 import { CreatureConfig, getAnimMap } from './CreatureConfig.js';
+import { Projectile } from './Projectile.js';
 
 export class Enemy {
     constructor(physicsWorld, scene, assetManager, type = "wolf") {
@@ -29,6 +30,10 @@ export class Enemy {
         this.isAttacking = false;
         this.attackTimer = 0;
         this.attackCooldown = 0;
+        
+        this.specialCooldownTimer = this.config.specialAttackCooldown || 0;
+        this.currentAttackType = "melee";
+        this.hasFiredProjectile = false;
     }
     
     async init(x, y) {
@@ -82,6 +87,29 @@ export class Enemy {
             this.attackTimer -= delta;
             if (this.attackTimer <= 0) this.isAttacking = false;
             
+            // Fire projectile during special attack windup
+            if (this.currentAttackType === "special" && !this.hasFiredProjectile && this.attackTimer <= this.config.attackDuration / 2) {
+                this.hasFiredProjectile = true;
+                if (playerBody && game && game.projectiles) {
+                    const distX = playerBody.position.x - this.body.position.x;
+                    const distY = playerBody.position.y - this.body.position.y;
+                    const dist = Math.sqrt(distX * distX + distY * distY) || 1;
+                    
+                    const p = new Projectile(
+                        this.physics, 
+                        this.scene, 
+                        this.body.position.x + (this.direction * 20), 
+                        this.body.position.y - 15, // Spawn higher to avoid hitting the floor instantly
+                        distX / dist, 
+                        distY / dist, 
+                        this.config, 
+                        this.config.specialAttack
+                    );
+                    game.projectiles.push(p);
+                    console.log("DEBUG: FIRED", this.config.specialAttack);
+                }
+            }
+            
             if (isFlying) {
                 Matter.Body.setVelocity(this.body, { x: this.body.velocity.x * 0.9, y: this.body.velocity.y * 0.9 });
             } else {
@@ -89,6 +117,7 @@ export class Enemy {
             }
         } else {
             if (this.attackCooldown > 0) this.attackCooldown -= delta;
+            if (this.specialCooldownTimer > 0) this.specialCooldownTimer -= delta;
             
             // Creature AI
             if (playerBody) {
@@ -99,29 +128,58 @@ export class Enemy {
                 if (dist < this.config.detectionRange) {
                     this.direction = Math.sign(distX) || this.direction;
                     
-                    if (dist > this.config.attackRange) {
-                        // Move phase
+                    let shouldSpecial = this.config.specialAttack && this.specialCooldownTimer <= 0 && dist <= this.config.specialAttackRange;
+                    let shouldMelee = this.attackCooldown <= 0 && dist <= this.config.attackRange;
+                    
+                    if (shouldSpecial || shouldMelee) {
+                        // Attack phase
+                        if (isFlying) {
+                            if (this.config.aiProfile === "swoop" || this.config.aiProfile === "aerial_heavy") {
+                                Matter.Body.setVelocity(this.body, { x: this.direction * this.speed * -0.5, y: -2 });
+                            } else {
+                                Matter.Body.setVelocity(this.body, { x: this.body.velocity.x * 0.8, y: this.body.velocity.y * 0.8 });
+                            }
+                        } else {
+                            if (this.config.aiProfile === "defensive") {
+                                Matter.Body.setVelocity(this.body, { x: this.direction * -0.5, y: this.body.velocity.y });
+                            } else if (this.config.aiProfile === "heavy") {
+                                Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                            } else if (this.config.aiProfile === "pursuit") {
+                                Matter.Body.setVelocity(this.body, { x: this.direction * 1.5, y: this.body.velocity.y });
+                            } else {
+                                Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                            }
+                        }
+                        
+                        this.isAttacking = true;
+                        this.hasFiredProjectile = false;
+                        this.attackTimer = this.config.attackDuration; 
+                        
+                        if (shouldSpecial) {
+                            this.currentAttackType = "special";
+                            this.specialCooldownTimer = this.config.specialAttackCooldown;
+                            this.attackCooldown = this.config.attackCooldown; // reset melee too
+                        } else {
+                            this.currentAttackType = "melee";
+                            this.attackCooldown = this.config.attackCooldown;
+                        }
+                    } else {
+                        // Move phase (not close enough to attack, or attacks on cooldown)
                         if (isFlying) {
                             let dirX = distX / dist;
                             let dirY = distY / dist;
                             
                             if (this.config.aiProfile === "swoop") {
-                                // Bat swoop: straight at player
                                 Matter.Body.setVelocity(this.body, { x: dirX * this.speed, y: dirY * this.speed });
                             } else if (this.config.aiProfile === "aerial_heavy") {
-                                // Dragon: Stay higher until closer in X
                                 if (Math.abs(distX) > 150) {
-                                    // Move towards player but stay above them
                                     const targetY = playerBody.position.y - 150;
                                     const altDistY = targetY - this.body.position.y;
                                     const altDist = Math.sqrt(distX * distX + altDistY * altDistY) || 1;
                                     dirX = distX / altDist;
                                     dirY = altDistY / altDist;
-                                    Matter.Body.setVelocity(this.body, { x: dirX * this.speed, y: dirY * this.speed });
-                                } else {
-                                    // Swoop down
-                                    Matter.Body.setVelocity(this.body, { x: dirX * this.speed, y: dirY * this.speed });
                                 }
+                                Matter.Body.setVelocity(this.body, { x: dirX * this.speed, y: dirY * this.speed });
                             } else {
                                 Matter.Body.setVelocity(this.body, { x: dirX * this.speed, y: dirY * this.speed });
                             }
@@ -150,40 +208,11 @@ export class Enemy {
                                     }
                                 }
                                 if (!overFloor) {
-                                    currentSpeed = 0; // Don't walk off cliff
+                                    currentSpeed = 0; 
                                 }
                             }
                             
                             Matter.Body.setVelocity(this.body, { x: this.direction * currentSpeed, y: this.body.velocity.y });
-                        }
-                    } else {
-                        // Attack phase
-                        if (isFlying) {
-                            if (this.config.aiProfile === "swoop" || this.config.aiProfile === "aerial_heavy") {
-                                // Bounce up slightly when attacking
-                                Matter.Body.setVelocity(this.body, { x: this.direction * this.speed * -0.5, y: -2 });
-                            } else {
-                                Matter.Body.setVelocity(this.body, { x: this.body.velocity.x * 0.8, y: this.body.velocity.y * 0.8 });
-                            }
-                        } else {
-                            if (this.config.aiProfile === "defensive") {
-                                // Scorpion backs up slightly while attacking
-                                Matter.Body.setVelocity(this.body, { x: this.direction * -0.5, y: this.body.velocity.y });
-                            } else if (this.config.aiProfile === "heavy") {
-                                // Crocodile completely stops
-                                Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
-                            } else if (this.config.aiProfile === "pursuit") {
-                                // Wolf short lunge
-                                Matter.Body.setVelocity(this.body, { x: this.direction * 1.5, y: this.body.velocity.y });
-                            } else {
-                                Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
-                            }
-                        }
-                        
-                        if (this.attackCooldown <= 0) {
-                            this.isAttacking = true;
-                            this.attackTimer = this.config.attackDuration; 
-                            this.attackCooldown = this.config.attackCooldown; 
                         }
                     }
                 } else {

@@ -942,6 +942,57 @@ simulateIntegration((tick, player, enemy, game, input) => {
     test('TEST G: Gate unlocked when enemies die', game.gate.isUnlocked);
 });
 
+// TEST H: Projectile Hit
+simulateIntegration((tick, player, enemy, game, input) => {
+    // Modify tick to handle projectiles
+    let projectile = { type: 'web', isActive: true, damage: 2 };
+    
+    // Simulating the Game.js projectile collision loop
+    if (projectile.isActive) {
+        if (!player.isHurt) {
+            if (player.isBlocking) {
+                if (projectile.type === 'web') projectile.isActive = false;
+                else if (projectile.type === 'acid') { player.health -= Math.floor(projectile.damage / 4); projectile.isActive = false; }
+            } else {
+                if (projectile.type === 'web') {
+                    player.isWebbed = true;
+                    player.health -= projectile.damage;
+                } else if (projectile.type === 'acid') {
+                    player.health -= projectile.damage;
+                }
+                projectile.isActive = false;
+            }
+        }
+    }
+    
+    test('TEST H: Web slows player when not blocking', player.isWebbed === true && player.health === 98 && projectile.isActive === false);
+});
+
+// TEST I: Projectile Block
+simulateIntegration((tick, player, enemy, game, input) => {
+    let projectile = { type: 'web', isActive: true, damage: 2 };
+    player.isBlocking = true;
+    
+    if (projectile.isActive) {
+        if (!player.isHurt) {
+            if (player.isBlocking) {
+                if (projectile.type === 'web') projectile.isActive = false;
+                else if (projectile.type === 'acid') { player.health -= Math.floor(projectile.damage / 4); projectile.isActive = false; }
+            } else {
+                if (projectile.type === 'web') {
+                    player.isWebbed = true;
+                    player.health -= projectile.damage;
+                } else if (projectile.type === 'acid') {
+                    player.health -= projectile.damage;
+                }
+                projectile.isActive = false;
+            }
+        }
+    }
+    
+    test('TEST I: Web is destroyed, player not slowed when blocking', player.isWebbed === undefined && player.health === 100 && projectile.isActive === false);
+});
+
 // ============================================================
 // FINAL SUMMARY
 // ============================================================

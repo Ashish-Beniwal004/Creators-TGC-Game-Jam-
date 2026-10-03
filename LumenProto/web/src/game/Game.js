@@ -11,6 +11,7 @@ import { LevelManager } from '../levels/LevelManager.js';
 import { UIAndDialogue } from '../systems/UIAndDialogue.js';
 import { AudioManager } from '../systems/AudioManager.js';
 import { EnvironmentRenderer } from '../rendering/EnvironmentRenderer.js';
+import { Projectile } from '../entities/Projectile.js';
 import * as Matter from 'matter-js';
 
 export class Game {
@@ -30,6 +31,7 @@ export class Game {
         this.enemies = [];
         this.boss = null;
         this.platforms = [];
+        this.projectiles = [];
         this.particles = null;
         
         this.lastTime = performance.now();
@@ -199,14 +201,14 @@ export class Game {
                 if (this.player.canDealDamage()) {
                     for (let e of this.enemies) {
                         if (e.health > 0 && this.combat.checkMeleeHit(this.player, e, 80, this.player.direction)) {
-                            e.takeDamage(10, this.player.direction);
+                            e.takeDamage(this.player.damage || 10, this.player.direction);
                             this.audio.playHit();
                             this.renderer.camera.shake(2, 0.1);
                             this.hitStopTimer = 0.05; // 50ms hit stop
                         }
                     }
                     if (this.boss && this.boss.health > 0 && this.combat.checkMeleeHit(this.player, this.boss, 120, this.player.direction)) {
-                        this.boss.takeDamage(10, this.player.direction);
+                        this.boss.takeDamage(this.player.damage || 10, this.player.direction);
                         this.audio.playHit();
                         this.renderer.camera.shake(4, 0.15);
                         this.hitStopTimer = 0.08; // Stronger hit stop for boss
@@ -227,13 +229,65 @@ export class Game {
                 
                 if (this.boss && this.boss.health > 0 && this.boss.canDealDamage() && !this.player.isHurt) {
                     if (this.combat.checkMeleeHit(this.boss, this.player, 150, this.boss.direction)) {
-                        this.player.takeDamage(20, this.boss.direction);
+                        this.player.takeDamage(this.boss.damage || 20, this.boss.direction);
                         this.audio.playHit();
                         this.renderer.camera.shake(8, 0.3);
                         this.hitStopTimer = 0.1;
                     }
                 }
             }
+            
+            // Projectile Updates & Collision
+            if (this.projectiles) {
+                for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                    let p = this.projectiles[i];
+                    if (!isDialogueActive) {
+                        p.update(deltaTime);
+                    }
+                    
+                    if (p.isActive) {
+                        // Check collision with player
+                        if (this.player && this.player.health > 0 && !this.player.isHurt) {
+                            if (Matter.Bounds.overlaps(p.body.bounds, this.player.body.bounds)) {
+                                if (p.type === 'web') {
+                                    if (this.player.isBlocking) {
+                                        // Blocked: destroyed, minimal effect
+                                        p.destroy();
+                                    } else {
+                                        // Slow player
+                                        this.player.isWebbed = true;
+                                        this.player.webTimer = 2.0; // 2 seconds slow
+                                        this.player.takeDamage(p.damage, Math.sign(this.player.body.position.x - p.body.position.x));
+                                        p.destroy();
+                                    }
+                                } else if (p.type === 'acid') {
+                                    if (this.player.isBlocking) {
+                                        this.player.takeDamage(Math.floor(p.damage / 4), Math.sign(this.player.body.position.x - p.body.position.x));
+                                    } else {
+                                        this.player.takeDamage(p.damage, Math.sign(this.player.body.position.x - p.body.position.x));
+                                    }
+                                    p.destroy();
+                                }
+                            }
+                        }
+                        
+                        // Check collision with terrain
+                        if (p.isActive) {
+                            for (let platform of this.platforms) {
+                                if (Matter.Bounds.overlaps(p.body.bounds, platform.body.bounds)) {
+                                    p.destroy();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (!p.isActive) {
+                        this.projectiles.splice(i, 1);
+                    }
+                }
+            }
+
             
             // ISSUE 3: Void Death
             if (this.player.body.position.y > 1500) {
@@ -247,7 +301,7 @@ export class Game {
         for (let i = this.enemies.length - 1; i >= 0; i--) {
             let e = this.enemies[i];
             if (!isDialogueActive) {
-                e.update(deltaTime, this.player ? this.player.body : null);
+                e.update(deltaTime, this.player ? this.player.body : null, this);
             }
             if (!e.body) {
                 this.enemies.splice(i, 1);

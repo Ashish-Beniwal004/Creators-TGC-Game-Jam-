@@ -40,20 +40,24 @@ export class AssetManager {
                 "bat", "lizard", "dragon", "ice_wolf", "ancient_dragon"
             ];
             
+            const loadPromises = [];
+            
             for (let i = 0; i < folders.length; i++) {
                 const folder = folders[i];
                 const prefix = prefixes[i];
                 for (let row = 0; row < 4; row++) {
                     for (let col = 0; col < 4; col++) {
-                        await this.loadExternalSprite(`entities/${folder}/${prefix}_${row}_${col}.png`);
+                        loadPromises.push(this.loadExternalSprite(`entities/${folder}/${prefix}_${row}_${col}.png`));
                     }
                 }
             }
             
             const playerFrames = [0, 1, 2, 3, 5, 6, 12, 17, 20, 21, 25, 28, 36];
             for (let f of playerFrames) {
-                await this.loadExternalSprite(`entities/player_frames/player_frame_${f}.png`);
+                loadPromises.push(this.loadExternalSprite(`entities/player_frames/player_frame_${f}.png`));
             }
+            
+            await Promise.all(loadPromises);
             
             return true;
         } catch (error) {

@@ -73,14 +73,11 @@ export class LevelManager {
                 this.createCore(2600, 250, 'blue');
             }
             
-            this.spawnEnemy(600, 400, "wolf");
-            this.spawnEnemy(950, 300, "bat");
-            this.spawnEnemy(1300, 200, "spider");
-            this.spawnEnemy(1500, 450, "scorpion");
-            this.spawnEnemy(1600, 450, "wolf");
-            this.spawnEnemy(2200, 400, "spider");
-            this.spawnEnemy(2600, 250, "bat");
-            this.spawnEnemy(3000, 400, "wolf");
+            this.spawnEnemy(250, 400, "wolf");
+            this.spawnEnemy(350, 250, "bat");
+            this.spawnEnemy(450, 400, "spider");
+            this.spawnEnemy(550, 400, "scorpion");
+            this.spawnEnemy(650, 400, "spider");
             
             this.spawnBoss(3200, 400, "dark_boss");
             
@@ -183,7 +180,7 @@ export class LevelManager {
         if (this.checkpoint && !this.checkpoint.isActivated) {
             if (Matter.Bounds.overlaps(player.body.bounds, this.checkpoint.body.bounds)) {
                 this.checkpoint.activate();
-                this.game.respawnPoint = { x: this.checkpoint.x, y: this.checkpoint.y - 50, biome: this.checkpoint.biomeId };
+                this.game.respawnPoint = { x: this.checkpoint.x, y: this.checkpoint.y - 50, biome: this.currentBiome };
                 this.game.ui.showDialogue(["Checkpoint Reached.", "Progress Saved."]);
             }
         }

@@ -88,7 +88,7 @@ export class Boss {
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
-        this.animator.baseScale = 0.25; // Huge
+        this.animator.baseScale = 0.45; // Huge
         this.animator.play("idle", 8);
         
         // Telegraph Mesh

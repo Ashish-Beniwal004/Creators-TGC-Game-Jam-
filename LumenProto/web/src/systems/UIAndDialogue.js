@@ -97,7 +97,6 @@ export class UIAndDialogue {
     }
     
     showDialogue(textLines) {
-        console.log("showDialogue called with:", textLines);
         this.queue.push(...textLines);
         if (!this.isTyping && this.dialogueBox.style.display === 'none') {
             this.nextDialogue();

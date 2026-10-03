@@ -8,13 +8,11 @@ export class LevelManager {
     constructor(game) {
         this.game = game;
         this.currentBiome = 'dark';
+        this.checkpoints = [];
     }
     
     loadLevel(biomeName) {
         this.currentBiome = biomeName;
-        // In a real game, this would read from a JSON file mapped by Godot.
-        // For now, we procedurally generate based on biome rules.
-        
         // Load the visual environment layer
         if (this.game.environment) {
             this.game.environment.loadBiome(biomeName).catch(e => console.error("Failed to load biome visual:", e));
@@ -40,10 +38,13 @@ export class LevelManager {
             this.game.boss = null;
         }
         
-        if (this.checkpoint) {
-            this.checkpoint.destroy();
-            this.checkpoint = null;
+        if (this.checkpoints) {
+            for (let cp of this.checkpoints) {
+                cp.destroy();
+            }
         }
+        this.checkpoints = [];
+        
         if (this.gate) {
             this.gate.destroy();
             this.gate = null;
@@ -59,91 +60,135 @@ export class LevelManager {
         
         // Create floors, platforms, and entities based on biome
         if (biomeName === 'dark') {
-            // Dark Biome (Caves/Ruins)
-            this.createPlatform(300, 500, 1000, 40, color); // Start floor
-            this.createPlatform(950, 400, 200, 20, color); // Step up
-            this.createPlatform(1300, 300, 400, 20, color); // High platform
-            this.createPlatform(1500, 550, 600, 40, color); // Pit bottom
-            this.createPlatform(1900, 450, 200, 20, color); // Step out of pit
-            this.createPlatform(2400, 500, 1000, 40, color); // Mid floor
-            this.createPlatform(2600, 350, 300, 20, color); // Floating platform
-            this.createPlatform(3200, 500, 1200, 40, color); // Gate floor
+            // Expanded Dark Biome
+            this.createPlatform(500, 500, 2000, 40, color); // Safe start zone (-500 to 1500)
+            this.createPlatform(1700, 400, 400, 20, color);
+            this.createPlatform(2200, 300, 400, 20, color);
+            this.createPlatform(2900, 550, 1000, 40, color); // Pit
+            this.createPlatform(3600, 450, 400, 20, color);
+            this.createPlatform(4200, 500, 1000, 40, color);
+            this.createPlatform(5000, 350, 400, 20, color);
+            this.createPlatform(5800, 550, 1200, 40, color);
+            this.createPlatform(6600, 400, 400, 20, color);
+            this.createPlatform(7100, 300, 300, 20, color);
+            this.createPlatform(7900, 500, 2000, 40, color); // Boss Arena (6900 to 8900)
             
             if (!this.game.light.hasBlueCore) {
-                this.createCore(2600, 250, 'blue');
+                this.createCore(7100, 200, 'blue');
             }
             
-            this.spawnEnemy(250, 400, "wolf");
-            this.spawnEnemy(350, 250, "bat");
-            this.spawnEnemy(450, 400, "spider");
-            this.spawnEnemy(550, 400, "scorpion");
-            this.spawnEnemy(650, 400, "spider");
+            // Enemies
+            this.spawnEnemy(1300, 400, "wolf");
+            this.spawnEnemy(1700, 300, "bat");
+            this.spawnEnemy(2200, 200, "spider");
+            this.spawnEnemy(2700, 500, "scorpion");
+            this.spawnEnemy(3000, 500, "wolf");
+            this.spawnEnemy(3600, 350, "bat");
+            this.spawnEnemy(4100, 400, "spider");
+            this.spawnEnemy(4500, 400, "scorpion");
+            this.spawnEnemy(5000, 250, "bat");
+            this.spawnEnemy(5500, 450, "wolf");
+            this.spawnEnemy(5900, 450, "wolf");
+            this.spawnEnemy(6600, 300, "spider");
+            this.spawnEnemy(7100, 200, "scorpion");
+            this.spawnEnemy(7500, 400, "bat");
             
-            this.spawnBoss(3200, 400, "dark_boss");
+            this.spawnBoss(8000, 400, "dark_boss");
             
             this.game.ui.showDialogue(["Welcome to the Dark World.", "The light has faded.", "Find the Blue Core to restore the Ice."]);
             
             if (targetBiome) {
-                this.gate = new Gate(this.game.physics, this.game.renderer.scene, 3700, 420, targetBiome);
+                this.gate = new Gate(this.game.physics, this.game.renderer.scene, 8700, 420, targetBiome);
             }
+            
+            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 100, 400, biomeName));
+            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 4200, 400, biomeName));
+            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 6800, 350, biomeName));
             
         } else if (biomeName === 'ice') {
-            // Ice Biome
-            this.createPlatform(300, 500, 800, 40, color); // Start floor
-            this.createPlatform(850, 400, 200, 20, color); // Step down
-            this.createPlatform(1150, 300, 300, 20, color); // High path
-            this.createPlatform(1300, 650, 800, 40, color); // Deep trench
-            this.createPlatform(1800, 500, 300, 20, color); // Step up
-            this.createPlatform(2400, 600, 1000, 40, color); // Boss Arena
-            this.createPlatform(3200, 500, 800, 40, color); // Exit floor
+            // Expanded Ice Biome
+            this.createPlatform(500, 500, 2000, 40, color); // Safe start zone (-500 to 1500)
+            this.createPlatform(1700, 400, 400, 20, color);
+            this.createPlatform(2200, 300, 400, 20, color);
+            this.createPlatform(2900, 650, 1000, 40, color); // Trench
+            this.createPlatform(3600, 500, 600, 40, color);
+            this.createPlatform(4200, 350, 400, 20, color);
+            this.createPlatform(4700, 250, 400, 20, color);
+            this.createPlatform(5500, 600, 1200, 40, color);
+            this.createPlatform(6300, 450, 500, 20, color);
+            this.createPlatform(6900, 300, 400, 20, color);
+            this.createPlatform(8000, 600, 2000, 40, color); // Boss Arena (7000 to 9000)
             
             if (!this.game.light.hasGreenCore) {
-                this.createCore(2400, 450, 'green');
+                this.createCore(7500, 450, 'green');
             }
             
-            this.spawnEnemy(700, 400, "ice_wolf");
-            this.spawnEnemy(1150, 200, "bat");
-            this.spawnEnemy(1300, 550, "ice_wolf");
-            this.spawnEnemy(1500, 550, "wolf");
-            this.spawnEnemy(1800, 400, "bat");
-            this.spawnEnemy(2000, 500, "ice_wolf");
+            this.spawnEnemy(1400, 400, "wolf");
+            this.spawnEnemy(1700, 300, "bat");
+            this.spawnEnemy(2200, 200, "bat");
+            this.spawnEnemy(2700, 550, "ice_wolf");
+            this.spawnEnemy(3000, 550, "ice_wolf");
+            this.spawnEnemy(3500, 400, "wolf");
+            this.spawnEnemy(4200, 250, "bat");
+            this.spawnEnemy(4700, 150, "bat");
+            this.spawnEnemy(5200, 500, "ice_wolf");
+            this.spawnEnemy(5700, 500, "wolf");
+            this.spawnEnemy(6300, 350, "ice_wolf");
+            this.spawnEnemy(6900, 200, "bat");
+            this.spawnEnemy(7300, 500, "ice_wolf");
+            this.spawnEnemy(7600, 500, "ice_wolf");
             
-            this.spawnBoss(2400, 450, "cold_blood");
+            this.spawnBoss(8100, 450, "cold_blood");
             this.game.ui.showDialogue(["The Ice Biome.", "Cold Blood guards the Green Core.", "Prepare for battle."]);
             
             if (targetBiome) {
-                this.gate = new Gate(this.game.physics, this.game.renderer.scene, 3500, 420, targetBiome);
+                this.gate = new Gate(this.game.physics, this.game.renderer.scene, 8800, 420, targetBiome);
             }
+            
+            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 100, 400, biomeName));
+            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 3700, 400, biomeName));
+            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 6300, 350, biomeName));
             
         } else if (biomeName === 'jungle') {
-            // Jungle Biome
-            this.createPlatform(300, 500, 600, 40, color); // Start floor
-            this.createPlatform(750, 400, 200, 20, color); // Tree branch
-            this.createPlatform(1100, 300, 200, 20, color); // Higher branch
-            this.createPlatform(1450, 200, 300, 20, color); // Canopy
-            this.createPlatform(1500, 600, 800, 40, color); // Swamp floor
-            this.createPlatform(2100, 450, 300, 20, color); // Step out of swamp
-            this.createPlatform(2600, 300, 1000, 40, color); // High Boss Arena
-            this.createPlatform(3300, 500, 800, 40, color); // Low Gate exit
+            // Expanded Jungle Biome
+            this.createPlatform(500, 500, 2000, 40, color); // Safe start zone (-500 to 1500)
+            this.createPlatform(1700, 400, 400, 20, color);
+            this.createPlatform(2200, 300, 400, 20, color);
+            this.createPlatform(2700, 200, 400, 20, color);
+            this.createPlatform(3400, 600, 1200, 40, color); // Swamp floor
+            this.createPlatform(4300, 450, 500, 20, color);
+            this.createPlatform(4900, 300, 500, 20, color);
+            this.createPlatform(5700, 600, 1000, 40, color);
+            this.createPlatform(6400, 450, 400, 20, color);
+            this.createPlatform(6900, 300, 400, 20, color);
+            this.createPlatform(7400, 150, 400, 20, color);
+            this.createPlatform(8400, 300, 2000, 40, color); // Boss Arena (7400 to 9400)
             
-            this.spawnEnemy(500, 400, "lizard");
-            this.spawnEnemy(750, 300, "spider");
-            this.spawnEnemy(1100, 200, "bat");
-            this.spawnEnemy(1400, 100, "dragon");
-            this.spawnEnemy(1500, 500, "crocodile");
-            this.spawnEnemy(1700, 500, "crocodile");
-            this.spawnEnemy(2100, 350, "lizard");
+            this.spawnEnemy(1300, 400, "lizard");
+            this.spawnEnemy(1700, 300, "spider");
+            this.spawnEnemy(2200, 200, "bat");
+            this.spawnEnemy(2700, 100, "bat");
+            this.spawnEnemy(3100, 500, "crocodile");
+            this.spawnEnemy(3500, 500, "crocodile");
+            this.spawnEnemy(4300, 350, "lizard");
+            this.spawnEnemy(4900, 200, "dragon");
+            this.spawnEnemy(5400, 500, "crocodile");
+            this.spawnEnemy(5900, 500, "spider");
+            this.spawnEnemy(6400, 350, "lizard");
+            this.spawnEnemy(6900, 200, "spider");
+            this.spawnEnemy(7400, 50, "bat");
+            this.spawnEnemy(7800, 200, "dragon");
             
-            this.spawnBoss(2600, 150, "overgrowth");
+            this.spawnBoss(8500, 150, "overgrowth");
             this.game.ui.showDialogue(["The Jungle.", "Overgrowth stands in your way.", "Defeat it to reveal the truth."]);
             
-            if (targetBiome) {
-                this.gate = new Gate(this.game.physics, this.game.renderer.scene, 3600, 420, targetBiome);
-            }
+            // Just leaving the gate in place if there's ever a 4th biome
+            this.gate = new Gate(this.game.physics, this.game.renderer.scene, 9200, 420, "victory"); 
+            
+            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 100, 400, biomeName));
+            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 4300, 350, biomeName));
+            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 6400, 350, biomeName));
         }
-        
-        // Spawn checkpoint at beginning
-        this.checkpoint = new Checkpoint(this.game.physics, this.game.renderer.scene, 100, 400, biomeName);
     }
     
     async spawnEnemy(x, y, type = "wolf") {
@@ -165,23 +210,24 @@ export class LevelManager {
     }
     
     createCore(x, y, type) {
-        // Just a visual representation for now. Sensor will be added later if needed.
         const color = type === 'blue' ? 0x0000ff : 0x00ff00;
         const body = Matter.Bodies.circle(x, y, 20, { isStatic: true, isSensor: true, label: `core_${type}` });
         Matter.Composite.add(this.game.physics.engine.world, body);
         const mesh = this.game.renderer.createBox(x, y, 40, 40, color);
-        this.game.platforms.push({ body, mesh }); // Push to platforms array just so it cleans up on level load
+        this.game.platforms.push({ body, mesh });
     }
     
     update(player) {
         if (!player || !player.body || this.game.ui.isDead) return;
         
-        // Handle Checkpoint
-        if (this.checkpoint && !this.checkpoint.isActivated) {
-            if (Matter.Bounds.overlaps(player.body.bounds, this.checkpoint.body.bounds)) {
-                this.checkpoint.activate();
-                this.game.respawnPoint = { x: this.checkpoint.x, y: this.checkpoint.y - 50, biome: this.currentBiome };
-                this.game.ui.showDialogue(["Checkpoint Reached.", "Progress Saved."]);
+        // Handle Checkpoints
+        for (let cp of this.checkpoints) {
+            if (!cp.isActivated) {
+                if (Matter.Bounds.overlaps(player.body.bounds, cp.body.bounds)) {
+                    cp.activate();
+                    this.game.respawnPoint = { x: cp.x, y: cp.y - 50, biome: this.currentBiome };
+                    this.game.ui.showDialogue(["Checkpoint Reached.", "Progress Saved."]);
+                }
             }
         }
         
@@ -195,12 +241,16 @@ export class LevelManager {
             }
         }
         
-        // Handle Gate transition or locked message
+        // Handle Gate transition
         if (this.gate) {
             if (Matter.Bounds.overlaps(player.body.bounds, this.gate.body.bounds)) {
                 if (this.gate.isUnlocked) {
-                    this.loadLevel(this.gate.targetBiome);
-                    Matter.Body.setPosition(player.body, { x: 100, y: 300 });
+                    if (this.gate.targetBiome === "victory") {
+                        this.game.ui.showVictoryScreen();
+                    } else {
+                        this.loadLevel(this.gate.targetBiome);
+                        Matter.Body.setPosition(player.body, { x: 100, y: 300 });
+                    }
                 } else if (!this.gate.messageShown) {
                     const enemiesLeft = this.game.enemies.length;
                     this.game.ui.showDialogue([
@@ -208,8 +258,6 @@ export class LevelManager {
                         `${enemiesLeft} ENEMIES REMAIN.`
                     ]);
                     this.gate.messageShown = true;
-                    
-                    // Reset message shown after a few seconds so it doesn't spam, but can trigger again
                     setTimeout(() => {
                         if (this.gate) this.gate.messageShown = false;
                     }, 5000);

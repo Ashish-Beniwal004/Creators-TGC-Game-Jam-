@@ -391,6 +391,7 @@ export class LevelManager {
                         this.game.ui.showVictoryScreen();
                     } else {
                         this.loadLevel(this.gate.targetBiome);
+                        Matter.Body.setVelocity(player.body, { x: 0, y: 0 });
                         Matter.Body.setPosition(player.body, { x: 100, y: 300 });
                     }
                 } else if (!this.gate.messageShown) {

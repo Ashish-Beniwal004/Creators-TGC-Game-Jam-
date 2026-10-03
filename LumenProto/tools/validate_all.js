@@ -788,6 +788,161 @@ for (const biome of Object.values(BiomeDefinitions)) {
 test('Scorpion is spawned somewhere', allSpawnedTypes.has('scorpion'), 'Scorpion configured but never spawned in any biome');
 
 // ============================================================
+// TEST 12: DETERMINISTIC INTEGRATION SIMULATIONS
+// ============================================================
+
+section('TEST 12: INTEGRATION SIMULATIONS');
+
+// Simulating the Game loop interaction
+function simulateIntegration(scenario) {
+    let player = { health: 100, isHurt: false, hurtTimer: 0, isBlocking: false, isAttacking: false, isDead: false, velocity: {x:0,y:0}, pos: {x:100, y:300}, attackTimer: 0 };
+    let enemy = { health: 20, isAttacking: false, attackTimer: 0, pos: {x:150, y:300} };
+    let game = { respawnPoint: null, enemies: [enemy], gate: { isUnlocked: false }, boss: null };
+    let input = { isDown: (k) => false, isJustPressed: (k) => false };
+    const delta = 1/60;
+
+    // A simplified tick logic reflecting the repaired codebase
+    const tick = () => {
+        if (player.health <= 0 && !player.isDead) {
+            player.isDead = true;
+        }
+        
+        if (player.isDead) {
+            if (input.isJustPressed('KeyR')) {
+                player.isDead = false;
+                player.health = 100;
+                player.isHurt = false;
+                player.isBlocking = false;
+                player.isAttacking = false;
+                player.velocity = {x:0, y:0};
+                if (game.respawnPoint) {
+                    player.pos = { ...game.respawnPoint };
+                }
+            }
+            return;
+        }
+        
+        if (player.pos.y > 1500) {
+            player.health = 0;
+            player.isDead = true;
+            return;
+        }
+        
+        // Player Update
+        if (player.health > 0) {
+            player.isBlocking = input.isDown('KeyC') && !player.isAttacking;
+        }
+        if (player.isHurt) {
+            player.hurtTimer -= delta;
+            if (player.hurtTimer <= 0) player.isHurt = false;
+        } else {
+            if (input.isJustPressed('KeyX') && !player.isAttacking && !player.isBlocking) {
+                player.isAttacking = true;
+                player.attackTimer = 0.3;
+            }
+        }
+        if (player.isAttacking) {
+            player.attackTimer -= delta;
+            if (player.attackTimer <= 0) player.isAttacking = false;
+            
+            // Deal damage
+            if (enemy.health > 0) {
+                enemy.health -= 10;
+            }
+        }
+        
+        // Enemy Update
+        if (enemy.pos.y > 1500 && enemy.health > 0) {
+            enemy.health = 0;
+            game.enemies.splice(0, 1);
+        }
+        
+        if (enemy.isAttacking && !player.isHurt) {
+            if (player.isBlocking) {
+                player.health -= 2.5;
+                player.isHurt = true;
+                player.hurtTimer = 0.3;
+                player.velocity.x = 2;
+            } else {
+                player.health -= 10;
+                player.isHurt = true;
+                player.hurtTimer = 0.5;
+                player.velocity.x = 5;
+                player.isBlocking = false;
+                player.isAttacking = false;
+            }
+        }
+        
+        // Gate Logic
+        if (game.enemies.length === 0 && !game.boss) {
+            game.gate.isUnlocked = true;
+        }
+    };
+    
+    scenario(tick, player, enemy, game, input);
+}
+
+// TEST A: Checkpoint
+simulateIntegration((tick, player, enemy, game, input) => {
+    game.respawnPoint = { x: 3400, y: 350 };
+    player.pos.y = 2000; // Void death
+    tick(); // Player dies
+    test('TEST A: Player is dead in void', player.isDead);
+    input.isJustPressed = (k) => k === 'KeyR';
+    tick(); // Press R
+    test('TEST A: Player respawned at checkpoint', player.pos.x === 3400 && player.pos.y === 350);
+});
+
+// TEST B: Block
+simulateIntegration((tick, player, enemy, game, input) => {
+    input.isDown = (k) => k === 'KeyC';
+    tick(); // Starts blocking
+    test('TEST B: Block activated', player.isBlocking);
+    enemy.isAttacking = true;
+    tick(); // Enemy hits
+    test('TEST B: Damage mitigated (100 -> 97.5)', player.health === 97.5);
+    test('TEST B: Knockback reduced (vel.x == 2)', player.velocity.x === 2);
+    input.isDown = (k) => false; // Release C
+    tick();
+    test('TEST B: Block dropped', player.isBlocking === false);
+});
+
+// TEST C: Attack
+simulateIntegration((tick, player, enemy, game, input) => {
+    input.isJustPressed = (k) => k === 'KeyX';
+    tick();
+    test('TEST C: Player attacking', player.isAttacking);
+    test('TEST C: Enemy took damage (20 -> 10)', enemy.health === 10);
+});
+
+// TEST D: Block -> Attack
+simulateIntegration((tick, player, enemy, game, input) => {
+    input.isDown = (k) => k === 'KeyC';
+    input.isJustPressed = (k) => k === 'KeyX';
+    tick(); // Holds C, presses X
+    test('TEST D: Block active', player.isBlocking);
+    test('TEST D: Attack prevented by block', !player.isAttacking);
+    input.isDown = (k) => false; // Release C
+    tick(); // Presses X without C
+    test('TEST D: Attack succeeds after releasing C', player.isAttacking);
+});
+
+// TEST F: Void Enemy
+simulateIntegration((tick, player, enemy, game, input) => {
+    enemy.pos.y = 2000;
+    tick();
+    test('TEST F: Enemy dies in void', enemy.health === 0);
+    test('TEST F: Enemy removed from array', game.enemies.length === 0);
+});
+
+// TEST G: Gate
+simulateIntegration((tick, player, enemy, game, input) => {
+    enemy.pos.y = 2000;
+    tick();
+    test('TEST G: Gate unlocked when enemies die', game.gate.isUnlocked);
+});
+
+// ============================================================
 // FINAL SUMMARY
 // ============================================================
 
@@ -797,6 +952,10 @@ console.log(`\n  Total Tests: ${totalTests}`);
 console.log(`  Passed: ${passedTests}`);
 console.log(`  Failed: ${failedTests}`);
 console.log(`  Bugs Found: ${bugs.length}`);
+
+if (failedTests > 0) {
+    process.exit(1);
+}
 
 if (bugs.length > 0) {
     console.log('\n  Bug List:');

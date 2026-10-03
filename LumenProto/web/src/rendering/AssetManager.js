@@ -25,13 +25,13 @@ export class AssetManager {
             }
             
             // Load isolated entity sprites (villain is still single sprite)
-            await this.loadExternalSprite('entities/villain.png');
+            await this.loadExternalSprite('entities/villain_cleaned.png');
             
             const playerFrames = [0, 1, 2, 3, 5, 6, 12, 17, 20, 21, 25, 28, 36];
             for (let f of playerFrames) {
                 await this.loadExternalSprite(`entities/player_frames/player_frame_${f}.png`);
             }
-            await this.loadExternalSprite('entities/villain.png');
+            await this.loadExternalSprite('entities/villain_cleaned.png');
             
             return true;
         } catch (error) {

@@ -52,8 +52,8 @@ export class LevelManager {
         // Spawn core if needed based on biome
         if (biomeName === 'dark' && !this.game.light.hasBlueCore) {
             this.createCore(1000, 250, 'blue');
-            this.spawnEnemy(600, 300);
-            this.spawnEnemy(900, 200);
+            this.spawnEnemy(800, 300);
+            this.spawnEnemy(1200, 200);
             this.game.ui.showDialogue(["Welcome to the Dark World.", "The light has faded.", "Find the Blue Core to restore the Ice."]);
         } else if (biomeName === 'ice' && !this.game.light.hasGreenCore) {
             this.createCore(1200, 200, 'green');

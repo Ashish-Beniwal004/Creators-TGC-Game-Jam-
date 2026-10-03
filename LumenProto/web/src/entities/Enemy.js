@@ -40,11 +40,11 @@ export class Enemy {
         this.scene.add(this.sprite);
         
         const animMap = {
-            "idle": ["entities/villain.png"],
-            "run": ["entities/villain.png"],
-            "attack": ["entities/villain.png"],
-            "hurt": ["entities/villain.png"],
-            "death": ["entities/villain.png"]
+            "idle": ["entities/villain_cleaned.png"],
+            "run": ["entities/villain_cleaned.png"],
+            "attack": ["entities/villain_cleaned.png"],
+            "hurt": ["entities/villain_cleaned.png"],
+            "death": ["entities/villain_cleaned.png"]
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
@@ -122,5 +122,10 @@ export class Enemy {
             Matter.Composite.remove(this.physics.engine.world, this.body);
             this.body = null;
         }
+    }
+    
+    canDealDamage() {
+        if (!this.isAttacking) return false;
+        return this.attackTimer <= 0.3 && this.attackTimer >= 0.1;
     }
 }

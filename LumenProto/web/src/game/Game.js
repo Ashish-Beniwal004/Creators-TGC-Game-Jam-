@@ -90,8 +90,12 @@ export class Game {
         
         // (Input update moved to end of loop)
         
-        // Update physics step (60Hz)
-        this.physics.update(1000/60);
+        const isDialogueActive = this.ui.dialogueBox.style.display === 'block';
+        
+        // Update physics step (60Hz) - freeze during dialogue
+        if (!isDialogueActive) {
+            this.physics.update(1000/60);
+        }
         
         // Handle Core collection sensors
         if (this.player && this.player.body) {
@@ -132,7 +136,7 @@ export class Game {
         // Update entities
         if (this.player) {
             // Disable player movement if dialogue is active
-            if (this.ui.dialogueBox.style.display === 'block') {
+            if (isDialogueActive) {
                 Matter.Body.setVelocity(this.player.body, { x: 0, y: this.player.body.velocity.y });
                 this.player.animator.play("idle");
                 this.player.animator.update(deltaTime);
@@ -148,38 +152,41 @@ export class Game {
             this.environment.update(this.renderer.camera.cam.position);
             this.ui.updateHUD(this.player, this.light);
             
-            // Player attacks enemies
-            if (this.player.isAttacking) {
+            // Combat logic only when dialogue is not active
+            if (!isDialogueActive) {
+                // Player attacks enemies
+                if (this.player.canDealDamage()) {
+                    for (let e of this.enemies) {
+                        if (e.health > 0 && this.combat.checkMeleeHit(this.player, e, 80, this.player.direction)) {
+                            e.takeDamage(10, this.player.direction);
+                            this.audio.playHit();
+                            this.renderer.camera.shake(2, 0.1);
+                        }
+                    }
+                    if (this.boss && this.boss.health > 0 && this.combat.checkMeleeHit(this.player, this.boss, 120, this.player.direction)) {
+                        this.boss.takeDamage(10, this.player.direction);
+                        this.audio.playHit();
+                        this.renderer.camera.shake(4, 0.15);
+                    }
+                }
+                
+                // Enemies attack player
                 for (let e of this.enemies) {
-                    if (e.health > 0 && this.combat.checkMeleeHit(this.player, e, 80, this.player.direction)) {
-                        e.takeDamage(10, this.player.direction);
-                        this.audio.playHit();
-                        this.renderer.camera.shake(2, 0.1);
+                    if (e.health > 0 && e.canDealDamage() && !this.player.isHurt) {
+                        if (this.combat.checkMeleeHit(e, this.player, 80, e.direction)) {
+                            this.player.takeDamage(10, e.direction);
+                            this.audio.playHit();
+                            this.renderer.camera.shake(5, 0.2);
+                        }
                     }
                 }
-                if (this.boss && this.boss.health > 0 && this.combat.checkMeleeHit(this.player, this.boss, 120, this.player.direction)) {
-                    this.boss.takeDamage(10, this.player.direction);
-                    this.audio.playHit();
-                    this.renderer.camera.shake(4, 0.15);
-                }
-            }
-            
-            // Enemies attack player
-            for (let e of this.enemies) {
-                if (e.health > 0 && e.isAttacking && !this.player.isHurt) {
-                    if (this.combat.checkMeleeHit(e, this.player, 80, e.direction)) {
-                        this.player.takeDamage(10, e.direction);
+                
+                if (this.boss && this.boss.health > 0 && this.boss.state === "attack" && !this.player.isHurt) {
+                    if (this.combat.checkMeleeHit(this.boss, this.player, 150, this.boss.direction)) {
+                        this.player.takeDamage(20, this.boss.direction);
                         this.audio.playHit();
-                        this.renderer.camera.shake(5, 0.2);
+                        this.renderer.camera.shake(8, 0.3);
                     }
-                }
-            }
-            
-            if (this.boss && this.boss.health > 0 && this.boss.state === "attack" && !this.player.isHurt) {
-                if (this.combat.checkMeleeHit(this.boss, this.player, 150, this.boss.direction)) {
-                    this.player.takeDamage(20, this.boss.direction);
-                    this.audio.playHit();
-                    this.renderer.camera.shake(8, 0.3);
                 }
             }
             
@@ -194,13 +201,15 @@ export class Game {
         // Update Enemies
         for (let i = this.enemies.length - 1; i >= 0; i--) {
             let e = this.enemies[i];
-            e.update(deltaTime, this.player ? this.player.body : null);
+            if (!isDialogueActive) {
+                e.update(deltaTime, this.player ? this.player.body : null);
+            }
             if (!e.body) {
                 this.enemies.splice(i, 1);
             }
         }
         
-        if (this.boss) {
+        if (this.boss && !isDialogueActive) {
             this.boss.update(deltaTime, this.player ? this.player.body : null);
         }
         

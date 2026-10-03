@@ -160,4 +160,14 @@ export class Player {
         // Knockback
         Matter.Body.setVelocity(this.body, { x: knockbackDir * 5, y: -5 });
     }
+    
+    canDealDamage() {
+        if (!this.isAttacking) return false;
+        if (this.animator.currentState === "attack") {
+            // The attack animation has 5 frames: 0, 1, 2, 3, 4
+            // Deal damage on frames 2, 3, or 4 (the swing and follow-through)
+            return this.animator.frameIndex >= 2;
+        }
+        return false;
+    }
 }

@@ -43,6 +43,12 @@ export class Player {
         this.sprite = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ transparent: true }));
         this.scene.add(this.sprite);
         
+        // Setup slash visual
+        const slashGeo = new THREE.PlaneGeometry(60, 60);
+        this.slashMesh = new THREE.Mesh(slashGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.0 }));
+        this.slashMesh.visible = false;
+        this.scene.add(this.slashMesh);
+        
         // Setup Animator
         const animMap = {
             "idle": ["entities/player_frames/player_frame_0.png"],
@@ -109,8 +115,14 @@ export class Player {
             if (this.input.isJustPressed('KeyX') && !this.isAttacking && !this.isBlocking) {
                 this.isAttacking = true;
                 this.attackTimer = 0.3; // 300ms attack duration
-                // Stop moving while attacking (hit-stop)
+                // Hit-stop
                 Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                
+                // Show slash visual
+                if (this.slashMesh) {
+                    this.slashMesh.visible = true;
+                    this.slashMesh.material.opacity = 0.8;
+                }
             }
         }
         
@@ -162,6 +174,18 @@ export class Player {
         // Sync
         this.sprite.position.x = this.body.position.x;
         this.sprite.position.y = -this.body.position.y;
+        
+        // Sync slash
+        if (this.slashMesh) {
+            this.slashMesh.position.x = this.body.position.x + (this.direction * 30);
+            this.slashMesh.position.y = -this.body.position.y;
+            this.slashMesh.scale.x = this.direction;
+            if (this.slashMesh.material.opacity > 0) {
+                this.slashMesh.material.opacity -= delta * 3;
+            } else {
+                this.slashMesh.visible = false;
+            }
+        }
     }
     
     takeDamage(amount, knockbackDir) {

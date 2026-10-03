@@ -8,7 +8,8 @@ export const CreatureConfig = {
         hp: 20, damage: 10, speed: 3.5,
         attackRange: 80, attackCooldown: 1.0, attackDuration: 0.4,
         detectionRange: 400,
-        movementType: "ground"
+        movementType: "ground",
+        aiProfile: "pursuit"
     },
     "lizard": {
         folder: "lizard_frames",
@@ -18,7 +19,8 @@ export const CreatureConfig = {
         hp: 15, damage: 8, speed: 2.0,
         attackRange: 70, attackCooldown: 1.5, attackDuration: 0.5,
         detectionRange: 300,
-        movementType: "ground"
+        movementType: "ground",
+        aiProfile: "deliberate"
     },
     "spider": {
         folder: "spider_frames",
@@ -27,8 +29,9 @@ export const CreatureConfig = {
         width: 50, height: 30,
         hp: 10, damage: 5, speed: 4.0,
         attackRange: 60, attackCooldown: 0.8, attackDuration: 0.3,
-        detectionRange: 350,
-        movementType: "ground"
+        detectionRange: 200, // Reduced for ambush
+        movementType: "ground",
+        aiProfile: "ambush"
     },
     "scorpion": {
         folder: "scorpion_frames",
@@ -36,9 +39,11 @@ export const CreatureConfig = {
         scale: 0.25,
         width: 60, height: 40,
         hp: 25, damage: 12, speed: 1.5,
-        attackRange: 80, attackCooldown: 2.0, attackDuration: 0.6,
+        attackRange: 90, // Longer reach
+        attackCooldown: 2.0, attackDuration: 0.6,
         detectionRange: 250,
-        movementType: "ground"
+        movementType: "ground",
+        aiProfile: "defensive"
     },
     "crocodile": {
         folder: "crocodile_frames",
@@ -48,17 +53,19 @@ export const CreatureConfig = {
         hp: 50, damage: 20, speed: 1.2,
         attackRange: 90, attackCooldown: 2.5, attackDuration: 0.8,
         detectionRange: 200,
-        movementType: "ground"
+        movementType: "ground",
+        aiProfile: "heavy"
     },
     "ice_wolf": {
         folder: "ice_wolf_frames",
         prefix: "ice_wolf",
         scale: 0.28,
         width: 65, height: 45,
-        hp: 40, damage: 15, speed: 3.8,
-        attackRange: 85, attackCooldown: 1.0, attackDuration: 0.4,
+        hp: 40, damage: 15, speed: 4.2, // Faster
+        attackRange: 85, attackCooldown: 0.8, attackDuration: 0.4,
         detectionRange: 450,
-        movementType: "ground"
+        movementType: "ground",
+        aiProfile: "pursuit"
     },
     // ---- FLYING CREATURES ----
     "bat": {
@@ -69,7 +76,8 @@ export const CreatureConfig = {
         hp: 10, damage: 5, speed: 3.0,
         attackRange: 60, attackCooldown: 1.0, attackDuration: 0.3,
         detectionRange: 400,
-        movementType: "flying"
+        movementType: "flying",
+        aiProfile: "swoop"
     },
     "dragon": {
         folder: "dragon_frames",
@@ -79,7 +87,8 @@ export const CreatureConfig = {
         hp: 60, damage: 25, speed: 2.5,
         attackRange: 100, attackCooldown: 2.0, attackDuration: 0.5,
         detectionRange: 500,
-        movementType: "flying"
+        movementType: "flying",
+        aiProfile: "aerial_heavy"
     },
     
     // ---- GENERIC FALLBACK (Just in case) ----
@@ -91,7 +100,8 @@ export const CreatureConfig = {
         hp: 30, damage: 10, speed: 2.0,
         attackRange: 70, attackCooldown: 1.5, attackDuration: 0.5,
         detectionRange: 300,
-        movementType: "ground"
+        movementType: "ground",
+        aiProfile: "deliberate"
     }
 };
 

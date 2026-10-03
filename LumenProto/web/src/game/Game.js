@@ -92,6 +92,14 @@ export class Game {
         
         const isDialogueActive = this.ui.dialogueBox.style.display === 'block';
         
+        // Hit-Stop logic
+        if (this.hitStopTimer > 0) {
+            this.hitStopTimer -= deltaTime;
+            this.renderer.render();
+            requestAnimationFrame(this.loop.bind(this));
+            return;
+        }
+        
         // Update physics step (60Hz) - freeze during dialogue
         if (!isDialogueActive) {
             this.physics.update(1000/60);
@@ -182,12 +190,14 @@ export class Game {
                             e.takeDamage(10, this.player.direction);
                             this.audio.playHit();
                             this.renderer.camera.shake(2, 0.1);
+                            this.hitStopTimer = 0.05; // 50ms hit stop
                         }
                     }
                     if (this.boss && this.boss.health > 0 && this.combat.checkMeleeHit(this.player, this.boss, 120, this.player.direction)) {
                         this.boss.takeDamage(10, this.player.direction);
                         this.audio.playHit();
                         this.renderer.camera.shake(4, 0.15);
+                        this.hitStopTimer = 0.08; // Stronger hit stop for boss
                     }
                 }
                 
@@ -198,6 +208,7 @@ export class Game {
                             this.player.takeDamage(e.config ? e.config.damage : 10, e.direction);
                             this.audio.playHit();
                             this.renderer.camera.shake(5, 0.2);
+                            this.hitStopTimer = 0.05;
                         }
                     }
                 }
@@ -207,6 +218,7 @@ export class Game {
                         this.player.takeDamage(20, this.boss.direction);
                         this.audio.playHit();
                         this.renderer.camera.shake(8, 0.3);
+                        this.hitStopTimer = 0.1;
                     }
                 }
             }

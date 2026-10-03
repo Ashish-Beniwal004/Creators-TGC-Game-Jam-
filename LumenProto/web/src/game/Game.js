@@ -124,18 +124,15 @@ export class Game {
         if (this.ui.isDead && this.input.isJustPressed('KeyR')) {
             this.ui.isDead = false;
             this.ui.overlay.style.display = 'none';
-            this.player.health = 100;
-            this.player.isHurt = false;
+            this.player.reset();
             
             if (this.respawnPoint) {
                 this.levels.loadLevel(this.respawnPoint.biome);
                 Matter.Body.setPosition(this.player.body, { x: this.respawnPoint.x, y: this.respawnPoint.y });
-                Matter.Body.setVelocity(this.player.body, { x: 0, y: 0 });
                 if (this.levels.checkpoint) this.levels.checkpoint.activate();
             } else {
                 this.levels.loadLevel('dark');
                 Matter.Body.setPosition(this.player.body, { x: 100, y: 300 });
-                Matter.Body.setVelocity(this.player.body, { x: 0, y: 0 });
             }
             return;
         }

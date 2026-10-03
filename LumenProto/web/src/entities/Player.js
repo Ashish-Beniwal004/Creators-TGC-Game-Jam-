@@ -81,7 +81,8 @@ export class Player {
         let isMoving = false;
         
         if (!this.isHurt) {
-            this.isBlocking = this.input.isDown('KeyC');
+            // Cannot block while attacking
+            this.isBlocking = this.input.isDown('KeyC') && !this.isAttacking;
             const currentSpeed = this.isBlocking ? this.speed * 0.3 : this.speed;
             
             if (this.input.isDown('ArrowLeft') || this.input.isDown('KeyA')) {
@@ -178,6 +179,16 @@ export class Player {
         
         // Knockback
         Matter.Body.setVelocity(this.body, { x: knockbackDir * 5, y: -5 });
+    }
+    
+    reset() {
+        this.health = 100;
+        this.isHurt = false;
+        this.hurtTimer = 0;
+        this.isAttacking = false;
+        this.attackTimer = 0;
+        this.isBlocking = false;
+        Matter.Body.setVelocity(this.body, { x: 0, y: 0 });
     }
     
     canDealDamage() {

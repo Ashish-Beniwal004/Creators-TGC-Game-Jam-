@@ -2,6 +2,7 @@ import * as Matter from 'matter-js';
 import { Enemy } from '../entities/Enemy.js';
 import { Boss } from '../entities/Boss.js';
 import { Checkpoint } from '../entities/Checkpoint.js';
+import { Chest } from '../entities/Chest.js';
 import { Gate } from '../entities/Gate.js';
 
 export class LevelManager {
@@ -9,6 +10,7 @@ export class LevelManager {
         this.game = game;
         this.currentBiome = 'dark';
         this.checkpoints = [];
+        this.chests = [];
         this.spawnId = 0;
     }
     
@@ -19,6 +21,7 @@ export class LevelManager {
             if(e.sprite) this.game.renderer.scene.remove(e.sprite);
         }
         this.game.enemies = [];
+        this.game.totalEnemiesLevel = 0;
         
         if (this.game.projectiles) {
             for (let p of this.game.projectiles) { p.destroy(); }
@@ -34,6 +37,15 @@ export class LevelManager {
         
         if (this.gate) {
             this.gate.isUnlocked = false;
+        }
+        
+        // Reset Chests
+        if (this.chests) {
+            for (let chest of this.chests) {
+                chest.isOpened = false;
+                chest.tex.offset.set(0, 3/4);
+                chest.material.color.setHex(0xffffff);
+            }
         }
         
         // Mark checkpoint as activated if we spawn there, so it doesn't instantly re-trigger dialogue
@@ -117,6 +129,7 @@ export class LevelManager {
             if(e.sprite) this.game.renderer.scene.remove(e.sprite);
         }
         this.game.enemies = [];
+        this.game.totalEnemiesLevel = 0;
         
         if (this.game.projectiles) {
             for (let p of this.game.projectiles) { p.destroy(); }
@@ -137,6 +150,13 @@ export class LevelManager {
         }
         this.checkpoints = [];
         
+        if (this.chests) {
+            for (let chest of this.chests) {
+                chest.destroy();
+            }
+        }
+        this.chests = [];
+        
         if (this.gate) {
             this.gate.destroy();
             this.gate = null;
@@ -149,6 +169,9 @@ export class LevelManager {
         let targetBiome = null;
         if (biomeName === 'dark') targetBiome = 'ice';
         else if (biomeName === 'ice') targetBiome = 'jungle';
+        
+        // Automatically set respawn point to the start of this new biome
+        this.game.respawnPoint = { x: 100, y: 350, biome: biomeName };
         
         // Create floors, platforms, and entities based on biome
         if (biomeName === 'dark') {
@@ -202,8 +225,6 @@ export class LevelManager {
             }
             
             this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 100, 400, biomeName));
-            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 3400, 400, biomeName));
-            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 5900, 400, biomeName));
             
         } else if (biomeName === 'ice') {
             // Expanded Ice Biome
@@ -262,8 +283,6 @@ export class LevelManager {
             }
             
             this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 100, 400, biomeName));
-            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 3500, 400, biomeName));
-            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 6700, 400, biomeName));
             
         } else if (biomeName === 'jungle') {
             // Expanded Jungle Biome
@@ -318,8 +337,19 @@ export class LevelManager {
             this.gate = new Gate(this.game.physics, this.game.renderer.scene, 9400, 220, "victory"); 
             
             this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 100, 400, biomeName));
-            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 3100, 250, biomeName));
-            this.checkpoints.push(new Checkpoint(this.game.physics, this.game.renderer.scene, 6500, 300, biomeName));
+        }
+        
+        // Spawn up to 3 random chests on platforms
+        if (this.game.platforms.length > 2) {
+            let validPlatforms = this.game.platforms.slice(1); // skip the very first giant spawn platform
+            validPlatforms.sort(() => 0.5 - Math.random());
+            let numChests = Math.min(3, validPlatforms.length);
+            for (let i = 0; i < numChests; i++) {
+                let p = validPlatforms[i];
+                let px = p.body.position.x;
+                let py = p.body.bounds.min.y - 30; // 30 units above the platform surface
+                this.chests.push(new Chest(this.game.physics, this.game.renderer.scene, px, py, this.game));
+            }
         }
         
         // Mark checkpoint as activated if we spawn there
@@ -338,6 +368,7 @@ export class LevelManager {
         await e.init(x, y);
         if (this.spawnId === currentSpawnId) {
             this.game.enemies.push(e);
+            this.game.totalEnemiesLevel = (this.game.totalEnemiesLevel || 0) + 1;
         } else {
             e.die();
         }
@@ -349,6 +380,7 @@ export class LevelManager {
         await boss.init(x, y);
         if (this.spawnId === currentSpawnId) {
             this.game.boss = boss;
+            this.game.totalEnemiesLevel = (this.game.totalEnemiesLevel || 0) + 1;
         } else {
             boss.die();
         }
@@ -383,6 +415,18 @@ export class LevelManager {
             }
         }
         
+        // Handle Chests
+        if (this.chests) {
+            for (let chest of this.chests) {
+                if (!chest.isOpened) {
+                    if (Matter.Bounds.overlaps(player.body.bounds, chest.body.bounds)) {
+                        chest.open();
+                    }
+                }
+            }
+        }
+        
+
         // Handle Gate unlocking
         if (this.gate && !this.gate.isUnlocked) {
             const enemiesLeft = this.game.enemies.length;

@@ -17,6 +17,14 @@ export class UIAndDialogue {
         Object.assign(this.hud.style, { padding: '20px', fontSize: '24px', textShadow: '2px 2px 0 #000' });
         this.container.appendChild(this.hud);
         
+        // Kill Count
+        this.killCount = document.createElement('div');
+        Object.assign(this.killCount.style, { 
+            position: 'absolute', top: '20px', right: '20px', 
+            fontSize: '24px', textShadow: '2px 2px 0 #000', color: '#ff4444'
+        });
+        this.container.appendChild(this.killCount);
+        
         // Dialogue Box (Comic style)
         this.dialogueBox = document.createElement('div');
         Object.assign(this.dialogueBox.style, {
@@ -50,9 +58,21 @@ export class UIAndDialogue {
         this.isVictory = false;
     }
     
-    updateHUD(player, light) {
+    updateHUD(player, light, killed = 0, total = 0) {
         if (!player) return;
         this.hud.innerHTML = `HEALTH: ${Math.max(0, player.health)}/100<br>LIGHT: ${light.lightPower}/2`;
+        
+        if (total > 0) {
+            this.killCount.innerHTML = `KILLS: ${killed}/${total}`;
+            if (killed >= total) {
+                this.killCount.style.color = '#44ff44';
+                this.killCount.innerHTML += '<br><span style="font-size:16px;">GATE OPEN</span>';
+            } else {
+                this.killCount.style.color = '#ff4444';
+            }
+        } else {
+            this.killCount.innerHTML = '';
+        }
         
         if (player.health <= 0 && !this.isDead) {
             this.showDeathScreen();

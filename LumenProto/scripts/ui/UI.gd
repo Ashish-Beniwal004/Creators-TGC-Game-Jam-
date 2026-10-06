@@ -53,6 +53,9 @@ func _input(event):
 		if event is InputEventKey and event.pressed:
 			if event.keycode == KEY_R:
 				_resume_game()
+				var players = get_tree().get_nodes_in_group("player")
+				if players.size() > 0 and is_instance_valid(players[0]):
+					GameState.save_player_state(players[0].level, players[0].xp, players[0].xp_to_next_level)
 				get_tree().reload_current_scene()
 			elif event.keycode == KEY_Q:
 				get_tree().quit()

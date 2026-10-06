@@ -44,9 +44,21 @@ func _ready():
 	add_to_group("player")
 	_setup_sprite_frames()
 	_setup_inputs()
+	
+	level = GameState.player_level
+	xp = GameState.player_xp
+	xp_to_next_level = GameState.player_xp_to_next
+	
+	if GameState.checkpoint_position != Vector2.ZERO:
+		global_position = GameState.checkpoint_position
+		
 	current_hp = max_hp
 	ui.update_ui(current_hp, level, xp, xp_to_next_level)
 	original_speed = speed
+
+func set_checkpoint(pos: Vector2):
+	GameState.checkpoint_position = pos
+	GameState.save_player_state(level, xp, xp_to_next_level)
 
 func _setup_sprite_frames():
 	var tex = load("res://assets/genrated assests/Gemini_Generated_Image_1en0xl1en0xl1en0_transparent.png")
@@ -206,20 +218,24 @@ func _flash_sprite(spr):
 	tween.tween_property(spr, "modulate", orig_color, 0.1)
 
 func _sync_light_visuals():
-	if has_node("PointLight2D") and light_power:
-		var point_light = $PointLight2D
+	if not is_instance_valid(light_power):
+		return
+		
+	var point_light = get_node_or_null("PointLight2D")
+	if point_light:
 		var color = light_power.get_light_color_value()
 		point_light.color = color
 		point_light.energy = 0.8 + (light_power.current_level * 0.3)
 		point_light.texture_scale = 1.5 + (light_power.current_level * 0.5)
-		if core_glow:
+		if is_instance_valid(core_glow):
 			core_glow.color = color
-		if hand_glow:
+		if is_instance_valid(hand_glow):
 			hand_glow.color = color
 
 func _input(event):
 	if is_dead:
 		if event.is_action_pressed("restart"):
+			GameState.save_player_state(level, xp, xp_to_next_level)
 			get_tree().reload_current_scene()
 		return
 		

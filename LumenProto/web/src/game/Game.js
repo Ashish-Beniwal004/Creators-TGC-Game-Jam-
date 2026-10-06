@@ -193,7 +193,13 @@ export class Game {
             }
             this.renderer.camera.follow(this.player.sprite.position, deltaTime);
             this.environment.update(this.renderer.camera.cam.position);
-            this.ui.updateHUD(this.player, this.light);
+            
+            let enemiesAlive = this.enemies.filter(e => e.health > 0).length;
+            if (this.boss && this.boss.health > 0) {
+                enemiesAlive += 1;
+            }
+            let totalEnemies = this.totalEnemiesLevel || 0;
+            this.ui.updateHUD(this.player, this.light, totalEnemies - enemiesAlive, totalEnemies);
             
             // Combat logic only when dialogue is not active
             if (!isDialogueActive) {

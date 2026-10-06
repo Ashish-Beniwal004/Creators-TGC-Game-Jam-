@@ -1,5 +1,6 @@
 import * as Matter from 'matter-js';
 import * as THREE from 'three';
+import checkpointImg from '../../../assets/checkpoint/checkpoint-removebg-preview.png';
 
 export class Checkpoint {
     constructor(physics, scene, x, y, biomeId) {
@@ -18,9 +19,21 @@ export class Checkpoint {
         });
         Matter.Composite.add(this.physics.engine.world, this.body);
         
-        // Visual (a simple obelisk or crystal)
-        const geo = new THREE.BoxGeometry(40, 80, 10);
-        this.material = new THREE.MeshBasicMaterial({ color: 0x555555, transparent: true, opacity: 0.8 });
+        // Visual (Plane with texture)
+        this.tex = new THREE.TextureLoader().load(checkpointImg);
+        this.tex.colorSpace = THREE.SRGBColorSpace;
+        
+        // Spritesheet is 4 cols, 3 rows
+        this.tex.repeat.set(1/4, 1/3);
+        this.tex.offset.set(0, 2/3); // Top-left inactive frame
+        
+        const geo = new THREE.PlaneGeometry(80, 100);
+        this.material = new THREE.MeshBasicMaterial({ 
+            map: this.tex, 
+            color: 0x555555, // dark initially
+            transparent: true,
+            side: THREE.DoubleSide
+        });
         this.mesh = new THREE.Mesh(geo, this.material);
         this.mesh.position.set(x, -y, -5);
         this.scene.add(this.mesh);
@@ -34,8 +47,9 @@ export class Checkpoint {
     activate() {
         if (this.isActivated) return;
         this.isActivated = true;
-        this.material.color.setHex(0x00ff00);
-        this.light.color.setHex(0x00ff00);
+        this.material.color.setHex(0xffffff); // Full bright glow
+        this.tex.offset.set(3/4, 0); // Bottom-right active frame
+        this.light.color.setHex(0x00ffff); // Cyan glow to match asset
         this.light.intensity = 2;
     }
     

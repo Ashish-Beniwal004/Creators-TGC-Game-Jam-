@@ -28,6 +28,9 @@ export class Player {
         this.isWebbed = false;
         this.webTimer = 0;
         
+        this.isInvincible = false;
+        this.invincibleTimer = 0;
+        
         // Godot equivalents
         this.speed = 4.0;
         this.jumpForce = -12.0;
@@ -97,7 +100,7 @@ export class Player {
         let isMoving = false;
         
         if (this.health > 0) {
-            this.isBlocking = this.input.isDown('KeyC') && !this.isAttacking;
+            this.isBlocking = (this.input.isDown('KeyC') || this.input.isDown('Mouse2')) && !this.isAttacking;
         }
         
         if (!this.isHurt) {
@@ -125,7 +128,7 @@ export class Player {
             }
             
             // Attack trigger
-            if (this.input.isJustPressed('KeyX') && !this.isAttacking && !this.isBlocking) {
+            if ((this.input.isJustPressed('KeyX') || this.input.isJustPressed('Mouse0')) && !this.isAttacking && !this.isBlocking) {
                 this.isAttacking = true;
                 this.attackTimer = 0.3; // 300ms attack duration
                 // Hit-stop
@@ -155,6 +158,11 @@ export class Player {
             if (this.webTimer <= 0) this.isWebbed = false;
         }
         
+        if (this.isInvincible) {
+            this.invincibleTimer -= delta;
+            if (this.invincibleTimer <= 0) this.isInvincible = false;
+        }
+        
         // Animation State Machine
         let state = "idle";
         let fps = 8;
@@ -181,7 +189,14 @@ export class Player {
         this.animator.update(delta);
         
         // Visual indicator for blocking and hurt
-        if (this.isHurt && this.sprite.material) {
+        if (this.isInvincible && this.sprite.material) {
+            // Flash gold and white
+            if (Math.floor(this.invincibleTimer * 10) % 2 === 0) {
+                this.sprite.material.color.setHex(0xffd700); // Gold
+            } else {
+                this.sprite.material.color.setHex(0xffffff);
+            }
+        } else if (this.isHurt && this.sprite.material) {
             this.sprite.material.color.setHex(0xff5555);
         } else if (this.isBlocking && this.sprite.material) {
             this.sprite.material.color.setHex(0x55aaff);
@@ -215,7 +230,7 @@ export class Player {
     }
     
     takeDamage(amount, knockbackDir) {
-        if (this.isHurt || this.health <= 0) return;
+        if (this.isInvincible || this.isHurt || this.health <= 0) return;
         
         if (this.isBlocking) {
             this.health -= Math.floor(amount / 4);
@@ -257,6 +272,8 @@ export class Player {
         this.isBlocking = false;
         this.isWebbed = false;
         this.webTimer = 0;
+        this.isInvincible = false;
+        this.invincibleTimer = 0;
         
         // Explicitly clear velocity and forces
         Matter.Body.setVelocity(this.body, { x: 0, y: 0 });

@@ -14,6 +14,23 @@ export class InputSystem {
             this.keys[e.code] = false;
         });
         
+        window.addEventListener('mousedown', (e) => {
+            const code = 'Mouse' + e.button;
+            if (!this.keys[code]) {
+                this.justPressed[code] = true;
+            }
+            this.keys[code] = true;
+        });
+        
+        window.addEventListener('mouseup', (e) => {
+            const code = 'Mouse' + e.button;
+            this.keys[code] = false;
+        });
+        
+        window.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+        
         window.addEventListener('blur', () => {
             this.keys = {};
             this.justPressed = {};

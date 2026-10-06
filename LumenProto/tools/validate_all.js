@@ -205,7 +205,8 @@ const BiomeDefinitions = {
             { x: 4900, y: 500, w: 400, h: 40 },
             { x: 5500, y: 500, w: 600, h: 40 },
             { x: 6100, y: 400, w: 200, h: 20 },
-            { x: 6350, y: 320, w: 200, h: 20 },
+            { x: 6250, y: 350, w: 100, h: 20 },
+            { x: 6400, y: 300, w: 200, h: 20 },
             { x: 6700, y: 500, w: 200, h: 40 },
             { x: 7200, y: 500, w: 600, h: 40 },
             { x: 8600, y: 600, w: 2000, h: 40 }
@@ -220,7 +221,7 @@ const BiomeDefinitions = {
             { x: 5400, y: 400, type: "ice_wolf" },
             { x: 5600, y: 400, type: "wolf" },
             { x: 5500, y: 300, type: "bat" },
-            { x: 6350, y: 200, type: "bat" },
+            { x: 6400, y: 200, type: "bat" },
             { x: 7100, y: 400, type: "ice_wolf" },
             { x: 7300, y: 400, type: "wolf" },
             { x: 7200, y: 300, type: "bat" },
@@ -1000,10 +1001,12 @@ simulateIntegration((tick, player, enemy, game, input) => {
 section('TEST 13: CHEST INTERACTION & ICE BIOME JUMP VALIDATION');
 
 // Ice biome jump reachability
-const iceGapStart = 6100 + 200/2; // 6200
-const iceGapEnd = 6350 - 200/2; // 6250
-const jumpDist = iceGapEnd - iceGapStart;
-test('Ice Biome problematic jump is reachable', jumpDist <= 50, `Jump distance is ${jumpDist}, should be <= 50 for comfort`);
+const iceGapStart1 = 6100 + 200/2;
+const iceGapEnd1 = 6250 - 100/2;
+const iceGapStart2 = 6250 + 100/2;
+const iceGapEnd2 = 6400 - 200/2;
+test('Ice Biome problematic jump 1 is reachable', (iceGapEnd1 - iceGapStart1) <= 0, `Jump 1 distance is ${iceGapEnd1 - iceGapStart1}`);
+test('Ice Biome problematic jump 2 is reachable', (iceGapEnd2 - iceGapStart2) <= 0, `Jump 2 distance is ${iceGapEnd2 - iceGapStart2}`);
 
 // Chest interaction tests
 let chestSim = {

@@ -254,7 +254,8 @@ export class LevelManager {
             
             // Elevated Ice Formations
             this.createPlatform(6100, 400, 200, 20, color);
-            this.createPlatform(6350, 320, 200, 20, color);
+            this.createPlatform(6250, 350, 100, 20, color);
+            this.createPlatform(6400, 300, 200, 20, color);
             this.createPlatform(6700, 500, 200, 40, color); // Checkpoint
             
             this.createPlatform(7200, 500, 600, 40, color); // Intense Final
@@ -276,7 +277,7 @@ export class LevelManager {
             this.spawnEnemy(5600, 400, "wolf");
             this.spawnEnemy(5500, 300, "bat");
             
-            this.spawnEnemy(6350, 200, "bat"); // Formations
+            this.spawnEnemy(6400, 200, "bat"); // Formations
             
             this.spawnEnemy(7100, 400, "ice_wolf"); // Intense Final
             this.spawnEnemy(7300, 400, "wolf");
@@ -421,33 +422,50 @@ export class LevelManager {
         const mesh = this.game.renderer.createBox(x, y, w, h, color);
         this.game.platforms.push({ body, mesh });
         
-        // Spawn Decor
+        // Spawn Decor Deterministically
         this.game.decorations = this.game.decorations || [];
         const biome = this.currentBiome;
-        const maxDecor = { 'dark': 122, 'ice': 30, 'jungle': 147 }[biome] || 0;
+        const maxDecor = { 'dark': 127, 'ice': 30, 'jungle': 147 }[biome] || 0;
         
-        if (maxDecor > 0 && Math.random() > 0.3) {
-            const decorCount = Math.floor(Math.random() * 3) + 1; // 1 to 3
-            for (let i = 0; i < decorCount; i++) {
-                const rIdx = Math.floor(Math.random() * maxDecor);
-                const path = `environments/${biome}/${biome}_decor_${rIdx}.png`;
-                const decorX = x + (Math.random() - 0.5) * w;
-                const decorY = y - (h/2);
-                
-                // Create decorative sprite
-                if (this.game.assets) {
-                    const tex = this.game.assets.textureLoader.load(path);
-                    tex.colorSpace = 152; // THREE.SRGBColorSpace
-                    tex.magFilter = 1003; // THREE.NearestFilter
-                    tex.minFilter = 1003;
-                    const aspect = tex.image ? (tex.image.width / tex.image.height) : 1.0;
-                    const scale = 50 + Math.random() * 100;
-                    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, alphaTest: 0.1 });
-                    const geo = new THREE.PlaneGeometry(scale * aspect, scale);
-                    const decorMesh = new THREE.Mesh(geo, mat);
-                    decorMesh.position.set(decorX, -decorY - (scale/2) + 10, -50); // slight offset to prevent z-fighting
-                    this.game.renderer.scene.add(decorMesh);
-                    this.game.decorations.push(decorMesh);
+        if (maxDecor > 0) {
+            // Pseudo-random based on platform X/Y so it's deterministic
+            let seed = Math.abs(Math.sin(x * 12.9898 + y * 78.233)) * 43758.5453;
+            let prng = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+            
+            if (prng() > 0.2) {
+                const decorCount = Math.floor(prng() * 3) + 1; // 1 to 3
+                for (let i = 0; i < decorCount; i++) {
+                    const rIdx = Math.floor(prng() * maxDecor);
+                    const path = `./web/environments/${biome}/${biome}_decor_${rIdx}.png`;
+                    
+                    const decorX = x + (prng() - 0.5) * (w * 0.8);
+                    
+                    if (this.game.assets) {
+                        const tex = this.game.assets.textureLoader.load(path);
+                        tex.colorSpace = THREE.SRGBColorSpace; 
+                        tex.magFilter = THREE.NearestFilter; 
+                        tex.minFilter = THREE.NearestFilter;
+                        const aspect = tex.image ? (tex.image.width / tex.image.height) : (Math.random()>0.5? 1.5 : 0.8);
+                        
+                        const scale = 40 + prng() * 120; // 40 to 160 height
+                        
+                        // decorY is the physical center Y of the mesh.
+                        // WebGL coordinate Y goes UP. Platform center is -y.
+                        // Top of platform is -y + h/2.
+                        // Decor center should be top of platform + scale/2.
+                        const decorY = -y + (h / 2) + (scale / 2) - 5; // Sink it 5 units into the platform so it sits flat
+                        
+                        const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, alphaTest: 0.1 });
+                        const geo = new THREE.PlaneGeometry(scale * aspect, scale);
+                        const decorMesh = new THREE.Mesh(geo, mat);
+                        
+                        // Z slightly back (-5 to -45) to prevent z-fighting and sit behind player
+                        const decorZ = -5 - (prng() * 40);
+                        
+                        decorMesh.position.set(decorX, decorY, decorZ); 
+                        this.game.renderer.scene.add(decorMesh);
+                        this.game.decorations.push(decorMesh);
+                    }
                 }
             }
         }

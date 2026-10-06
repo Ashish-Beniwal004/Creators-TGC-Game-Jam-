@@ -166,6 +166,37 @@ export class EnvironmentRenderer {
         }
     }
     
+    async placeDecoration(x, y, z, textureUrl, height, parallax = 0.0) {
+        try {
+            const tex = await this.assets.textureLoader.loadAsync(textureUrl);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            tex.minFilter = THREE.NearestFilter;
+            tex.magFilter = THREE.NearestFilter;
+            
+            const aspect = tex.image.width / tex.image.height;
+            const meshWidth = height * aspect;
+            
+            const mat = new THREE.MeshBasicMaterial({ 
+                map: tex, 
+                transparent: true, 
+                alphaTest: 0.1,
+                depthWrite: false 
+            });
+            
+            const geo = new THREE.PlaneGeometry(meshWidth, height);
+            const mesh = new THREE.Mesh(geo, mat);
+            
+            mesh.position.set(x, y, z);
+            mesh.userData = { type: 'decor', parallaxX: parallax, startX: x };
+            
+            this.group.add(mesh);
+            this.layers.push(mesh);
+            return mesh;
+        } catch (err) {
+            console.error(`Failed to load decoration ${textureUrl}:`, err);
+        }
+    }
+    
     update(cameraPosition) {
         // Apply parallax offsets
         for (let obj of this.layers) {

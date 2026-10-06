@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bx12uun5dnkvu"
-path="res://.godot/imported/bat_1_3.png-7d5c58375059f3700baf0986a2688796.ctex"
+uid="uid://dtnfp80ap77o2"
+path="res://.godot/imported/bat_1_3.png-a2393bb7550778a9a0b4055c6f7b81e8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/bat_frames/bat_1_3.png"
-dest_files=["res://.godot/imported/bat_1_3.png-7d5c58375059f3700baf0986a2688796.ctex"]
+source_file="res://assets/web/entities/bat_frames/bat_1_3.png"
+dest_files=["res://.godot/imported/bat_1_3.png-a2393bb7550778a9a0b4055c6f7b81e8.ctex"]
 
 [params]
 

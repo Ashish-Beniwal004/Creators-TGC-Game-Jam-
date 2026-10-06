@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cbo737l5uq62q"
-path="res://.godot/imported/darkboss_1_3.png-c66cf6454f693d1252c904e9c8571116.ctex"
+uid="uid://dy1qiomida08t"
+path="res://.godot/imported/darkboss_1_3.png-6b1769e015ce0f670282739b7be4c3f7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/dark_boss_frames/darkboss_1_3.png"
-dest_files=["res://.godot/imported/darkboss_1_3.png-c66cf6454f693d1252c904e9c8571116.ctex"]
+source_file="res://assets/web/entities/dark_boss_frames/darkboss_1_3.png"
+dest_files=["res://.godot/imported/darkboss_1_3.png-6b1769e015ce0f670282739b7be4c3f7.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cbof2n7iq4mbw"
-path="res://.godot/imported/dragon_3_2.png-771abe9765aada7348fdd62a4b25c676.ctex"
+uid="uid://d2onchuhwwulp"
+path="res://.godot/imported/dragon_3_2.png-76742a84b23d11daf07ba7981507da7e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/dragon_frames/dragon_3_2.png"
-dest_files=["res://.godot/imported/dragon_3_2.png-771abe9765aada7348fdd62a4b25c676.ctex"]
+source_file="res://assets/web/entities/dragon_frames/dragon_3_2.png"
+dest_files=["res://.godot/imported/dragon_3_2.png-76742a84b23d11daf07ba7981507da7e.ctex"]
 
 [params]
 

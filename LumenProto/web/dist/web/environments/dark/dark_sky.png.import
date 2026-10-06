@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjmi4wm6qnhn5"
-path="res://.godot/imported/dark_sky.png-b3aa7afe6491afce332de7a5b06bfb51.ctex"
+uid="uid://bpi4q24jup5b4"
+path="res://.godot/imported/dark_sky.png-fdbf7ecb15e5c39098233d095d81ae6e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/environments/dark/dark_sky.png"
-dest_files=["res://.godot/imported/dark_sky.png-b3aa7afe6491afce332de7a5b06bfb51.ctex"]
+source_file="res://assets/web/environments/dark/dark_sky.png"
+dest_files=["res://.godot/imported/dark_sky.png-fdbf7ecb15e5c39098233d095d81ae6e.ctex"]
 
 [params]
 

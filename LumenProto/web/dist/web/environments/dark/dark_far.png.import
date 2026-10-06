@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d044qkbdt0c6e"
-path="res://.godot/imported/dark_far.png-b5dec35d43bc8105725a2a056124c9dc.ctex"
+uid="uid://bsuhdc2xm2sjo"
+path="res://.godot/imported/dark_far.png-f33be55b7cfdc739136111f98a77a0cc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/environments/dark/dark_far.png"
-dest_files=["res://.godot/imported/dark_far.png-b5dec35d43bc8105725a2a056124c9dc.ctex"]
+source_file="res://assets/web/environments/dark/dark_far.png"
+dest_files=["res://.godot/imported/dark_far.png-f33be55b7cfdc739136111f98a77a0cc.ctex"]
 
 [params]
 

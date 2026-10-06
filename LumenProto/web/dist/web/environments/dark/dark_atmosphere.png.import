@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgcujmisvwuo6"
-path="res://.godot/imported/dark_atmosphere.png-ce8c99dd2e2b359b87018785a81b782e.ctex"
+uid="uid://cs0uxwwwafml6"
+path="res://.godot/imported/dark_atmosphere.png-0b678582b9b93fb6101a24a07b781889.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/environments/dark/dark_atmosphere.png"
-dest_files=["res://.godot/imported/dark_atmosphere.png-ce8c99dd2e2b359b87018785a81b782e.ctex"]
+source_file="res://assets/web/environments/dark/dark_atmosphere.png"
+dest_files=["res://.godot/imported/dark_atmosphere.png-0b678582b9b93fb6101a24a07b781889.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://drnwt734v6x04"
-path="res://.godot/imported/characters_atlas.webp-602750dff9666d5716b1ec69eb253a37.ctex"
+uid="uid://bjo4kcfkn8wev"
+path="res://.godot/imported/characters_atlas.webp-eb70b54811cd982be128e7947afefb7a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/characters_atlas.webp"
-dest_files=["res://.godot/imported/characters_atlas.webp-602750dff9666d5716b1ec69eb253a37.ctex"]
+source_file="res://assets/web/characters_atlas.webp"
+dest_files=["res://.godot/imported/characters_atlas.webp-eb70b54811cd982be128e7947afefb7a.ctex"]
 
 [params]
 

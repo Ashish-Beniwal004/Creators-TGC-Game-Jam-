@@ -1,4 +1,5 @@
 import * as Matter from 'matter-js';
+import * as THREE from 'three';
 import { Enemy } from '../entities/Enemy.js';
 import { Boss } from '../entities/Boss.js';
 import { Checkpoint } from '../entities/Checkpoint.js';
@@ -131,6 +132,13 @@ export class LevelManager {
         this.game.enemies = [];
         this.game.totalEnemiesLevel = 0;
         
+        if (this.game.decorations) {
+            for (let d of this.game.decorations) {
+                this.game.renderer.scene.remove(d);
+            }
+        }
+        this.game.decorations = [];
+        
         if (this.game.projectiles) {
             for (let p of this.game.projectiles) { p.destroy(); }
             this.game.projectiles = [];
@@ -246,7 +254,7 @@ export class LevelManager {
             
             // Elevated Ice Formations
             this.createPlatform(6100, 400, 200, 20, color);
-            this.createPlatform(6400, 300, 200, 20, color);
+            this.createPlatform(6350, 320, 200, 20, color);
             this.createPlatform(6700, 500, 200, 40, color); // Checkpoint
             
             this.createPlatform(7200, 500, 600, 40, color); // Intense Final
@@ -268,7 +276,7 @@ export class LevelManager {
             this.spawnEnemy(5600, 400, "wolf");
             this.spawnEnemy(5500, 300, "bat");
             
-            this.spawnEnemy(6400, 200, "bat"); // Formations
+            this.spawnEnemy(6350, 200, "bat"); // Formations
             
             this.spawnEnemy(7100, 400, "ice_wolf"); // Intense Final
             this.spawnEnemy(7300, 400, "wolf");
@@ -291,7 +299,7 @@ export class LevelManager {
             
             // Vertical Climb
             this.createPlatform(2200, 400, 200, 20, color);
-            this.createPlatform(2400, 320, 200, 20, color); // Spider here
+            this.createPlatform(2400, 320, 350, 20, color); // Spider here
             this.createPlatform(2600, 240, 200, 20, color);
             
             this.createPlatform(2900, 350, 200, 20, color); // Checkpoint
@@ -301,7 +309,7 @@ export class LevelManager {
             this.createPlatform(4800, 400, 600, 40, color); // Hard Encounter (Dragon intro)
             
             // Canopy Section
-            this.createPlatform(5400, 300, 200, 20, color);
+            this.createPlatform(5400, 300, 350, 20, color);
             this.createPlatform(5700, 200, 200, 20, color);
             this.createPlatform(6000, 500, 400, 40, color); // Lower path
             
@@ -365,7 +373,28 @@ export class LevelManager {
     async spawnEnemy(x, y, type = "wolf") {
         const currentSpawnId = this.spawnId;
         const e = new Enemy(this.game.physics, this.game.renderer.scene, this.game.assets, type);
-        await e.init(x, y);
+        
+        let spawnX = x;
+        if (e.config && e.config.movementType !== "flying") {
+            const margin = (e.config.width / 2) + 80; // 80 units player landing safety margin
+            for (let p of this.game.platforms) {
+                if (p.body && p.body.bounds) {
+                    // Check if spawn is horizontally near this platform and vertically above it
+                    if (x >= p.body.bounds.min.x - 10 && x <= p.body.bounds.max.x + 10) {
+                        if (y <= p.body.bounds.min.y && y >= p.body.bounds.min.y - 400) {
+                            const minX = p.body.bounds.min.x + margin;
+                            const maxX = p.body.bounds.max.x - margin;
+                            if (minX <= maxX) {
+                                spawnX = Math.max(minX, Math.min(maxX, spawnX));
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        await e.init(spawnX, y);
         if (this.spawnId === currentSpawnId) {
             this.game.enemies.push(e);
             this.game.totalEnemiesLevel = (this.game.totalEnemiesLevel || 0) + 1;
@@ -391,18 +420,84 @@ export class LevelManager {
         Matter.Composite.add(this.game.physics.engine.world, body);
         const mesh = this.game.renderer.createBox(x, y, w, h, color);
         this.game.platforms.push({ body, mesh });
+        
+        // Spawn Decor
+        this.game.decorations = this.game.decorations || [];
+        const biome = this.currentBiome;
+        const maxDecor = { 'dark': 122, 'ice': 30, 'jungle': 147 }[biome] || 0;
+        
+        if (maxDecor > 0 && Math.random() > 0.3) {
+            const decorCount = Math.floor(Math.random() * 3) + 1; // 1 to 3
+            for (let i = 0; i < decorCount; i++) {
+                const rIdx = Math.floor(Math.random() * maxDecor);
+                const path = `environments/${biome}/${biome}_decor_${rIdx}.png`;
+                const decorX = x + (Math.random() - 0.5) * w;
+                const decorY = y - (h/2);
+                
+                // Create decorative sprite
+                if (this.game.assets) {
+                    const tex = this.game.assets.textureLoader.load(path);
+                    tex.colorSpace = 152; // THREE.SRGBColorSpace
+                    tex.magFilter = 1003; // THREE.NearestFilter
+                    tex.minFilter = 1003;
+                    const aspect = tex.image ? (tex.image.width / tex.image.height) : 1.0;
+                    const scale = 50 + Math.random() * 100;
+                    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, alphaTest: 0.1 });
+                    const geo = new THREE.PlaneGeometry(scale * aspect, scale);
+                    const decorMesh = new THREE.Mesh(geo, mat);
+                    decorMesh.position.set(decorX, -decorY - (scale/2) + 10, -50); // slight offset to prevent z-fighting
+                    this.game.renderer.scene.add(decorMesh);
+                    this.game.decorations.push(decorMesh);
+                }
+            }
+        }
     }
     
     createCore(x, y, type) {
-        const color = type === 'blue' ? 0x0000ff : 0x00ff00;
         const body = Matter.Bodies.circle(x, y, 20, { isStatic: true, isSensor: true, label: `core_${type}` });
         Matter.Composite.add(this.game.physics.engine.world, body);
-        const mesh = this.game.renderer.createBox(x, y, 40, 40, color);
-        this.game.platforms.push({ body, mesh });
+        
+        const numFrames = type === 'blue' ? 16 : 22;
+        const frames = [];
+        for(let i=0; i<numFrames; i++) {
+            frames.push(`particles/orb_${type}_decor_${i}.png`);
+        }
+        
+        const geo = new THREE.PlaneGeometry(80, 80);
+        const mat = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, alphaTest: 0.1 });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, -y, 10);
+        this.game.renderer.scene.add(mesh);
+        
+        const core = { body, mesh, frames, currentFrame: -1, time: 0, type, baseY: -y };
+        this.game.platforms.push(core);
+        
+        this.game.cores = this.game.cores || [];
+        this.game.cores.push(core);
     }
     
     update(player) {
         if (!player || !player.body || this.game.ui.isDead) return;
+        
+        // Handle Cores
+        if (this.game.cores) {
+            for (let core of this.game.cores) {
+                if (core.mesh.parent) {
+                    core.time += 0.016;
+                    core.mesh.position.y = core.baseY + Math.sin(core.time * 3) * 15;
+                    const frameIndex = Math.floor(core.time * 12) % core.frames.length;
+                    if (frameIndex !== core.currentFrame && this.game.assets) {
+                        core.currentFrame = frameIndex;
+                        const tex = this.game.assets.textureLoader.load(core.frames[frameIndex]);
+                        tex.colorSpace = 152; // THREE.SRGBColorSpace
+                        tex.magFilter = 1003; // THREE.NearestFilter
+                        tex.minFilter = 1003;
+                        core.mesh.material.map = tex;
+                        core.mesh.material.needsUpdate = true;
+                    }
+                }
+            }
+        }
         
         // Handle Checkpoints
         for (let cp of this.checkpoints) {
@@ -416,13 +511,29 @@ export class LevelManager {
         }
         
         // Handle Chests
+        let chestInRange = null;
         if (this.chests) {
             for (let chest of this.chests) {
                 if (!chest.isOpened) {
                     if (Matter.Bounds.overlaps(player.body.bounds, chest.body.bounds)) {
-                        chest.open();
+                        chestInRange = chest;
+                        break;
                     }
                 }
+            }
+        }
+        
+        if (chestInRange) {
+            if (this.game.input.isJustPressed('KeyC')) {
+                this.game.input.consumeKey('KeyC'); // Prevent shield block
+                chestInRange.open();
+                this.game.ui.hideInteractionPrompt();
+            } else {
+                this.game.ui.showInteractionPrompt("Press C to Open");
+            }
+        } else {
+            if (this.game.ui.hideInteractionPrompt) {
+                this.game.ui.hideInteractionPrompt();
             }
         }
         

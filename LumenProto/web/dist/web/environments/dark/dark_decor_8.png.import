@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://237o4klic6xx"
-path="res://.godot/imported/dark_decor_8.png-1f8032d4206770a059360c33b21292f3.ctex"
+uid="uid://br5fvc6ltvais"
+path="res://.godot/imported/dark_decor_8.png-2a81c0ede43b92acdfb5bd3880ee6914.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/environments/dark/dark_decor_8.png"
-dest_files=["res://.godot/imported/dark_decor_8.png-1f8032d4206770a059360c33b21292f3.ctex"]
+source_file="res://assets/web/environments/dark/dark_decor_8.png"
+dest_files=["res://.godot/imported/dark_decor_8.png-2a81c0ede43b92acdfb5bd3880ee6914.ctex"]
 
 [params]
 

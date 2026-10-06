@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cm4suvw5r16pv"
-path="res://.godot/imported/ancient_dragon_2_1.png-aea2a6cc6f1987926d9d0d884479e0c1.ctex"
+uid="uid://bd8u3golomx21"
+path="res://.godot/imported/ancient_dragon_2_1.png-3398ee24288d7fd0b36a89caf6650ed3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/ancient_dragon_frames/ancient_dragon_2_1.png"
-dest_files=["res://.godot/imported/ancient_dragon_2_1.png-aea2a6cc6f1987926d9d0d884479e0c1.ctex"]
+source_file="res://assets/web/entities/ancient_dragon_frames/ancient_dragon_2_1.png"
+dest_files=["res://.godot/imported/ancient_dragon_2_1.png-3398ee24288d7fd0b36a89caf6650ed3.ctex"]
 
 [params]
 

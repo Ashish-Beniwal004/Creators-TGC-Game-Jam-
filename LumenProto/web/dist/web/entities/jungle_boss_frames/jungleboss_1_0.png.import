@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://biuetcygt6ajh"
-path="res://.godot/imported/jungleboss_1_0.png-6839dde13a00f281621f0125a859b094.ctex"
+uid="uid://c0d75rwpoks3c"
+path="res://.godot/imported/jungleboss_1_0.png-9c83b6b3ea92dbdd31bc876bc18e61bf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/jungle_boss_frames/jungleboss_1_0.png"
-dest_files=["res://.godot/imported/jungleboss_1_0.png-6839dde13a00f281621f0125a859b094.ctex"]
+source_file="res://assets/web/entities/jungle_boss_frames/jungleboss_1_0.png"
+dest_files=["res://.godot/imported/jungleboss_1_0.png-9c83b6b3ea92dbdd31bc876bc18e61bf.ctex"]
 
 [params]
 

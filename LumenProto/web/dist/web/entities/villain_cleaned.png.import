@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b7ux835s5wlw"
-path="res://.godot/imported/villain_cleaned.png-8d22e572aa8e4c95c4fceba336ae5a9b.ctex"
+uid="uid://c31xxp6xttlyu"
+path="res://.godot/imported/villain_cleaned.png-5def7a5ee3a203d9fa57d31522000319.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/villain_cleaned.png"
-dest_files=["res://.godot/imported/villain_cleaned.png-8d22e572aa8e4c95c4fceba336ae5a9b.ctex"]
+source_file="res://assets/web/entities/villain_cleaned.png"
+dest_files=["res://.godot/imported/villain_cleaned.png-5def7a5ee3a203d9fa57d31522000319.ctex"]
 
 [params]
 

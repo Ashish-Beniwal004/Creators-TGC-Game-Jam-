@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://tgpklx0c2as8"
-path="res://.godot/imported/jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl_transparent.webp-28ad7877cf070c38ada6c32c4e2e3738.ctex"
+uid="uid://pfahya0wmsey"
+path="res://.godot/imported/jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl_transparent.webp-410e76171fb9351d6b18a7e84d39b45f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/environments/jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl_transparent.webp"
-dest_files=["res://.godot/imported/jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl_transparent.webp-28ad7877cf070c38ada6c32c4e2e3738.ctex"]
+source_file="res://assets/web/environments/jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl_transparent.webp"
+dest_files=["res://.godot/imported/jungle_background_Gemini_Generated_Image_l3bl6gl3bl6gl3bl_transparent.webp-410e76171fb9351d6b18a7e84d39b45f.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://chemno0hah1cb"
-path="res://.godot/imported/dark_foreground.png-942f6b682d95607d9f9b20ad75aae3cc.ctex"
+uid="uid://djfd6i4ikpcuw"
+path="res://.godot/imported/dark_foreground.png-6d869f76fedaa345629c0904e6460395.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/environments/dark/dark_foreground.png"
-dest_files=["res://.godot/imported/dark_foreground.png-942f6b682d95607d9f9b20ad75aae3cc.ctex"]
+source_file="res://assets/web/environments/dark/dark_foreground.png"
+dest_files=["res://.godot/imported/dark_foreground.png-6d869f76fedaa345629c0904e6460395.ctex"]
 
 [params]
 

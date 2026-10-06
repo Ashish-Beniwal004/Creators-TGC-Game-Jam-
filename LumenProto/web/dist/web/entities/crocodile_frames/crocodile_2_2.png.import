@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b2c2d6cw51rym"
-path="res://.godot/imported/crocodile_2_2.png-1c2197fa0aa6efd980059d58ffea0565.ctex"
+uid="uid://bibxm64jrqtc2"
+path="res://.godot/imported/crocodile_2_2.png-0cae0ffc5a49b1631ae7c301a473384e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/crocodile_frames/crocodile_2_2.png"
-dest_files=["res://.godot/imported/crocodile_2_2.png-1c2197fa0aa6efd980059d58ffea0565.ctex"]
+source_file="res://assets/web/entities/crocodile_frames/crocodile_2_2.png"
+dest_files=["res://.godot/imported/crocodile_2_2.png-0cae0ffc5a49b1631ae7c301a473384e.ctex"]
 
 [params]
 

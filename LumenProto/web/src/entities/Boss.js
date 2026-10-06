@@ -57,38 +57,27 @@ export class Boss {
             prefix = "ancient_dragon";
         }
         
+        const buildAnim = (row, startCol, count) => {
+            let frames = [];
+            for(let i = 0; i < count; i++) {
+                if (startCol + i < 8) {
+                    frames.push(`entities/${folder}/${prefix}_${row}_${startCol + i}.png`);
+                }
+            }
+            return frames;
+        };
+        
         const animMap = {
-            "idle": [
-                `entities/${folder}/${prefix}_0_0.png`,
-                `entities/${folder}/${prefix}_0_1.png`,
-                `entities/${folder}/${prefix}_0_2.png`,
-                `entities/${folder}/${prefix}_0_3.png`
-            ],
-            "run": [ // Row 1 is a charge/attack for bosses, let's use idle for run, or row 0
-                `entities/${folder}/${prefix}_0_0.png`,
-                `entities/${folder}/${prefix}_0_1.png`,
-                `entities/${folder}/${prefix}_0_2.png`,
-                `entities/${folder}/${prefix}_0_3.png`
-            ],
-            "attack": [ // Row 2 is typically the big swing
-                `entities/${folder}/${prefix}_2_0.png`,
-                `entities/${folder}/${prefix}_2_1.png`,
-                `entities/${folder}/${prefix}_2_2.png`,
-                `entities/${folder}/${prefix}_2_3.png`
-            ],
-            "hurt": [ // Row 3 start
-                `entities/${folder}/${prefix}_3_0.png`,
-                `entities/${folder}/${prefix}_3_1.png`
-            ],
-            "death": [ // Row 3 end
-                `entities/${folder}/${prefix}_3_1.png`,
-                `entities/${folder}/${prefix}_3_2.png`,
-                `entities/${folder}/${prefix}_3_3.png`
-            ]
+            "idle": buildAnim(0, 0, 5),
+            "run": buildAnim(1, 0, 6),
+            "attack": buildAnim(3, 0, 4),
+            "attack2": buildAnim(4, 0, 4),
+            "hurt": buildAnim(4, 4, 3),
+            "death": buildAnim(5, 0, 7)
         };
         
         this.animator = new AtlasAnimator(this.sprite, this.assetManager, animMap);
-        this.animator.baseScale = 0.45; // Huge
+        this.animator.baseScale = 0.55; // Adjust scale for bosses
         this.animator.play("idle", 8);
         
         // Telegraph Mesh

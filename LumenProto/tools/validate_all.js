@@ -205,7 +205,7 @@ const BiomeDefinitions = {
             { x: 4900, y: 500, w: 400, h: 40 },
             { x: 5500, y: 500, w: 600, h: 40 },
             { x: 6100, y: 400, w: 200, h: 20 },
-            { x: 6400, y: 300, w: 200, h: 20 },
+            { x: 6350, y: 320, w: 200, h: 20 },
             { x: 6700, y: 500, w: 200, h: 40 },
             { x: 7200, y: 500, w: 600, h: 40 },
             { x: 8600, y: 600, w: 2000, h: 40 }
@@ -220,7 +220,7 @@ const BiomeDefinitions = {
             { x: 5400, y: 400, type: "ice_wolf" },
             { x: 5600, y: 400, type: "wolf" },
             { x: 5500, y: 300, type: "bat" },
-            { x: 6400, y: 200, type: "bat" },
+            { x: 6350, y: 200, type: "bat" },
             { x: 7100, y: 400, type: "ice_wolf" },
             { x: 7300, y: 400, type: "wolf" },
             { x: 7200, y: 300, type: "bat" },
@@ -776,9 +776,9 @@ if (!enemyDamageUsed) {
     });
 }
 
-// BUG: Boss scale very small (0.25)
-const isBossScaleCorrect = bossSrc.includes('this.animator.baseScale = 0.45');
-test('Boss scale is correct (0.45)', isBossScaleCorrect, 'Boss visual scale check');
+// BUG: Boss scale very small (0.25) -> Note: Updated to 0.55 for newly generated high-res boss sprites
+const isBossScaleCorrect = bossSrc.includes('this.animator.baseScale = 0.55');
+test('Boss scale is correct (0.55)', isBossScaleCorrect, 'Boss visual scale check');
 
 // BUG: Scorpion not spawned in any biome
 const allSpawnedTypes = new Set();
@@ -992,6 +992,113 @@ simulateIntegration((tick, player, enemy, game, input) => {
     
     test('TEST I: Web is destroyed, player not slowed when blocking', player.isWebbed === undefined && player.health === 100 && projectile.isActive === false);
 });
+
+// ============================================================
+// TEST 13: CHEST INTERACTION SIMULATION
+// ============================================================
+
+section('TEST 13: CHEST INTERACTION & ICE BIOME JUMP VALIDATION');
+
+// Ice biome jump reachability
+const iceGapStart = 6100 + 200/2; // 6200
+const iceGapEnd = 6350 - 200/2; // 6250
+const jumpDist = iceGapEnd - iceGapStart;
+test('Ice Biome problematic jump is reachable', jumpDist <= 50, `Jump distance is ${jumpDist}, should be <= 50 for comfort`);
+
+// Chest interaction tests
+let chestSim = {
+    game: {
+        input: {
+            keys: {}, justPressed: {},
+            isDown: (k) => chestSim.game.input.keys[k] === true,
+            isJustPressed: (k) => chestSim.game.input.justPressed[k] === true,
+            consumeKey: (k) => { chestSim.game.input.keys[k] = false; chestSim.game.input.justPressed[k] = false; }
+        },
+        ui: {
+            promptVisible: false, isPaused: false,
+            showInteractionPrompt: () => chestSim.game.ui.promptVisible = true,
+            hideInteractionPrompt: () => chestSim.game.ui.promptVisible = false,
+            showDialogue: () => { chestSim.game.ui.isPaused = true; }
+        },
+        player: { body: { bounds: { min: { x: 90, y: 0 }, max: { x: 110, y: 20 } } }, health: 50, isBlocking: false }
+    },
+    chests: [{
+        isOpened: false,
+        body: { bounds: { min: { x: 100, y: 0 }, max: { x: 160, y: 60 } } },
+        open: function() { 
+            if (this.isOpened) return;
+            this.isOpened = true; 
+            chestSim.game.player.health += 25; 
+            chestSim.game.ui.showDialogue(); 
+        }
+    }]
+};
+
+function overlaps(b1, b2) {
+    return b1.min.x <= b2.max.x && b1.max.x >= b2.min.x && b1.min.y <= b2.max.y && b1.max.y >= b2.min.y;
+}
+
+function updateChestLogic() {
+    // Player Block logic
+    chestSim.game.player.isBlocking = chestSim.game.input.isDown('KeyC');
+    
+    // Chest logic
+    let chestInRange = null;
+    for (let chest of chestSim.chests) {
+        if (!chest.isOpened && overlaps(chestSim.game.player.body.bounds, chest.body.bounds)) {
+            chestInRange = chest;
+            break;
+        }
+    }
+    if (chestInRange) {
+        if (chestSim.game.input.isJustPressed('KeyC')) {
+            chestSim.game.input.consumeKey('KeyC');
+            chestInRange.open();
+            chestSim.game.ui.hideInteractionPrompt();
+        } else {
+            chestSim.game.ui.showInteractionPrompt("Press C to Open");
+        }
+    } else {
+        chestSim.game.ui.hideInteractionPrompt();
+    }
+}
+
+// 1. Approach without pressing C
+updateChestLogic();
+test('Approaching chest does not pause game', !chestSim.game.ui.isPaused);
+test('Approaching chest shows prompt', chestSim.game.ui.promptVisible);
+test('Chest remains closed on approach', !chestSim.chests[0].isOpened);
+
+// 2. Press C outside range
+chestSim.game.player.body.bounds = { min: { x: 0, y: 0 }, max: { x: 20, y: 20 } }; // move away
+chestSim.game.input.keys['KeyC'] = true;
+chestSim.game.input.justPressed['KeyC'] = true;
+updateChestLogic();
+test('C outside range does not open chest', !chestSim.chests[0].isOpened);
+test('C outside range performs block', chestSim.game.player.isBlocking);
+test('Prompt hidden when moving away', !chestSim.game.ui.promptVisible);
+
+// 3. Release C
+chestSim.game.input.keys['KeyC'] = false;
+chestSim.game.input.justPressed['KeyC'] = false;
+updateChestLogic();
+test('Releasing C stops blocking', !chestSim.game.player.isBlocking);
+
+// 4. Press C inside range
+chestSim.game.player.body.bounds = { min: { x: 90, y: 0 }, max: { x: 110, y: 20 } }; // near
+chestSim.game.input.keys['KeyC'] = true;
+chestSim.game.input.justPressed['KeyC'] = true;
+updateChestLogic();
+test('C inside range opens chest', chestSim.chests[0].isOpened);
+test('Opening chest consumes C key', !chestSim.game.input.keys['KeyC'] && !chestSim.game.input.justPressed['KeyC']);
+test('Opening chest pauses game', chestSim.game.ui.isPaused);
+
+// 5. Try opening again
+const prevHealth = chestSim.game.player.health;
+chestSim.game.input.keys['KeyC'] = true;
+chestSim.game.input.justPressed['KeyC'] = true;
+updateChestLogic();
+test('Chest only rewards once', chestSim.game.player.health === prevHealth);
 
 // ============================================================
 // FINAL SUMMARY

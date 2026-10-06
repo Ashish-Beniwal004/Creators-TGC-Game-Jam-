@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btwei6uindk5y"
-path="res://.godot/imported/spider_3_3.png-2444ea8a2bf9643bfbe410ed44826b56.ctex"
+uid="uid://cx5ynggojbql2"
+path="res://.godot/imported/spider_3_3.png-f2132ad1c7a458d7748c85f6bc5036c3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/spider_frames/spider_3_3.png"
-dest_files=["res://.godot/imported/spider_3_3.png-2444ea8a2bf9643bfbe410ed44826b56.ctex"]
+source_file="res://assets/web/entities/spider_frames/spider_3_3.png"
+dest_files=["res://.godot/imported/spider_3_3.png-f2132ad1c7a458d7748c85f6bc5036c3.ctex"]
 
 [params]
 

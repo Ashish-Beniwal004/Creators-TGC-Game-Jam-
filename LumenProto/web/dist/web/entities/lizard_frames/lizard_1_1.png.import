@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c111cpnprwkjb"
-path="res://.godot/imported/lizard_1_1.png-a2a94c3a765430078289cb592d19f4a7.ctex"
+uid="uid://dk38ryeyugrj"
+path="res://.godot/imported/lizard_1_1.png-602fc51774837e7041e7e6f34c3e62e4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/lizard_frames/lizard_1_1.png"
-dest_files=["res://.godot/imported/lizard_1_1.png-a2a94c3a765430078289cb592d19f4a7.ctex"]
+source_file="res://assets/web/entities/lizard_frames/lizard_1_1.png"
+dest_files=["res://.godot/imported/lizard_1_1.png-602fc51774837e7041e7e6f34c3e62e4.ctex"]
 
 [params]
 

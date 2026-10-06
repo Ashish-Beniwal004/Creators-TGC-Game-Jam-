@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://opdkdo0s6kld"
-path="res://.godot/imported/wolf_3_3.png-9572e9a2ec63cdc4306c1372f98502ca.ctex"
+uid="uid://coyxfafm1ki02"
+path="res://.godot/imported/wolf_3_3.png-2fd96b7c45a058fe790140615a0e63d5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/wolf_frames/wolf_3_3.png"
-dest_files=["res://.godot/imported/wolf_3_3.png-9572e9a2ec63cdc4306c1372f98502ca.ctex"]
+source_file="res://assets/web/entities/wolf_frames/wolf_3_3.png"
+dest_files=["res://.godot/imported/wolf_3_3.png-2fd96b7c45a058fe790140615a0e63d5.ctex"]
 
 [params]
 

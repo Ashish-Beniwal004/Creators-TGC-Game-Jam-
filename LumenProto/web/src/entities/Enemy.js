@@ -257,7 +257,32 @@ export class Enemy {
             this.sprite.material.color.setHex(0xffffff);
         }
         
-        // Sync
+        // Sync and Enforce Platform Bounds
+        if (!isFlying && this.body.velocity.y > -0.1 && this.body.velocity.y < 0.1) {
+            const margin = (this.config.width / 2) + 80;
+            const bodies = Matter.Composite.allBodies(this.physics.engine.world);
+            for (let b of bodies) {
+                if (b.isStatic && !b.isSensor) {
+                    if (this.body.position.x > b.bounds.min.x - 50 && this.body.position.x < b.bounds.max.x + 50) {
+                        if (this.body.bounds.max.y <= b.bounds.min.y + 10 && this.body.bounds.max.y >= b.bounds.min.y - 100) {
+                            const minX = b.bounds.min.x + margin;
+                            const maxX = b.bounds.max.x - margin;
+                            if (minX <= maxX) {
+                                if (this.body.position.x < minX) {
+                                    Matter.Body.setPosition(this.body, { x: minX, y: this.body.position.y });
+                                    if (this.body.velocity.x < 0) Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                                } else if (this.body.position.x > maxX) {
+                                    Matter.Body.setPosition(this.body, { x: maxX, y: this.body.position.y });
+                                    if (this.body.velocity.x > 0) Matter.Body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
         this.sprite.position.x = this.body.position.x;
         this.sprite.position.y = -this.body.position.y;
     }

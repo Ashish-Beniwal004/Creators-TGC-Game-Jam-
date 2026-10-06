@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://qrkw8f8ajq5i"
-path="res://.godot/imported/iceboss_1_0.png-ed68577d3bd9c68d73970dc0a5d7d078.ctex"
+uid="uid://bi3lyisl40gab"
+path="res://.godot/imported/iceboss_1_0.png-31feb92b35d55cbb70d47b5dd80a5b96.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/ice_boss_frames/iceboss_1_0.png"
-dest_files=["res://.godot/imported/iceboss_1_0.png-ed68577d3bd9c68d73970dc0a5d7d078.ctex"]
+source_file="res://assets/web/entities/ice_boss_frames/iceboss_1_0.png"
+dest_files=["res://.godot/imported/iceboss_1_0.png-31feb92b35d55cbb70d47b5dd80a5b96.ctex"]
 
 [params]
 

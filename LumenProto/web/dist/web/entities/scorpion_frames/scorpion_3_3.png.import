@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://18523thmjb57"
-path="res://.godot/imported/scorpion_3_3.png-cc21463fa73713eaa69f569c5e719db6.ctex"
+uid="uid://d4nue2a4c5tph"
+path="res://.godot/imported/scorpion_3_3.png-70714edbcad49251eb4a11d6c7362f05.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/scorpion_frames/scorpion_3_3.png"
-dest_files=["res://.godot/imported/scorpion_3_3.png-cc21463fa73713eaa69f569c5e719db6.ctex"]
+source_file="res://assets/web/entities/scorpion_frames/scorpion_3_3.png"
+dest_files=["res://.godot/imported/scorpion_3_3.png-70714edbcad49251eb4a11d6c7362f05.ctex"]
 
 [params]
 

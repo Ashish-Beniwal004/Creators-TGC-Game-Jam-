@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ev20edeyyy5j"
-path="res://.godot/imported/villain_quarter_2.png-70139e0c3e9b8687b8a27fb2d000b907.ctex"
+uid="uid://c8sp5cf4lbegl"
+path="res://.godot/imported/villain_quarter_2.png-46b4fa51a7e4c8a551b77662fa343a0e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://web/dist/web/entities/villain_quarter_2.png"
-dest_files=["res://.godot/imported/villain_quarter_2.png-70139e0c3e9b8687b8a27fb2d000b907.ctex"]
+source_file="res://assets/web/entities/villain_quarter_2.png"
+dest_files=["res://.godot/imported/villain_quarter_2.png-46b4fa51a7e4c8a551b77662fa343a0e.ctex"]
 
 [params]
 

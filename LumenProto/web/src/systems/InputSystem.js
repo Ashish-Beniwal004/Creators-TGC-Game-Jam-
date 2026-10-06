@@ -51,4 +51,9 @@ export class InputSystem {
     isJustPressed(code) {
         return this.justPressed[code] === true;
     }
+    
+    consumeKey(code) {
+        this.keys[code] = false;
+        this.justPressed[code] = false;
+    }
 }

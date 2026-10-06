@@ -25,6 +25,15 @@ export class UIAndDialogue {
         });
         this.container.appendChild(this.killCount);
         
+        // Interaction Prompt
+        this.interactionPrompt = document.createElement('div');
+        Object.assign(this.interactionPrompt.style, {
+            position: 'absolute', bottom: '20%', left: '50%', transform: 'translateX(-50%)',
+            fontSize: '3vw', textShadow: '2px 2px 0 #000', color: '#ffffff',
+            display: 'none', backgroundColor: 'rgba(0,0,0,0.5)', padding: '10px', borderRadius: '5px'
+        });
+        this.container.appendChild(this.interactionPrompt);
+        
         // Dialogue Box (Comic style)
         this.dialogueBox = document.createElement('div');
         Object.assign(this.dialogueBox.style, {
@@ -121,6 +130,15 @@ export class UIAndDialogue {
         if (!this.isTyping && this.dialogueBox.style.display === 'none') {
             this.nextDialogue();
         }
+    }
+    
+    showInteractionPrompt(text) {
+        this.interactionPrompt.innerHTML = text;
+        this.interactionPrompt.style.display = 'block';
+    }
+    
+    hideInteractionPrompt() {
+        this.interactionPrompt.style.display = 'none';
     }
     
     nextDialogue() {
